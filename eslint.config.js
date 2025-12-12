@@ -24,12 +24,11 @@ export default defineConfig([
         sourceType: 'module',
       },
     },
-    settings: { react: { version: '18.3' } },
+    settings: { react: { version: 'detect' } },
     plugins: {
       react,
     },
     rules: {
-      ...react.configs.flat.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'react/prop-types': 'warn',

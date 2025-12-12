@@ -16,19 +16,19 @@ jest.mock('html-to-image', () => ({
   toPng: jest.fn(),
 }));
 
-// Mock environment variables
-const originalEnv = process.env;
-
 describe('App', () => {
+  const originalClientId = process.env.VITE_STRAVA_CLIENT_ID;
+  const originalClientSecret = process.env.VITE_STRAVA_CLIENT_SECRET;
+
   beforeEach(() => {
     jest.resetModules();
-    process.env = { ...originalEnv };
     delete process.env.VITE_STRAVA_CLIENT_ID;
     delete process.env.VITE_STRAVA_CLIENT_SECRET;
   });
 
-  afterAll(() => {
-    process.env = originalEnv;
+  afterEach(() => {
+    process.env.VITE_STRAVA_CLIENT_ID = originalClientId;
+    process.env.VITE_STRAVA_CLIENT_SECRET = originalClientSecret;
   });
 
   test('renders the landing page correctly', () => {

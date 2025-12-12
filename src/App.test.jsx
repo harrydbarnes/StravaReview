@@ -3,14 +3,19 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 
 // Mock dependencies
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-    h1: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
-    p: ({ children, ...props }) => <p {...props}>{children}</p>,
-  },
-  AnimatePresence: ({ children }) => <>{children}</>,
-}));
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    motion: new Proxy({}, {
+      get: (target, prop) => {
+        const MockComponent = ({ children, ...props }) => React.createElement(prop, props, children);
+        MockComponent.displayName = `motion.${prop}`;
+        return MockComponent;
+      },
+    }),
+    AnimatePresence: ({ children }) => <>{children}</>,
+  };
+});
 
 jest.mock('html-to-image', () => ({
   toPng: jest.fn(),
@@ -33,16 +38,17 @@ describe('App', () => {
 
   test('renders the landing page correctly', () => {
     render(<App />);
-    const titleElements = screen.getAllByText(/STRAVA/i);
-    expect(titleElements.length).toBeGreaterThan(0);
 
-    const subtitleElement = screen.getByText(/WRAPPED/i);
-    expect(subtitleElement).toBeInTheDocument();
+    // Use getByRole for better accessibility testing
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveTextContent(/STRAVA/i);
+    expect(heading).toHaveTextContent(/WRAPPED/i);
 
-    const connectButton = screen.getByText(/Connect with Strava/i);
+    const connectButton = screen.getByRole('button', { name: /Connect with Strava/i });
     expect(connectButton).toBeInTheDocument();
 
-    const demoButton = screen.getByText(/Try Demo Mode/i);
+    const demoButton = screen.getByRole('button', { name: /Try Demo Mode/i });
     expect(demoButton).toBeInTheDocument();
   });
 });

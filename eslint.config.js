@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'src/App.test.jsx']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -32,7 +32,7 @@ export default defineConfig([
       ...react.configs.flat.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react/prop-types': 'off',
+      'react/prop-types': 'warn',
     },
   },
 ])

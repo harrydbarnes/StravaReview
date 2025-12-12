@@ -23,6 +23,8 @@ describe('App', () => {
   beforeEach(() => {
     jest.resetModules();
     process.env = { ...originalEnv };
+    delete process.env.VITE_STRAVA_CLIENT_ID;
+    delete process.env.VITE_STRAVA_CLIENT_SECRET;
   });
 
   afterAll(() => {

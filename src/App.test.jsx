@@ -32,8 +32,16 @@ describe('App', () => {
   });
 
   afterEach(() => {
-    process.env.VITE_STRAVA_CLIENT_ID = originalClientId;
-    process.env.VITE_STRAVA_CLIENT_SECRET = originalClientSecret;
+    if (originalClientId === undefined) {
+      delete process.env.VITE_STRAVA_CLIENT_ID;
+    } else {
+      process.env.VITE_STRAVA_CLIENT_ID = originalClientId;
+    }
+    if (originalClientSecret === undefined) {
+      delete process.env.VITE_STRAVA_CLIENT_SECRET;
+    } else {
+      process.env.VITE_STRAVA_CLIENT_SECRET = originalClientSecret;
+    }
   });
 
   test('renders the landing page correctly', () => {

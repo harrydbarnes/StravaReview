@@ -37,7 +37,7 @@ export const exchangeToken = async (clientId, clientSecret, code) => {
 export const fetchActivities = async (accessToken) => {
   let activities = [];
   let page = 1;
-  const perPage = 50; // Strava allows up to 200, but 50 is safer for rate limits/timing
+  const perPage = 200; // Strava allows up to 200
   const currentYear = new Date().getFullYear();
   // Epoch timestamp for Jan 1st of current year
   const after = Math.floor(new Date(currentYear, 0, 1).getTime() / 1000); 

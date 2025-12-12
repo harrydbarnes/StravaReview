@@ -6,6 +6,6 @@ module.exports = {
     '^/assets/(.*)$': '<rootDir>/src/assets/$1',
   },
   transform: {
-    '^.+\\.jsx?$': ['babel-jest', { configFile: './babel.config.cjs' }],
+    '^.+\\.jsx?$': ['babel-jest', { configFile: './babel.config.test.cjs' }],
   },
 };

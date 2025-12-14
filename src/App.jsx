@@ -65,7 +65,8 @@ function App() {
       localStorage.setItem('strava_client_id', clientId);
       localStorage.setItem('strava_client_secret', clientSecret);
       
-      const redirectUri = window.location.origin;
+      // Use current URL without query params as redirect URI to support subdirectories
+      const redirectUri = window.location.href.split('?')[0];
       window.location.href = getAuthUrl(clientId, redirectUri);
   };
 

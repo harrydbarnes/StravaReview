@@ -30,7 +30,7 @@ function App() {
             setLoading(true);
             setLoadingStatus('Authenticating with Strava...');
             // Clear code from URL to clean up
-            window.history.replaceState({}, document.title, "/");
+            window.history.replaceState({}, document.title, window.location.pathname);
 
             try {
                 const tokenData = await exchangeToken(storedClientId, storedClientSecret, code);
@@ -65,7 +65,8 @@ function App() {
       localStorage.setItem('strava_client_id', clientId);
       localStorage.setItem('strava_client_secret', clientSecret);
       
-      const redirectUri = window.location.origin;
+      // Use current URL without query/hash params as redirect URI to support subdirectories
+      const redirectUri = `${window.location.origin}${window.location.pathname}`;
       window.location.href = getAuthUrl(clientId, redirectUri);
   };
 

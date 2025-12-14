@@ -30,7 +30,7 @@ function App() {
             setLoading(true);
             setLoadingStatus('Authenticating with Strava...');
             // Clear code from URL to clean up
-            window.history.replaceState({}, document.title, "/");
+            window.history.replaceState({}, document.title, window.location.pathname);
 
             try {
                 const tokenData = await exchangeToken(storedClientId, storedClientSecret, code);

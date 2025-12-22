@@ -163,7 +163,7 @@ export const analyzeData = (activities) => {
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
 
-      if (new Date(act.start_date) < new Date(activityTypes[type].firstDate)) {
+      if (date < new Date(activityTypes[type].firstDate)) {
           activityTypes[type].firstDate = act.start_date;
       }
 

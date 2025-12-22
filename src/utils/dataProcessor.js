@@ -111,7 +111,7 @@ export const analyzeData = (activities) => {
       }
 
       // 4. Locations
-      const loc = act.location_city || act.location_country || (act.timezone ? act.timezone.split('/')[1].replace('_', ' ') : null);
+      const loc = act.location_city || act.location_country || act.timezone?.split('/')[1]?.replace('_', ' ') || null;
       if(loc) {
           if (!locations[loc]) locations[loc] = 0;
           locations[loc]++;

@@ -3,7 +3,8 @@ import StoryViewer from './components/StoryViewer';
 import { generateMockActivities, analyzeData, personalityTraits } from './utils/dataProcessor';
 import { IntroSlide, NewActivitySlide, LocationSlide, PersonalitySlide, TopMonthsSlide, SummarySlide } from './components/Slides';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, HelpCircle } from 'lucide-react';
+import HowToSetup from './components/HowToSetup';
 
 function App() {
   const [data, setData] = useState(null);
@@ -11,6 +12,7 @@ function App() {
   const [loadingStatus, setLoadingStatus] = useState('');
   const [error, setError] = useState(null);
   const [started, setStarted] = useState(false);
+  const [showHowTo, setShowHowTo] = useState(false);
   
   // Auth state
   const [clientId, setClientId] = useState(import.meta.env.VITE_STRAVA_CLIENT_ID || '');
@@ -120,7 +122,15 @@ function App() {
                 ) : (
                     <div className="w-full space-y-4">
                         {needsCreds && (
-                            <div className="p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
+                            <div className="relative p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
+                                <button
+                                    onClick={() => setShowHowTo(true)}
+                                    className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+                                    aria-label="How to connect"
+                                >
+                                    <HelpCircle size={20} />
+                                </button>
+
                                 <div className="space-y-2">
                                     <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
                                     <input 
@@ -169,6 +179,7 @@ function App() {
                     </div>
                 )}
               </div>
+              <HowToSetup isOpen={showHowTo} onClose={() => setShowHowTo(false)} />
           </div>
       );
   }

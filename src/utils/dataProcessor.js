@@ -35,6 +35,13 @@ export const generateMockActivities = () => {
     const movingTime = type === 'Ride' ? distance * 3 * 60 : distance * 6 * 60; // rough seconds
     const calories = type === 'Ride' ? distance * KCAL_PER_KM_RIDE : distance * KCAL_PER_KM_DEFAULT;
 
+    // Set some times specifically for Lunch Breaker logic (11am-2pm)
+    if (Math.random() > 0.8) {
+        date.setHours(12, 30, 0);
+    } else {
+        date.setHours(Math.floor(Math.random() * 24), 0, 0);
+    }
+
     activities.push({
       id: i,
       name: `${type} in ${locations[Math.floor(Math.random() * locations.length)]}`,
@@ -46,7 +53,7 @@ export const generateMockActivities = () => {
       calories: Math.floor(calories),
       location_name: locations[Math.floor(Math.random() * locations.length)],
 
-      // New Mock Data Fields
+      // Mock Data Fields
       kudos_count: Math.floor(Math.random() * 40),
       comment_count: Math.floor(Math.random() * 5),
       achievement_count: Math.floor(Math.random() * 3),
@@ -65,7 +72,7 @@ export const generateMockActivities = () => {
     total_elevation_gain: 0,
     calories: 400,
     location_name: "Lake District",
-    kudos_count: 55, // High kudos for spotlight testing
+    kudos_count: 55,
     comment_count: 10
   });
 
@@ -80,7 +87,7 @@ export const analyzeData = (activities) => {
   let totalCalories = 0;
   let totalTime = 0;
 
-  // New Trackers
+  // Trackers
   const activeDaysSet = new Set();
   const weeksActive = new Set();
   let maxKudos = -1;
@@ -133,7 +140,6 @@ export const analyzeData = (activities) => {
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
 
-      // Track earliest date for this sport
       if (new Date(act.start_date) < new Date(activityTypes[type].firstDate)) {
           activityTypes[type].firstDate = act.start_date;
       }
@@ -173,7 +179,6 @@ export const analyzeData = (activities) => {
       .slice(0, 5);
 
   // Post-Processing: New Activity
-  // Logic: The activity type with the lowest count is likely the "newest" or "rarest"
   const sortedByCount = Object.values(activityTypes).sort((a, b) => a.count - b.count);
   const newActivity = sortedByCount[0];
 
@@ -216,6 +221,7 @@ export const analyzeData = (activities) => {
       totalActivities,
       morningCount: calculateTimeOfDayCount(activities, 4, 9),
       nightCount: calculateTimeOfDayCount(activities, 20, 24),
+      lunchCount: calculateTimeOfDayCount(activities, 11, 14), // <--- ADDED LUNCH CHECK
       weekendCount: calculateDayCount(activities, [0, 6]),
       streak: maxStreak
   });
@@ -255,14 +261,35 @@ const calculateDayCount = (activities, days) => {
 };
 
 const determineVibe = (stats) => {
-    const { activityTypes, totalActivities, morningCount, nightCount, weekendCount, streak } = stats;
+    const { activityTypes, totalActivities, morningCount, nightCount, lunchCount, weekendCount, streak } = stats;
 
-    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * 0.3) return "Soft Life Era";
-    if (streak > 20) return "Main Character Energy";
-    if ((morningCount / totalActivities) > 0.4) return "Sunrise CEO";
-    if ((nightCount / totalActivities) > 0.3) return "After Hours";
-    if ((weekendCount / totalActivities) > 0.6) return "Weekend Warrior";
-    if (Object.keys(activityTypes).length > 4) return "Side Quest Pro";
+    // Ratios
+    const morningRatio = morningCount / totalActivities;
+    const nightRatio = nightCount / totalActivities;
+    const lunchRatio = lunchCount / totalActivities;
+    const weekendRatio = weekendCount / totalActivities;
+
+    // Logic
+    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * 0.3)
+        return "Soft Life Era";
+
+    if (streak > 20)
+        return "Main Character Energy";
+
+    if (morningRatio > 0.4)
+        return "Early Bird"; // Renamed from Sunrise CEO
+
+    if (nightRatio > 0.3)
+        return "Night Owl"; // Renamed from After Hours
+
+    if (lunchRatio > 0.2)
+        return "Lunch Breaker"; // Restored
+
+    if (weekendRatio > 0.6)
+        return "Weekend Warrior";
+
+    if (Object.keys(activityTypes).length > 4)
+        return "Side Quest Pro";
 
     return "Certified Mover";
 };
@@ -270,8 +297,9 @@ const determineVibe = (stats) => {
 export const vibeTraits = {
     "Soft Life Era": { description: "You chose peace. Low impact, high vibes. Protect your energy at all costs.", icon: "🧘‍♀️" },
     "Main Character Energy": { description: "Consistent. Unstoppable. The plot revolves around your training arc.", icon: "✨" },
-    "Sunrise CEO": { description: "While they slept, you worked. The grind doesn't know what a snooze button is.", icon: "🌅" },
-    "After Hours": { description: "The city hits different at night. You own the darkness.", icon: "🌙" },
+    "Early Bird": { description: "While they slept, you worked. The grind doesn't know what a snooze button is.", icon: "🌅" },
+    "Night Owl": { description: "The city hits different at night. You own the darkness.", icon: "🌙" },
+    "Lunch Breaker": { description: "Maximizing every minute. You turned downtime into go-time.", icon: "🥪" },
     "Side Quest Pro": { description: "Why specialize? You're collecting XP in every category possible.", icon: "🎮" },
     "Certified Mover": { description: "No labels, just movement. You kept it moving all year long.", icon: "👟" },
     "Weekend Warrior": { description: "Living for the weekend adventures.", icon: "🗓️" }

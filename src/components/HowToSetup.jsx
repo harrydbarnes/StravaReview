@@ -69,7 +69,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                     <li><strong>Authorization Callback Domain:</strong>
                         <code className="mx-1 px-1 bg-white/10 rounded select-all">{hostname}</code>
                     </li>
-                    <li><strong>App Icon:</strong> you will need to upload one on the next page. Any image will do</li>
+                    <li><strong>App Icon:</strong> You will need to upload one on the next page. Any image will do</li>
                   </ul>
                   <p className="text-xs text-gray-500 mt-2">
                     Note: The &quot;Authorization Callback Domain&quot; must match the domain in your address bar ({hostname}).

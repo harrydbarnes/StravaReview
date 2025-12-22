@@ -9,6 +9,15 @@ const KCAL_PER_KM_DEFAULT = 60;
 const SONG_DURATION_SECONDS = 219; // "Shake It Off" approx 3:39
 const MOVIE_DURATION_MINUTES = 120;
 
+// Vibe Thresholds
+const VIBE_THRESHOLD_YOGA_RATIO = 0.3;
+const VIBE_THRESHOLD_STREAK = 20;
+const VIBE_THRESHOLD_MORNING_RATIO = 0.4;
+const VIBE_THRESHOLD_NIGHT_RATIO = 0.3;
+const VIBE_THRESHOLD_LUNCH_RATIO = 0.2;
+const VIBE_THRESHOLD_WEEKEND_RATIO = 0.6;
+const VIBE_THRESHOLD_VARIETY_COUNT = 4;
+
 // Helper to determine if a sport is Distance or Time based
 const isDistanceSport = (type) => ['Run', 'Ride', 'Swim', 'Hike', 'Walk', 'Kayaking'].includes(type);
 
@@ -99,6 +108,12 @@ export const analyzeData = (activities) => {
   const activityTypes = {};
   const locations = {};
 
+  // Vibe Counters
+  let morningCount = 0;
+  let nightCount = 0;
+  let lunchCount = 0;
+  let weekendCount = 0;
+
   // Single Pass Loop
   for (const act of activities) {
       const dist = act.distance || 0;
@@ -110,8 +125,16 @@ export const analyzeData = (activities) => {
       // Globals
       totalDistance += dist;
       totalTime += time;
-      if (act.calories) totalCalories += act.calories;
-      else if (act.kilojoules) totalCalories += (act.kilojoules * KJ_TO_KCAL);
+      if (act.calories) {
+        totalCalories += act.calories;
+      } else if (act.kilojoules) {
+        totalCalories += (act.kilojoules * KJ_TO_KCAL);
+      } else {
+        // Fallback calorie calculation
+        const distKm = dist / 1000;
+        if (act.type === 'Ride') totalCalories += (distKm * KCAL_PER_KM_RIDE);
+        else totalCalories += (distKm * KCAL_PER_KM_DEFAULT);
+      }
 
       // Active Days & Weeks
       activeDaysSet.add(dateString);
@@ -163,6 +186,15 @@ export const analyzeData = (activities) => {
           maxKudos = kudos;
           mostLikedActivity = act;
       }
+
+      // Vibe Counters (Time of Day / Week)
+      const hour = date.getHours();
+      const day = date.getDay(); // 0 = Sun, 6 = Sat
+
+      if (hour >= 4 && hour < 9) morningCount++;
+      if (hour >= 20 && hour < 24) nightCount++;
+      if (hour >= 11 && hour < 14) lunchCount++;
+      if (day === 0 || day === 6) weekendCount++;
   }
 
   // Post-Processing: Top 5 Sports
@@ -219,10 +251,10 @@ export const analyzeData = (activities) => {
   const vibe = determineVibe({
       activityTypes,
       totalActivities,
-      morningCount: calculateTimeOfDayCount(activities, 4, 9),
-      nightCount: calculateTimeOfDayCount(activities, 20, 24),
-      lunchCount: calculateTimeOfDayCount(activities, 11, 14), // <--- ADDED LUNCH CHECK
-      weekendCount: calculateDayCount(activities, [0, 6]),
+      morningCount,
+      nightCount,
+      lunchCount,
+      weekendCount,
       streak: maxStreak
   });
 
@@ -249,17 +281,6 @@ export const analyzeData = (activities) => {
   };
 };
 
-// Vibe Helpers
-const calculateTimeOfDayCount = (activities, startHour, endHour) => {
-    return activities.filter(a => {
-        const h = new Date(a.start_date).getHours();
-        return h >= startHour && h < endHour;
-    }).length;
-};
-const calculateDayCount = (activities, days) => {
-    return activities.filter(a => days.includes(new Date(a.start_date).getDay())).length;
-};
-
 const determineVibe = (stats) => {
     const { activityTypes, totalActivities, morningCount, nightCount, lunchCount, weekendCount, streak } = stats;
 
@@ -270,25 +291,25 @@ const determineVibe = (stats) => {
     const weekendRatio = weekendCount / totalActivities;
 
     // Logic
-    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * 0.3)
+    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * VIBE_THRESHOLD_YOGA_RATIO)
         return "Soft Life Era";
 
-    if (streak > 20)
+    if (streak > VIBE_THRESHOLD_STREAK)
         return "Main Character Energy";
 
-    if (morningRatio > 0.4)
+    if (morningRatio > VIBE_THRESHOLD_MORNING_RATIO)
         return "Early Bird"; // Renamed from Sunrise CEO
 
-    if (nightRatio > 0.3)
+    if (nightRatio > VIBE_THRESHOLD_NIGHT_RATIO)
         return "Night Owl"; // Renamed from After Hours
 
-    if (lunchRatio > 0.2)
+    if (lunchRatio > VIBE_THRESHOLD_LUNCH_RATIO)
         return "Lunch Breaker"; // Restored
 
-    if (weekendRatio > 0.6)
+    if (weekendRatio > VIBE_THRESHOLD_WEEKEND_RATIO)
         return "Weekend Warrior";
 
-    if (Object.keys(activityTypes).length > 4)
+    if (Object.keys(activityTypes).length > VIBE_THRESHOLD_VARIETY_COUNT)
         return "Side Quest Pro";
 
     return "Certified Mover";

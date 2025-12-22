@@ -103,7 +103,7 @@ function App() {
       (props) => <LocationSlide data={data} {...props} />,
       (props) => <TopMonthsSlide data={data} {...props} />,
       (props) => <SummarySlide data={data} {...props} />
-  ];
+  ].filter(Boolean);
 
   if (!started) {
       return (

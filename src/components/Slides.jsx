@@ -2,6 +2,8 @@ import React from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
+const MIN_STREAK_FOR_DISPLAY = 5;
+
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-center relative")}>
@@ -296,7 +298,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
                 </p>
             </motion.div>
 
-            {data.longestStreak > 5 && (
+            {data.longestStreak > MIN_STREAK_FOR_DISPLAY && (
                 <div className="mt-8 flex items-center gap-2 text-sm font-bold uppercase tracking-widest opacity-75">
                     <span>🔥 {data.longestStreak} Week Streak</span>
                 </div>

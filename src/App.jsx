@@ -127,6 +127,7 @@ function App() {
                                     <div className="flex justify-between items-center">
                                         <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
                                         <button
+                                            type="button"
                                             onClick={() => setShowHowTo(true)}
                                             className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center gap-1"
                                         >

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 const HowToSetup = ({ isOpen, onClose }) => {
   const [hostname] = useState(window.location.hostname);
@@ -61,7 +62,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                   <h3>Create an Application</h3>
                 </div>
                 <div className="pl-8 text-sm space-y-2">
-                  <p>If you don't have one, create a new application with:</p>
+                  <p>If you don&apos;t have one, create a new application with:</p>
                   <ul className="list-disc pl-4 space-y-1 text-gray-400">
                     <li><strong>Application Name:</strong> Strava Wrapped (or similar)</li>
                     <li><strong>Category:</strong> Visualizer</li>
@@ -70,7 +71,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                     </li>
                   </ul>
                   <p className="text-xs text-gray-500 mt-2">
-                    Note: The "Authorization Callback Domain" must match the domain in your address bar ({hostname}).
+                    Note: The &quot;Authorization Callback Domain&quot; must match the domain in your address bar ({hostname}).
                   </p>
                 </div>
               </div>
@@ -99,6 +100,11 @@ const HowToSetup = ({ isOpen, onClose }) => {
       )}
     </AnimatePresence>
   );
+};
+
+HowToSetup.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default HowToSetup;

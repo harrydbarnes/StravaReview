@@ -122,7 +122,7 @@ function App() {
                 ) : (
                     <div className="w-full space-y-4">
                         {needsCreds && (
-                            <div className="relative p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
+                            <div className="p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center">
                                         <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>

@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
 
 const HowToSetup = ({ isOpen, onClose }) => {
+  const [hostname, setHostname] = useState('');
+
+  useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -16,6 +22,9 @@ const HowToSetup = ({ isOpen, onClose }) => {
           />
 
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="howto-heading"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -24,11 +33,12 @@ const HowToSetup = ({ isOpen, onClose }) => {
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              aria-label="Close"
             >
               <X size={24} />
             </button>
 
-            <h2 className="text-2xl font-bold mb-6 text-white">How to Connect Strava</h2>
+            <h2 id="howto-heading" className="text-2xl font-bold mb-6 text-white">How to Connect Strava</h2>
 
             <div className="space-y-6 text-gray-300">
               <div className="space-y-2">
@@ -60,11 +70,11 @@ const HowToSetup = ({ isOpen, onClose }) => {
                     <li><strong>Application Name:</strong> Strava Wrapped (or similar)</li>
                     <li><strong>Category:</strong> Visualizer</li>
                     <li><strong>Authorization Callback Domain:</strong>
-                        <code className="mx-1 px-1 bg-white/10 rounded select-all">{window.location.hostname}</code>
+                        <code className="mx-1 px-1 bg-white/10 rounded select-all">{hostname}</code>
                     </li>
                   </ul>
                   <p className="text-xs text-gray-500 mt-2">
-                    Note: The "Authorization Callback Domain" must match the domain in your address bar ({window.location.hostname}).
+                    Note: The "Authorization Callback Domain" must match the domain in your address bar ({hostname}).
                   </p>
                 </div>
               </div>

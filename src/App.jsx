@@ -122,9 +122,12 @@ function App() {
                         {needsCreds && (
                             <div className="p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
                                 <div className="space-y-2">
-                                    <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
+                                    <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
                                     <input 
+                                        id="client-id"
                                         type="text" 
+                                        required
+                                        autoComplete="off"
                                         value={clientId}
                                         onChange={(e) => setClientId(e.target.value)}
                                         placeholder="e.g., 12345"
@@ -132,9 +135,12 @@ function App() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client Secret</label>
+                                    <label htmlFor="client-secret" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client Secret</label>
                                     <input 
+                                        id="client-secret"
                                         type="password" 
+                                        required
+                                        autoComplete="off"
                                         value={clientSecret}
                                         onChange={(e) => setClientSecret(e.target.value)}
                                         placeholder="e.g., a1b2c3..."

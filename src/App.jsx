@@ -127,6 +127,7 @@ function App() {
                                         id="client-id"
                                         type="text" 
                                         required
+                                        autoComplete="off"
                                         value={clientId}
                                         onChange={(e) => setClientId(e.target.value)}
                                         placeholder="e.g., 12345"

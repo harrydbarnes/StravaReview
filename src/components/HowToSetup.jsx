@@ -3,11 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
 
 const HowToSetup = ({ isOpen, onClose }) => {
-  const [hostname, setHostname] = useState('');
-
-  useEffect(() => {
-    setHostname(window.location.hostname);
-  }, []);
+  const [hostname] = useState(window.location.hostname);
 
   return (
     <AnimatePresence>

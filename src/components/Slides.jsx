@@ -145,7 +145,6 @@ export const SummarySlide = ({ data, theme, textColor }) => {
                         </div>
                     </div>
 
-                    <div className="mt-12 text-sm opacity-50">strava-wrapped-demo.vercel.app</div>
                 </div>
             </div>
 

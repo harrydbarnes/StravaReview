@@ -64,8 +64,9 @@ const HowToSetup = ({ isOpen, onClose }) => {
                 <div className="pl-8 text-sm space-y-2">
                   <p>If you don&apos;t have one, create a new application with:</p>
                   <ul className="list-disc pl-4 space-y-1 text-gray-400">
-                    <li><strong>Application Name:</strong> Strava Wrapped (or similar)</li>
+                    <li><strong>Application Name:</strong> Wrapped App (or similar - just don't mention the word Strava!)</li>
                     <li><strong>Category:</strong> Visualizer</li>
+                    <li><strong>App Icon:</strong> Upload any image (required)</li>
                     <li><strong>Authorization Callback Domain:</strong>
                         <code className="mx-1 px-1 bg-white/10 rounded select-all">{hostname}</code>
                     </li>
@@ -82,7 +83,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                   <h3>Copy Credentials</h3>
                 </div>
                 <p className="text-sm pl-8">
-                  Copy your <strong>Client ID</strong> and <strong>Client Secret</strong> from Strava and paste them into the form below.
+                  Copy your <strong>Client ID</strong> and <strong>Client Secret</strong> from Strava and paste them into the form on the page - click 'Got it' when ready.
                 </p>
               </div>
             </div>

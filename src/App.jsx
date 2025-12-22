@@ -98,7 +98,7 @@ function App() {
       (props) => <TopSportsSlide data={data} {...props} />,
       (props) => data.newActivity ? <NewActivitySlide data={data} {...props} /> : null,
       (props) => <FunStatsSlide data={data} {...props} />,
-      (props) => <SpotlightSlide data={data} {...props} />,
+(props) => (data.mostLikedActivity || data.spotlightActivity) ? <SpotlightSlide data={data} {...props} /> : null,
       (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
       (props) => <LocationSlide data={data} {...props} />,
       (props) => <TopMonthsSlide data={data} {...props} />,

@@ -106,7 +106,7 @@ export const analyzeData = (activities) => {
       if (!activityTypes[type]) activityTypes[type] = { count: 0, distance: 0, firstDate: act.start_date };
       activityTypes[type].count++;
       activityTypes[type].distance += dist;
-      if (date < new Date(activityTypes[type].firstDate)) {
+      if (act.start_date < activityTypes[type].firstDate) {
           activityTypes[type].firstDate = act.start_date;
       }
 

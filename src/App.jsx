@@ -140,6 +140,7 @@ function App() {
                                         id="client-secret"
                                         type="password" 
                                         required
+                                        autoComplete="off"
                                         value={clientSecret}
                                         onChange={(e) => setClientSecret(e.target.value)}
                                         placeholder="e.g., a1b2c3..."

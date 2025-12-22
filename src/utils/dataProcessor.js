@@ -1,5 +1,28 @@
 // Mock data and analysis logic
 
+// Constants
+// Calorie conversion constants
+const KJ_TO_KCAL = 0.239;
+const KCAL_PER_KM_RIDE = 25;
+const KCAL_PER_KM_DEFAULT = 60;
+
+// Commuter duration limits
+const COMMUTER_MIN_DURATION_MINUTES = 5;
+const COMMUTER_MAX_DURATION_MINUTES = 45;
+
+// Personality Thresholds
+const THRESHOLD_RUNNER = 0.5;
+const THRESHOLD_SWIMMER = 0.2;
+const THRESHOLD_YOGI = 0.1;
+const THRESHOLD_VARIETY = 4;
+const THRESHOLD_EARLY_BIRD = 0.4;
+const THRESHOLD_NIGHT_OWL = 0.3;
+const THRESHOLD_WEEKEND_WARRIOR = 0.6;
+const THRESHOLD_LUNCH_BREAKER = 0.2;
+const THRESHOLD_COMMUTER = 0.4;
+const THRESHOLD_THE_MACHINE = 300;
+
+
 // Mock Activities Data
 export const generateMockActivities = () => {
   const activities = [];
@@ -16,7 +39,7 @@ export const generateMockActivities = () => {
     const type = types[Math.floor(Math.random() * types.length)];
     const distance = type === 'Ride' ? Math.random() * 50 + 10 : Math.random() * 10 + 2; // km
     const movingTime = type === 'Ride' ? distance * 3 * 60 : distance * 6 * 60; // rough seconds
-    const calories = type === 'Ride' ? distance * 25 : distance * 60;
+    const calories = type === 'Ride' ? distance * KCAL_PER_KM_RIDE : distance * KCAL_PER_KM_DEFAULT;
 
     // Set time for Lunch Breaker logic (11am-2pm)
     if (Math.random() > 0.7) {
@@ -84,11 +107,11 @@ export const analyzeData = (activities) => {
 
       // Calories
       if (act.calories) totalCalories += act.calories;
-      else if (act.kilojoules) totalCalories += (act.kilojoules * 0.239);
+      else if (act.kilojoules) totalCalories += (act.kilojoules * KJ_TO_KCAL);
       else {
           const distKm = dist / 1000;
-          if (act.type === 'Ride') totalCalories += (distKm * 25);
-          else totalCalories += (distKm * 60);
+          if (act.type === 'Ride') totalCalories += (distKm * KCAL_PER_KM_RIDE);
+          else totalCalories += (distKm * KCAL_PER_KM_DEFAULT);
       }
 
       // Date parsing - done ONCE
@@ -128,7 +151,7 @@ export const analyzeData = (activities) => {
 
       // Commuter logic
       const durationMin = (act.moving_time || 0) / 60;
-      if (day >= 1 && day <= 5 && durationMin < 45 && durationMin > 5) {
+      if (day >= 1 && day <= 5 && durationMin < COMMUTER_MAX_DURATION_MINUTES && durationMin > COMMUTER_MIN_DURATION_MINUTES) {
           commuterCount++;
       }
   }
@@ -154,22 +177,22 @@ export const analyzeData = (activities) => {
   const yogaCount = activityTypes['Yoga']?.count || 0;
   
   // Activity Type Checks
-  if (runCount / totalActivities > 0.5) personality = "Run Forest, Run";
-  else if (swimCount / totalActivities > 0.2) personality = "Water Baby";
-  else if (yogaCount / totalActivities > 0.1) personality = "Zen Master";
-  else if (Object.keys(activityTypes).length > 4) personality = "Variety Pack";
+  if (runCount / totalActivities > THRESHOLD_RUNNER) personality = "Run Forest, Run";
+  else if (swimCount / totalActivities > THRESHOLD_SWIMMER) personality = "Water Baby";
+  else if (yogaCount / totalActivities > THRESHOLD_YOGI) personality = "Zen Master";
+  else if (Object.keys(activityTypes).length > THRESHOLD_VARIETY) personality = "Variety Pack";
   
   // Time of Day Checks (Independent/Sequential Overrides in original logic)
-  if (morningCount / totalActivities > 0.4) personality = "Early Bird";
-  else if (nightCount / totalActivities > 0.3) personality = "Night Owl";
-  else if (weekendCount / totalActivities > 0.6) personality = "Weekend Warrior";
-  else if (lunchCount / totalActivities > 0.2) personality = "Lunch Breaker";
+  if (morningCount / totalActivities > THRESHOLD_EARLY_BIRD) personality = "Early Bird";
+  else if (nightCount / totalActivities > THRESHOLD_NIGHT_OWL) personality = "Night Owl";
+  else if (weekendCount / totalActivities > THRESHOLD_WEEKEND_WARRIOR) personality = "Weekend Warrior";
+  else if (lunchCount / totalActivities > THRESHOLD_LUNCH_BREAKER) personality = "Lunch Breaker";
   
   // Commuter Check
-  if (commuterCount / totalActivities > 0.4) personality = "The Commuter";
+  if (commuterCount / totalActivities > THRESHOLD_COMMUTER) personality = "The Commuter";
   
   // The Machine (Ultimate Override)
-  if (totalActivities > 300) personality = "The Machine";
+  if (totalActivities > THRESHOLD_THE_MACHINE) personality = "The Machine";
 
   return {
     totalActivities,

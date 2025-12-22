@@ -21,12 +21,15 @@ const VIBE_THRESHOLD_VARIETY_COUNT = 4;
 // Helper to determine if a sport is Distance or Time based
 const isDistanceSport = (type) => ['Run', 'Ride', 'Swim', 'Hike', 'Walk', 'Kayaking'].includes(type);
 
-// Helper to get Week Number for Streak Calculation
-const getWeekNumber = (d) => {
+// Helper to get ISO Week and Year
+const getISOWeekAndYear = (d) => {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return {
+        year: d.getUTCFullYear(),
+        week: Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
+    };
 };
 
 export const generateMockActivities = () => {
@@ -138,7 +141,9 @@ export const analyzeData = (activities) => {
 
       // Active Days & Weeks
       activeDaysSet.add(dateString);
-      weeksActive.add(`${date.getFullYear()}-W${getWeekNumber(date)}`);
+
+      const { year: isoYear, week: isoWeek } = getISOWeekAndYear(date);
+      weeksActive.add(`${isoYear}-W${isoWeek}`);
 
       // Monthly Stats
       if (!months[monthKey]) months[monthKey] = { count: 0, distance: 0, time: 0 };
@@ -163,7 +168,7 @@ export const analyzeData = (activities) => {
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
 
-      if (date < new Date(activityTypes[type].firstDate)) {
+      if (new Date(act.start_date) < new Date(activityTypes[type].firstDate)) {
           activityTypes[type].firstDate = act.start_date;
       }
 
@@ -218,17 +223,27 @@ export const analyzeData = (activities) => {
   const sortedWeeks = Array.from(weeksActive).sort();
   let currentStreak = 0;
   let maxStreak = 0;
-  let prevWeekVal = null;
 
-  sortedWeeks.forEach(weekStr => {
-      const [y, w] = weekStr.split('-W').map(Number);
-      const val = y * 52 + w;
-      if (prevWeekVal && val === prevWeekVal + 1) currentStreak++;
-      else currentStreak = 1;
+  if (sortedWeeks.length > 0) {
+    currentStreak = 1;
+    maxStreak = 1;
+    for (let i = 1; i < sortedWeeks.length; i++) {
+      const [prevY, prevW] = sortedWeeks[i - 1].split('-W').map(Number);
+      const [currY, currW] = sortedWeeks[i].split('-W').map(Number);
 
-      if (currentStreak > maxStreak) maxStreak = currentStreak;
-      prevWeekVal = val;
-  });
+      const { week: weeksInPrevYear } = getISOWeekAndYear(new Date(prevY, 11, 28));
+
+      if (
+        (currY === prevY && currW === prevW + 1) ||
+        (currY === prevY + 1 && currW === 1 && prevW === weeksInPrevYear)
+      ) {
+        currentStreak++;
+      } else {
+        currentStreak = 1;
+      }
+      maxStreak = Math.max(maxStreak, currentStreak);
+    }
+  }
 
   // Top Months
   const topMonthsByDistance = Object.entries(months)

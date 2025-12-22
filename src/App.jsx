@@ -123,16 +123,16 @@ function App() {
                     <div className="w-full space-y-4">
                         {needsCreds && (
                             <div className="relative p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
-                                <button
-                                    onClick={() => setShowHowTo(true)}
-                                    className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
-                                    aria-label="How to connect"
-                                >
-                                    <HelpCircle size={20} />
-                                </button>
-
-                                <div className="space-y-2">
-                                    <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
+                                        <button
+                                            onClick={() => setShowHowTo(true)}
+                                            className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center gap-1"
+                                        >
+                                            <HelpCircle size={14} /> Help!
+                                        </button>
+                                    </div>
                                     <input 
                                         id="client-id"
                                         type="text" 
@@ -144,7 +144,7 @@ function App() {
                                         className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-orange transition-colors"
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <label htmlFor="client-secret" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client Secret</label>
                                     <input 
                                         id="client-secret"

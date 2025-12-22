@@ -160,7 +160,7 @@ export const analyzeData = (activities) => {
               time: 0,
               maxDistance: 0,
               type: type,
-              firstDate: act.start_date
+              firstDate: date
           };
       }
       activityTypes[type].count++;

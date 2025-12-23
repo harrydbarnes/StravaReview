@@ -47,7 +47,7 @@ export const NewActivitySlide = ({ data, textColor }) => (
         initial={{ rotate: -10, scale: 0.8 }}
         animate={{ rotate: 0, scale: 1 }}
         className={clsx("p-8 border-4 border-current rounded-3xl", data.newActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
-        onClick={() => data.newActivity.id && window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank')}
+        onClick={() => data.newActivity.id && window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer')}
       >
           <div className="text-5xl md:text-7xl mb-4">🆕</div>
           <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
@@ -246,7 +246,7 @@ export const SpotlightSlide = ({ data, textColor }) => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="p-8 border-4 border-current rounded-3xl max-w-md w-full hover:scale-105 transition-transform cursor-pointer"
-                onClick={() => window.open(`https://www.strava.com/activities/${activity.id}`, '_blank')}
+                onClick={() => window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer')}
             >
                 <div className="flex justify-between items-start mb-6">
                     <span className="text-5xl">👍</span>

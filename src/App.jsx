@@ -31,12 +31,16 @@ function App() {
 
   useEffect(() => {
     const handleAuth = async () => {
+        // Clear legacy local storage items to ensure security
+        localStorage.removeItem('strava_client_id');
+        localStorage.removeItem('strava_client_secret');
+
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         
         // Retrieve creds from storage if we were redirecting back
-        const storedClientId = localStorage.getItem('strava_client_id');
-        const storedClientSecret = localStorage.getItem('strava_client_secret');
+        const storedClientId = sessionStorage.getItem('strava_client_id');
+        const storedClientSecret = sessionStorage.getItem('strava_client_secret');
         
         if (code && storedClientId && storedClientSecret) {
             setLoading(true);
@@ -73,9 +77,9 @@ function App() {
           return;
       }
       
-      // Save to local storage for retrieval after redirect
-      localStorage.setItem('strava_client_id', clientId);
-      localStorage.setItem('strava_client_secret', clientSecret);
+      // Save to session storage for retrieval after redirect
+      sessionStorage.setItem('strava_client_id', clientId);
+      sessionStorage.setItem('strava_client_secret', clientSecret);
       
       // Use current URL without query/hash params as redirect URI to support subdirectories
       const redirectUri = `${window.location.origin}${window.location.pathname}`;

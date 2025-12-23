@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 // Removed unused imports
 
@@ -58,6 +59,10 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const CurrentSlide = slides[currentIndex];
 
+  const buttonClass = theme === 'white'
+    ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
+    : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
+
   return (
     <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].bg)}>
       
@@ -69,17 +74,21 @@ const StoryViewer = ({ slides, onClose }) => {
         
         {/* Progress Bars */}
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
-          {slides.map((_, idx) => (
-            <div key={idx} className="h-1 flex-1 bg-gray-500/50 rounded-full overflow-hidden">
-              <motion.div
-                className={clsx("h-full", textColor === 'text-black' || textColor === 'text-white' ? 'bg-current' : textColor.replace('text-', 'bg-'))}
-                initial={{ width: idx < currentIndex ? '100%' : '0%' }}
-                animate={{ width: idx === currentIndex ? '100%' : (idx < currentIndex ? '100%' : '0%') }}
-                transition={{ duration: idx === currentIndex ? 5 : 0, ease: 'linear' }}
-                style={{ backgroundColor: idx === currentIndex || idx < currentIndex ? 'currentColor' : 'transparent' }}
-              />
-            </div>
-          ))}
+          {slides.map((_, idx) => {
+            const isActive = idx === currentIndex;
+            const isPast = idx < currentIndex;
+            return (
+              <div key={idx} className="h-1 flex-1 bg-gray-500/50 rounded-full overflow-hidden">
+                <motion.div
+                  key={`${idx}-${isActive}`}
+                  className={clsx("h-full", textColor.replace('text-', 'bg-'))}
+                  initial={{ width: isPast ? '100%' : '0%' }}
+                  animate={{ width: isPast || isActive ? '100%' : '0%' }}
+                  transition={{ duration: isActive ? 5 : 0, ease: 'linear' }}
+                />
+              </div>
+            );
+          })}
         </div>
 
         {/* Controls Overlay (Theming) */}
@@ -88,7 +97,7 @@ const StoryViewer = ({ slides, onClose }) => {
                 const newTheme = theme === 'black' ? 'white' : 'black';
                 setTheme(newTheme);
                 setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
-            }} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
+            }} className={buttonClass}>
                 Theme
             </button>
              <button onClick={() => {
@@ -103,17 +112,40 @@ const StoryViewer = ({ slides, onClose }) => {
                  const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
 
                  setTextColor(availableColors[nextIdx]);
-             }} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
-                Color
+             }} className={buttonClass}>
+                Colour
             </button>
              {/* Close button that calls onClose */}
              {onClose && (
-                 <button onClick={onClose} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
+                 <button onClick={onClose} className={buttonClass}>
                      ✕
                  </button>
              )}
         </div>
 
+
+        {/* Tap Indicators (First Slide Only) */}
+        {currentIndex === 0 && (
+          <div className="absolute inset-0 pointer-events-none z-40 flex justify-between items-center px-4">
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: [0, 0.5, 0], x: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className={clsx("p-2 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
+            >
+              <ChevronLeft size={24} />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: [0, 0.5, 0], x: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
+              className={clsx("p-2 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
+            >
+              <ChevronRight size={24} />
+            </motion.div>
+          </div>
+        )}
 
         {/* Slide Content */}
         <div 

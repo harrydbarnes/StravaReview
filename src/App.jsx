@@ -93,18 +93,6 @@ function App() {
       setStarted(true);
   };
 
-  const slides = [
-      (props) => <IntroSlide data={data} {...props} />,
-      (props) => <TopSportsSlide data={data} {...props} />,
-      (props) => data.newActivity ? <NewActivitySlide data={data} {...props} /> : null,
-      (props) => <FunStatsSlide data={data} {...props} />,
-(props) => (data.mostLikedActivity || data.spotlightActivity) ? <SpotlightSlide data={data} {...props} /> : null,
-      (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
-      (props) => <LocationSlide data={data} {...props} />,
-      (props) => <TopMonthsSlide data={data} {...props} />,
-      (props) => <SummarySlide data={data} {...props} />
-  ].filter(Boolean);
-
   if (!started) {
       return (
           <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -197,6 +185,18 @@ function App() {
           </div>
       );
   }
+
+  const slides = data ? [
+      (props) => <IntroSlide data={data} {...props} />,
+      (props) => <TopSportsSlide data={data} {...props} />,
+      data.newActivity ? (props) => <NewActivitySlide data={data} {...props} /> : null,
+      (props) => <FunStatsSlide data={data} {...props} />,
+      (data.mostLikedActivity || data.spotlightActivity) ? (props) => <SpotlightSlide data={data} {...props} /> : null,
+      (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
+      (props) => <LocationSlide data={data} {...props} />,
+      (props) => <TopMonthsSlide data={data} {...props} />,
+      (props) => <SummarySlide data={data} {...props} />
+  ].filter(Boolean) : [];
 
   return (
     <div className="h-screen w-full bg-black overflow-hidden">

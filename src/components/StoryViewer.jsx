@@ -84,12 +84,25 @@ const StoryViewer = ({ slides, onClose }) => {
 
         {/* Controls Overlay (Theming) */}
         <div className="absolute top-6 right-4 z-30 flex gap-2">
-            <button onClick={() => setTheme(theme === 'black' ? 'white' : 'black')} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
+            <button onClick={() => {
+                const newTheme = theme === 'black' ? 'white' : 'black';
+                setTheme(newTheme);
+                setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
+            }} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
                 Theme
             </button>
              <button onClick={() => {
-                 const nextIdx = (textColors.indexOf(textColor) + 1) % textColors.length;
-                 setTextColor(textColors[nextIdx]);
+                 // Filter colors based on current theme to avoid invisible text
+                 const availableColors = textColors.filter(c =>
+                     (theme === 'black' && c !== 'text-black') ||
+                     (theme === 'white' && c !== 'text-white')
+                 );
+
+                 // Find current index in the filtered list or default to 0
+                 const currentFilteredIndex = availableColors.indexOf(textColor);
+                 const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
+
+                 setTextColor(availableColors[nextIdx]);
              }} className="p-2 bg-white/20 rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors">
                 Color
             </button>

@@ -289,7 +289,7 @@ export const analyzeData = (activities) => {
     longestStreak: maxStreak,
     spotlightActivity,
     mostLikedActivity,
-    newActivity: newActivity ? { type: newActivity.type, firstDate: newActivity.firstDate } : null,
+    newActivity: newActivity ? { type: newActivity.type, firstDate: newActivity.firstDate, id: activities.find(a => a.type === newActivity.type)?.id } : null,
     topMonthsByDistance,
     topLocation,
     vibe

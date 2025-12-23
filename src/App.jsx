@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import StoryViewer from './components/StoryViewer';
-import { generateMockActivities, analyzeData, personalityTraits } from './utils/dataProcessor';
-import { IntroSlide, NewActivitySlide, LocationSlide, PersonalitySlide, TopMonthsSlide, SummarySlide } from './components/Slides';
+import { generateMockActivities, analyzeData, vibeTraits } from './utils/dataProcessor';
+import {
+    IntroSlide,
+    TopSportsSlide,    // <--- New
+    NewActivitySlide,  // <--- Existing (kept)
+    FunStatsSlide,     // <--- New
+    SpotlightSlide,    // <--- New
+    VibeSlide,         // <--- New (Replaces PersonalitySlide)
+    LocationSlide,
+    TopMonthsSlide,
+    SummarySlide
+} from './components/Slides';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 import HowToSetup from './components/HowToSetup';
@@ -85,12 +95,15 @@ function App() {
 
   const slides = [
       (props) => <IntroSlide data={data} {...props} />,
-      (props) => <NewActivitySlide data={data} {...props} />,
+      (props) => <TopSportsSlide data={data} {...props} />,
+      (props) => data.newActivity ? <NewActivitySlide data={data} {...props} /> : null,
+      (props) => <FunStatsSlide data={data} {...props} />,
+(props) => (data.mostLikedActivity || data.spotlightActivity) ? <SpotlightSlide data={data} {...props} /> : null,
+      (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
       (props) => <LocationSlide data={data} {...props} />,
-      (props) => <PersonalitySlide data={data} traits={personalityTraits} {...props} />,
       (props) => <TopMonthsSlide data={data} {...props} />,
       (props) => <SummarySlide data={data} {...props} />
-  ];
+  ].filter(Boolean);
 
   if (!started) {
       return (

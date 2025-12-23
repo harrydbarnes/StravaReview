@@ -2,6 +2,8 @@ import React from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
+const MIN_STREAK_FOR_DISPLAY = 5;
+
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-center relative")}>
@@ -156,5 +158,151 @@ export const SummarySlide = ({ data, theme, textColor }) => {
                 Save & Share
             </button>
         </div>
+    );
+};
+
+// 1. TOP SPORTS SLIDE
+export const TopSportsSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 uppercase">Your Top Sports</h2>
+        <div className="w-full max-w-md space-y-4">
+            {data.topSports.map((sport, idx) => (
+                <motion.div
+                    key={sport.type}
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="flex items-center justify-between p-4 border-2 border-current rounded-xl bg-white/5 backdrop-blur-sm"
+                >
+                    <div className="flex items-center gap-4">
+                        <span className="text-2xl font-black opacity-50">#{idx + 1}</span>
+                        <div className="text-left">
+                            <div className="font-bold text-lg">{sport.type}</div>
+                            <div className="text-xs opacity-75">{sport.count} sessions</div>
+                        </div>
+                    </div>
+                    <div className="text-xl font-bold">{sport.displayValue}</div>
+                </motion.div>
+            ))}
+        </div>
+    </SlideContainer>
+);
+
+// 2. FUN STATS (Time Comparison) SLIDE
+export const FunStatsSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 uppercase text-center">Time Well Spent</h2>
+
+        <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
+            >
+                <div className="relative z-10">
+                    <p className="text-lg opacity-80 mb-2">You moved for</p>
+                    <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
+                    <p className="text-lg font-medium">
+                        That's like listening to <br/>
+                        <span className="font-black italic">"Shake It Off"</span> <br/>
+                        <span className="text-4xl font-bold text-brand-orange">{data.funComparisons.shakeItOff}</span> times! 💃
+                    </p>
+                </div>
+            </motion.div>
+
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center justify-center gap-4"
+            >
+                <span className="text-4xl">🎬</span>
+                <p className="text-xl">
+                    Or watching <span className="font-bold">{data.funComparisons.movies}</span> full-length movies.
+                </p>
+            </motion.div>
+        </div>
+    </SlideContainer>
+);
+
+// 3. SPOTLIGHT / KUDOS SLIDE
+export const SpotlightSlide = ({ data, textColor }) => {
+    // Fallback if no kudos data
+    const activity = data.mostLikedActivity || data.spotlightActivity;
+    if (!activity) return null;
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <div className="absolute top-10 right-10 rotate-12">
+                <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">
+                    🏆 Fan Favorite
+                </div>
+            </div>
+
+            <h2 className="text-3xl font-bold mb-8 opacity-80">The Crowd went Wild</h2>
+
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="p-8 border-4 border-current rounded-3xl max-w-md w-full"
+            >
+                <div className="flex justify-between items-start mb-6">
+                    <span className="text-5xl">👍</span>
+                    <span className="text-5xl font-black">{activity.kudos_count || 0}</span>
+                </div>
+
+                <h3 className="text-2xl font-black uppercase mb-2 line-clamp-2">{activity.name}</h3>
+                <p className="opacity-75 mb-6">{new Date(activity.start_date).toLocaleDateString()}</p>
+
+                <div className="grid grid-cols-2 gap-4 text-sm font-bold opacity-80">
+                    <div className="bg-current/10 p-2 rounded-lg">
+                        {Math.round(activity.distance / 1000)} km
+                    </div>
+                    <div className="bg-current/10 p-2 rounded-lg">
+                        {Math.round(activity.moving_time / 60)} min
+                    </div>
+                </div>
+            </motion.div>
+        </SlideContainer>
+    );
+};
+
+// 4. VIBE SLIDE (Replaces Old Personality Slide)
+export const VibeSlide = ({ data, textColor, traits }) => {
+    const vibeData = traits[data.vibe] || traits["Certified Mover"];
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-xl font-bold mb-8 uppercase tracking-[0.2em] opacity-60">2024 Vibe Check</h2>
+
+            <motion.div
+                initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                className="text-[8rem] md:text-[10rem] mb-6 drop-shadow-2xl"
+            >
+                {vibeData.icon}
+            </motion.div>
+
+            <h1 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tight text-center leading-none">
+                {data.vibe}
+            </h1>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm"
+            >
+                <p className="text-lg md:text-xl font-medium leading-relaxed">
+                    "{vibeData.description}"
+                </p>
+            </motion.div>
+
+            {data.longestStreak > MIN_STREAK_FOR_DISPLAY && (
+                <div className="mt-8 flex items-center gap-2 text-sm font-bold uppercase tracking-widest opacity-75">
+                    <span>🔥 {data.longestStreak} Week Streak</span>
+                </div>
+            )}
+        </SlideContainer>
     );
 };

@@ -127,6 +127,9 @@ export const analyzeData = (activities) => {
       const time = act.moving_time || 0;
       const date = new Date(act.start_date);
 
+      // Skip invalid dates to prevent crashes
+      if (isNaN(date.getTime())) continue;
+
       // ⚡ Bolt Optimization: Use substring if possible, fallback to ISO method
       // Benchmark: ~600x faster for strings
       const dateString = typeof act.start_date === 'string'

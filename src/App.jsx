@@ -34,8 +34,17 @@ function App() {
 
   useEffect(() => {
     const handleAuth = async () => {
-        // Clear legacy local storage items to ensure security
+        // Migrate credentials from localStorage to sessionStorage for a seamless user transition.
+        const legacyClientId = localStorage.getItem(STORAGE_KEY_CLIENT_ID);
+        if (legacyClientId && !sessionStorage.getItem(STORAGE_KEY_CLIENT_ID)) {
+            sessionStorage.setItem(STORAGE_KEY_CLIENT_ID, legacyClientId);
+        }
         localStorage.removeItem(STORAGE_KEY_CLIENT_ID);
+
+        const legacyClientSecret = localStorage.getItem(STORAGE_KEY_CLIENT_SECRET);
+        if (legacyClientSecret && !sessionStorage.getItem(STORAGE_KEY_CLIENT_SECRET)) {
+            sessionStorage.setItem(STORAGE_KEY_CLIENT_SECRET, legacyClientSecret);
+        }
         localStorage.removeItem(STORAGE_KEY_CLIENT_SECRET);
 
         const params = new URLSearchParams(window.location.search);

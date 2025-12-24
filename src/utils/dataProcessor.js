@@ -224,7 +224,11 @@ export const analyzeData = (activities) => {
   const newActivity = sortedByCount[0];
 
   // Post-Processing: Streak Logic
-  const sortedWeeks = Array.from(weeksActive).sort();
+  const sortedWeeks = Array.from(weeksActive).sort((a, b) => {
+    const [yA, wA] = a.split('-W').map(Number);
+    const [yB, wB] = b.split('-W').map(Number);
+    return yA - yB || wA - wB;
+  });
   let currentStreak = 0;
   let maxStreak = 0;
 

@@ -189,14 +189,14 @@ function App() {
   const slides = data ? [
       (props) => <IntroSlide data={data} {...props} />,
       (props) => <TopSportsSlide data={data} {...props} />,
-      data.newActivity ? (props) => <NewActivitySlide data={data} {...props} /> : null,
+      ...(data.newActivity ? [(props) => <NewActivitySlide data={data} {...props} />] : []),
       (props) => <FunStatsSlide data={data} {...props} />,
-      (data.mostLikedActivity || data.spotlightActivity) ? (props) => <SpotlightSlide data={data} {...props} /> : null,
+      ...((data.mostLikedActivity || data.spotlightActivity) ? [(props) => <SpotlightSlide data={data} {...props} />] : []),
       (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
       (props) => <LocationSlide data={data} {...props} />,
       (props) => <TopMonthsSlide data={data} {...props} />,
       (props) => <SummarySlide data={data} {...props} />
-  ].filter(Boolean) : [];
+  ] : [];
 
   return (
     <div className="h-screen w-full bg-black overflow-hidden">

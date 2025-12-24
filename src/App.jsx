@@ -33,18 +33,18 @@ function App() {
   const [needsCreds] = useState(!import.meta.env.VITE_STRAVA_CLIENT_ID);
 
   useEffect(() => {
-    const handleAuth = async () => {
-        // Migrate credentials from localStorage to sessionStorage for a seamless user transition.
-        const migrateItem = (key) => {
-            const legacyValue = localStorage.getItem(key);
-            if (legacyValue && !sessionStorage.getItem(key)) {
-                sessionStorage.setItem(key, legacyValue);
-            }
-            localStorage.removeItem(key);
-        };
-        migrateItem(STORAGE_KEY_CLIENT_ID);
-        migrateItem(STORAGE_KEY_CLIENT_SECRET);
+    // Migrate credentials from localStorage to sessionStorage for a seamless user transition.
+    const migrateItem = (key) => {
+      const legacyValue = localStorage.getItem(key);
+      if (legacyValue && !sessionStorage.getItem(key)) {
+          sessionStorage.setItem(key, legacyValue);
+      }
+      localStorage.removeItem(key);
+    };
+    migrateItem(STORAGE_KEY_CLIENT_ID);
+    migrateItem(STORAGE_KEY_CLIENT_SECRET);
 
+    const handleAuth = async () => {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         

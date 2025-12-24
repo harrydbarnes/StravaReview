@@ -16,6 +16,9 @@ import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 import HowToSetup from './components/HowToSetup';
 
+const STORAGE_KEY_CLIENT_ID = 'strava_client_id';
+const STORAGE_KEY_CLIENT_SECRET = 'strava_client_secret';
+
 function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -32,15 +35,15 @@ function App() {
   useEffect(() => {
     const handleAuth = async () => {
         // Clear legacy local storage items to ensure security
-        localStorage.removeItem('strava_client_id');
-        localStorage.removeItem('strava_client_secret');
+        localStorage.removeItem(STORAGE_KEY_CLIENT_ID);
+        localStorage.removeItem(STORAGE_KEY_CLIENT_SECRET);
 
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         
         // Retrieve creds from storage if we were redirecting back
-        const storedClientId = sessionStorage.getItem('strava_client_id');
-        const storedClientSecret = sessionStorage.getItem('strava_client_secret');
+        const storedClientId = sessionStorage.getItem(STORAGE_KEY_CLIENT_ID);
+        const storedClientSecret = sessionStorage.getItem(STORAGE_KEY_CLIENT_SECRET);
         
         if (code && storedClientId && storedClientSecret) {
             setLoading(true);
@@ -78,8 +81,8 @@ function App() {
       }
       
       // Save to session storage for retrieval after redirect
-      sessionStorage.setItem('strava_client_id', clientId);
-      sessionStorage.setItem('strava_client_secret', clientSecret);
+      sessionStorage.setItem(STORAGE_KEY_CLIENT_ID, clientId);
+      sessionStorage.setItem(STORAGE_KEY_CLIENT_SECRET, clientSecret);
       
       // Use current URL without query/hash params as redirect URI to support subdirectories
       const redirectUri = `${window.location.origin}${window.location.pathname}`;

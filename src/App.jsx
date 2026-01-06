@@ -20,6 +20,7 @@ const STORAGE_KEY_CLIENT_ID = 'strava_client_id';
 const STORAGE_KEY_CLIENT_SECRET = 'strava_client_secret';
 
 function App() {
+  const targetYear = new Date().getFullYear() - 1;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
@@ -65,14 +66,13 @@ function App() {
                 const activities = await fetchActivities(tokenData.access_token);
                 
                 setLoadingStatus('Analyzing your year...');
-                const currentYear = new Date().getFullYear() - 1;
-                const result = analyzeData(activities, currentYear);
+                const result = analyzeData(activities, targetYear);
                 
                 if (result) {
                     setData(result);
                     setStarted(true); // Auto start if we have data from redirect
                 } else {
-                    setError(`No activities found for ${currentYear}. Go record some activities!`);
+                    setError(`No activities found for ${targetYear}. Go record some activities!`);
                 }
             } catch (err) {
                 console.error(err);
@@ -84,7 +84,7 @@ function App() {
     };
 
     handleAuth();
-  }, []);
+  }, [targetYear]);
 
   const handleConnect = () => {
       if (!clientId || !clientSecret) {
@@ -108,7 +108,6 @@ function App() {
       try {
         await new Promise(r => setTimeout(r, 800));
 
-        const targetYear = new Date().getFullYear() - 1;
         const mock = generateMockActivities(targetYear);
         // Ensure we analyze the same year we generated for
         const result = analyzeData(mock, targetYear);
@@ -139,7 +138,7 @@ function App() {
                 </h1>
                 
                 <p className="text-gray-400 mb-8 text-lg">
-                    See your {new Date().getFullYear() - 1} year in review. <br/> Connect your account to get started.
+                    See your {targetYear} year in review. <br/> Connect your account to get started.
                 </p>
 
                 {error && (

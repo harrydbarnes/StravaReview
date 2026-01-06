@@ -94,6 +94,10 @@ export const generateMockActivities = (year = new Date().getFullYear()) => {
       calories: Math.floor(calories),
       location_name: locations[Math.floor(Math.random() * locations.length)],
 
+      // Mock Coordinates (grouped around some centers)
+      // e.g. Central Park approx 40.78, -73.96
+      start_latlng: Math.random() > 0.5 ? [40.78 + (Math.random() * 0.01), -73.96 + (Math.random() * 0.01)] : null,
+
       // Mock Data Fields
       kudos_count: Math.floor(Math.random() * 40),
       comment_count: Math.floor(Math.random() * 5),
@@ -147,6 +151,7 @@ export const analyzeData = (allActivities, year = 2025) => {
   const months = {};
   const activityTypes = {};
   const locations = {};
+  const coordinateClusters = {};
 
   // Vibe Counters
   let morningCount = 0;
@@ -222,24 +227,23 @@ export const analyzeData = (allActivities, year = 2025) => {
           activityTypes[type].firstDate = date;
       }
 
-      // Locations
-      // Use explicit city name if available. As a fallback, infer city from timezone.
-      let loc = act.location_city?.trim() || null;
+      // Locations Logic
+      // 1. Coordinate Clustering (approx 1.1km precision)
+      if (act.start_latlng && Array.isArray(act.start_latlng) && act.start_latlng.length === 2) {
+          const [lat, lng] = act.start_latlng;
+          const key = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+          if (!coordinateClusters[key]) coordinateClusters[key] = { count: 0, lat: 0, lng: 0 };
 
-      // Fallback: Infer city from timezone if available
-      // e.g., "America/Los_Angeles" -> "Los Angeles"
-      if (!loc && act.timezone) {
-          const parts = act.timezone.split('/');
-          if (parts.length > 1) {
-              const potentialLoc = parts[parts.length - 1].replace(/_/g, ' ');
-              // Avoid generic timezone identifiers like GMT, UTC, or region names like Pacific.
-              if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) {
-                  loc = potentialLoc;
-              }
-          }
+          // Running average for center
+          const cluster = coordinateClusters[key];
+          cluster.lat = (cluster.lat * cluster.count + lat) / (cluster.count + 1);
+          cluster.lng = (cluster.lng * cluster.count + lng) / (cluster.count + 1);
+          cluster.count++;
       }
 
-      if(loc) {
+      // 2. City Name Aggregation
+      const loc = act.location_city?.trim() || null;
+      if (loc) {
           if (!locations[loc]) locations[loc] = 0;
           locations[loc]++;
       }
@@ -321,11 +325,52 @@ export const analyzeData = (allActivities, year = 2025) => {
     .slice(0, 3)
     .map(([month, stats]) => ({ month, ...stats }));
 
-  // Top Location
-  const topLocationEntry = Object.entries(locations).sort(([,a], [,b]) => b - a)[0];
-  const topLocation = topLocationEntry 
-    ? { name: topLocationEntry[0], count: topLocationEntry[1] }
-    : { name: 'The Great Outdoors', count: activities.length };
+  // Top Location Selection Logic
+  // Strategy: Explicit City > Coordinate Cluster > Timezone Fallback > Generic Default
+
+  let topLocation = null;
+  const topCityEntry = Object.entries(locations).sort(([,a], [,b]) => b - a)[0];
+
+  // Find top coordinate cluster
+  const topClusterEntry = Object.values(coordinateClusters).sort((a, b) => b.count - a.count)[0];
+
+  if (topCityEntry) {
+      topLocation = { name: topCityEntry[0], count: topCityEntry[1], source: 'city' };
+  } else if (topClusterEntry) {
+      // If no city, but we have coordinates, use them
+      // We set a placeholder name that App.jsx can detect and resolve
+      topLocation = {
+          name: "The Great Outdoors", // Default text, will be updated if resolved
+          count: topClusterEntry.count,
+          center: [topClusterEntry.lat, topClusterEntry.lng],
+          requiresGeocoding: true,
+          source: 'coords'
+      };
+  } else {
+      // Fallback: Infer city from timezone of the most frequent activity's timezone
+      // We didn't aggregate timezone frequency, so let's check if the spotlight activity has one
+      // or just fallback to generic
+      // Re-scanning activities for most frequent timezone is expensive, so we'll use a simple heuristic:
+      // Check the timezone of the spotlight activity (longest duration) or new activity
+      const referenceAct = spotlightActivity || activities[0];
+      let timezoneLoc = null;
+
+      if (referenceAct && referenceAct.timezone) {
+          const parts = referenceAct.timezone.split('/');
+          if (parts.length > 1) {
+              const potentialLoc = parts[parts.length - 1].replace(/_/g, ' ');
+               if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) {
+                  timezoneLoc = potentialLoc;
+              }
+          }
+      }
+
+      if (timezoneLoc) {
+          topLocation = { name: timezoneLoc, count: activities.length, source: 'timezone' };
+      } else {
+          topLocation = { name: 'The Great Outdoors', count: activities.length, source: 'default' };
+      }
+  }
 
   // Fun Stats
   const totalHours = Math.round(totalTime / 3600);

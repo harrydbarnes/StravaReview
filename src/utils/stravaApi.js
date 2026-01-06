@@ -34,17 +34,19 @@ export const exchangeToken = async (clientId, clientSecret, code) => {
   return response.json();
 };
 
-export const fetchActivities = async (accessToken) => {
+export const fetchActivities = async (accessToken, year) => {
   let activities = [];
   let page = 1;
   const perPage = 200; // Strava allows up to 200
-  const currentYear = new Date().getFullYear();
-  // Epoch timestamp for Jan 1st of current year
-  const after = Math.floor(new Date(currentYear, 0, 1).getTime() / 1000); 
+  const targetYear = year || new Date().getFullYear();
+  // Epoch timestamp for Jan 1st of target year
+  const after = Math.floor(new Date(targetYear, 0, 1).getTime() / 1000);
+  // Epoch timestamp for Jan 1st of next year
+  const before = Math.floor(new Date(targetYear + 1, 0, 1).getTime() / 1000);
 
   while (true) {
     const response = await fetch(
-      `${STRAVA_API_BASE}/athlete/activities?page=${page}&per_page=${perPage}&after=${after}`,
+      `${STRAVA_API_BASE}/athlete/activities?page=${page}&per_page=${perPage}&after=${after}&before=${before}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

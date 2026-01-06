@@ -225,7 +225,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       // Locations
       // Only count explicit city names for "Favourite Playground" to avoid skewing data
       // with broad defaults like "United Kingdom" or timezone cities like "London"
-      const loc = act.location_city || null;
+      const loc = act.location_city?.trim() || null;
       if(loc) {
           if (!locations[loc]) locations[loc] = 0;
           locations[loc]++;

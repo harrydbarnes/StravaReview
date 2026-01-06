@@ -366,7 +366,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       }
 
       if (timezoneLoc) {
-          topLocation = { name: timezoneLoc, count: activities.length, source: 'timezone' };
+          topLocation = { name: timezoneLoc, count: 1, source: 'timezone' };
       } else {
           topLocation = { name: 'The Great Outdoors', count: activities.length, source: 'default' };
       }

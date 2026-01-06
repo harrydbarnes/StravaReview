@@ -83,7 +83,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                   <h3>Copy Credentials</h3>
                 </div>
                 <p className="text-sm pl-8">
-                  Copy your <strong>Client ID</strong> and <strong>Client Secret</strong> from Strava and paste them into the form on the page - click 'Got it' when ready.
+                  Copy your <strong>Client ID</strong> and <strong>Client Secret</strong> from Strava and paste them into the form on the page - click &apos;Got it&apos; when ready.
                 </p>
               </div>
             </div>

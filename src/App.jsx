@@ -65,10 +65,15 @@ function App() {
                 const activities = await fetchActivities(tokenData.access_token);
                 
                 setLoadingStatus('Analyzing your year...');
-                const result = analyzeData(activities);
+                const currentYear = new Date().getFullYear();
+                const result = analyzeData(activities, currentYear);
                 
-                setData(result);
-                setStarted(true); // Auto start if we have data from redirect
+                if (result) {
+                    setData(result);
+                    setStarted(true); // Auto start if we have data from redirect
+                } else {
+                    setError(`No activities found for ${currentYear}. Go record some activities!`);
+                }
             } catch (err) {
                 console.error(err);
                 setError("Failed to connect to Strava. Please check your credentials and try again.");
@@ -100,11 +105,19 @@ function App() {
       setLoading(true);
       setLoadingStatus('Generating demo data...');
       await new Promise(r => setTimeout(r, 800));
+
       const mock = generateMockActivities();
-      const result = analyzeData(mock);
-      setData(result);
+      const currentYear = new Date().getFullYear();
+      // Ensure we analyze the same year we generated for
+      const result = analyzeData(mock, currentYear);
+
+      if (result) {
+          setData(result);
+          setStarted(true);
+      } else {
+          setError("Failed to generate demo data.");
+      }
       setLoading(false);
-      setStarted(true);
   };
 
   if (!started) {

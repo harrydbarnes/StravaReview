@@ -334,7 +334,7 @@ export const analyzeData = (allActivities, year = 2025) => {
   });
 
   return {
-    year: 2025,
+    year: year,
     totalActivities,
     totalDistance: Math.round(totalDistance / 1000),
     totalCalories: Math.round(totalCalories),

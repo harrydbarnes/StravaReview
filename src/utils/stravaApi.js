@@ -40,9 +40,9 @@ export const fetchActivities = async (accessToken, year) => {
   const perPage = 200; // Strava allows up to 200
   const targetYear = year || new Date().getFullYear();
   // Epoch timestamp for Jan 1st of target year
-  const after = Math.floor(new Date(targetYear, 0, 1).getTime() / 1000);
+  const after = Math.floor(Date.UTC(targetYear, 0, 1) / 1000);
   // Epoch timestamp for Jan 1st of next year
-  const before = Math.floor(new Date(targetYear + 1, 0, 1).getTime() / 1000);
+  const before = Math.floor(Date.UTC(targetYear + 1, 0, 1) / 1000);
 
   while (true) {
     const response = await fetch(

@@ -59,6 +59,8 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const CurrentSlide = slides[currentIndex];
 
+  if (!CurrentSlide) return null;
+
   const buttonClass = theme === 'white'
     ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
     : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";

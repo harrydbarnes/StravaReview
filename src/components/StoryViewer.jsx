@@ -78,7 +78,11 @@ const StoryViewer = ({ slides, onClose }) => {
             const isActive = idx === currentIndex;
             const isPast = idx < currentIndex;
             return (
-              <div key={idx} className="h-1 flex-1 bg-gray-500/50 rounded-full overflow-hidden">
+              <div
+                key={idx}
+                className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all"
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+              >
                 <motion.div
                   key={`${idx}-${isActive}`}
                   className={clsx("h-full", textColor.replace('text-', 'bg-'))}

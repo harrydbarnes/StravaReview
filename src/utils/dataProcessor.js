@@ -6,8 +6,37 @@ const KCAL_PER_KM_RIDE = 25;
 const KCAL_PER_KM_DEFAULT = 60;
 
 // Fun Comparison Constants
-const SONG_DURATION_SECONDS = 219; // "Shake It Off" approx 3:39
-const MOVIE_DURATION_MINUTES = 120;
+// Songs (seconds)
+const SONGS = [
+  { title: "Best Song Ever", duration: 198 },
+  { title: "TOOTIMETOOTIMETOOTIME", duration: 200 },
+  { title: "Shake It Off", duration: 219 },
+  { title: "Cruel Summer", duration: 178 },
+  { title: "As It Was", duration: 167 },
+  { title: "Flowers", duration: 200 },
+  { title: "Anti-Hero", duration: 200 },
+  { title: "Unstoppable", duration: 217 },
+  { title: "I'm Good (Blue)", duration: 175 },
+  { title: "Levitating", duration: 203 },
+  { title: "Blinding Lights", duration: 200 },
+  { title: "Shut Up and Dance", duration: 199 }
+];
+
+// Movies (minutes)
+const MOVIES = [
+  { title: "A New Hope", duration: 121 },
+  { title: "La La Land", duration: 128 },
+  { title: "Twilight", duration: 122 },
+  { title: "Titanic", duration: 195 },
+  { title: "Avengers: Endgame", duration: 181 },
+  { title: "The Godfather", duration: 175 },
+  { title: "Inception", duration: 148 },
+  { title: "The Matrix", duration: 136 },
+  { title: "Interstellar", duration: 169 },
+  { title: "Pulp Fiction", duration: 154 },
+  { title: "Forrest Gump", duration: 142 },
+  { title: "The Lion King", duration: 88 }
+];
 
 // Vibe Thresholds
 const VIBE_THRESHOLD_YOGA_RATIO = 0.3;
@@ -91,8 +120,16 @@ export const generateMockActivities = () => {
   return activities.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 };
 
-export const analyzeData = (activities) => {
-  if (!activities || activities.length === 0) return null;
+export const analyzeData = (allActivities) => {
+  if (!allActivities || allActivities.length === 0) return null;
+
+  // Filter for 2025
+  const activities = allActivities.filter(a => {
+      const d = new Date(a.start_date);
+      return d.getFullYear() === 2025;
+  });
+
+  if (activities.length === 0) return null; // Or handle empty year gracefully
 
   const totalActivities = activities.length;
   let totalDistance = 0;
@@ -277,8 +314,13 @@ export const analyzeData = (activities) => {
 
   // Fun Stats
   const totalHours = Math.round(totalTime / 3600);
-  const shakeItOffCount = Math.floor(totalTime / SONG_DURATION_SECONDS);
-  const moviesCount = Math.floor((totalTime / 60) / MOVIE_DURATION_MINUTES);
+
+  // Select random comparisons
+  const song = SONGS[Math.floor(Math.random() * SONGS.length)];
+  const songCount = Math.floor(totalTime / song.duration);
+
+  const movie = MOVIES[Math.floor(Math.random() * MOVIES.length)];
+  const movieCount = Math.floor((totalTime / 60) / movie.duration);
   
   // Vibe Check
   const vibe = determineVibe({
@@ -292,7 +334,7 @@ export const analyzeData = (activities) => {
   });
 
   return {
-    year: new Date().getFullYear(),
+    year: 2025,
     totalActivities,
     totalDistance: Math.round(totalDistance / 1000),
     totalCalories: Math.round(totalCalories),
@@ -300,8 +342,8 @@ export const analyzeData = (activities) => {
     totalHours,
     activeDays: activeDaysSet.size,
     funComparisons: {
-        shakeItOff: shakeItOffCount,
-        movies: moviesCount
+        song: { title: song.title, count: songCount },
+        movie: { title: movie.title, count: movieCount }
     },
     topSports,
     longestStreak: maxStreak,

@@ -205,8 +205,8 @@ export const FunStatsSlide = ({ data, textColor }) => (
                     <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
                     <p className="text-lg font-medium">
                         That's like listening to <br/>
-                        <span className="font-black italic">"Shake It Off"</span> <br/>
-                        <span className="text-4xl font-bold text-brand-orange">{data.funComparisons.shakeItOff}</span> times! 💃
+                        <span className="font-black italic">"{data.funComparisons.song.title}"</span> <br/>
+                        <span className="text-4xl font-bold text-brand-orange">{data.funComparisons.song.count}</span> times! 💃
                     </p>
                 </div>
             </motion.div>
@@ -219,7 +219,7 @@ export const FunStatsSlide = ({ data, textColor }) => (
             >
                 <span className="text-4xl">🎬</span>
                 <p className="text-xl">
-                    Or watching <span className="font-bold">{data.funComparisons.movies}</span> full-length movies.
+                    Or watching <span className="font-bold">{data.funComparisons.movie.title}</span> <span className="font-bold">{data.funComparisons.movie.count}</span> times.
                 </p>
             </motion.div>
         </div>

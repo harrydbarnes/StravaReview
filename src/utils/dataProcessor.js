@@ -359,7 +359,7 @@ export const analyzeData = (allActivities, year = 2025) => {
           const parts = referenceAct.timezone.split('/');
           if (parts.length > 1) {
               const potentialLoc = parts[parts.length - 1].replace(/_/g, ' ');
-               if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) {
+if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) {
                   timezoneLoc = potentialLoc;
               }
           }

@@ -63,7 +63,7 @@ function App() {
                 const tokenData = await exchangeToken(storedClientId, storedClientSecret, code);
                 
                 setLoadingStatus('Fetching your activities (this might take a moment)...');
-                const activities = await fetchActivities(tokenData.access_token);
+                const activities = await fetchActivities(tokenData.access_token, targetYear);
                 
                 setLoadingStatus('Analyzing your year...');
                 const result = analyzeData(activities, targetYear);

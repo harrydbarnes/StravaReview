@@ -13,6 +13,7 @@ import {
     SummarySlide
 } from './components/Slides';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
+import { getCityFromCoords } from './utils/geocoder';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 import HowToSetup from './components/HowToSetup';
 
@@ -69,6 +70,15 @@ function App() {
                 const result = analyzeData(activities, targetYear);
                 
                 if (result) {
+                    // Enrich with geocoded city if needed
+                    if (result.topLocation && result.topLocation.requiresGeocoding && result.topLocation.center) {
+                        setLoadingStatus('Finding your playground...');
+                        const cityName = await getCityFromCoords(result.topLocation.center[0], result.topLocation.center[1]);
+                        if (cityName) {
+                            result.topLocation.name = cityName;
+                        }
+                    }
+
                     setData(result);
                     setStarted(true); // Auto start if we have data from redirect
                 } else {
@@ -113,6 +123,15 @@ function App() {
         const result = analyzeData(mock, targetYear);
 
         if (result) {
+            // Enrich with geocoded city if needed
+            if (result.topLocation && result.topLocation.requiresGeocoding && result.topLocation.center) {
+                setLoadingStatus('Finding your playground...');
+                const cityName = await getCityFromCoords(result.topLocation.center[0], result.topLocation.center[1]);
+                if (cityName) {
+                    result.topLocation.name = cityName;
+                }
+            }
+
             setData(result);
             setStarted(true);
         } else {

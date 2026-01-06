@@ -131,20 +131,27 @@ export const SummarySlide = ({ data, theme, textColor }) => {
         <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-between text-center")}>
             <div className={clsx("flex-1 w-full flex flex-col items-center justify-center", textColor)}>
                 <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl", theme.bg, textColor)}>
-                    <h2 className="text-4xl md:text-5xl font-black mb-8 uppercase">The Grand Total</h2>
+                    <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
+                        STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
+                    </h1>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">The Grand Total</h2>
 
-                    <div className="grid grid-cols-1 gap-8 w-full">
+                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
                         <div className="text-center">
-                            <p className="text-6xl md:text-7xl font-black">{data.totalActivities}</p>
-                            <p className="text-xl uppercase tracking-widest opacity-75">Activities</p>
+                            <p className="text-4xl md:text-6xl font-black">{data.totalActivities}</p>
+                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Activities</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-6xl md:text-7xl font-black">{data.totalDistance}</p>
-                            <p className="text-xl uppercase tracking-widest opacity-75">Kilometers</p>
+                            <p className="text-4xl md:text-6xl font-black">{data.totalHours}</p>
+                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Hours</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-6xl md:text-7xl font-black">{data.totalCalories.toLocaleString()}</p>
-                            <p className="text-xl uppercase tracking-widest opacity-75">Calories</p>
+                            <p className="text-4xl md:text-6xl font-black">{data.totalDistance}</p>
+                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Km</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-4xl md:text-6xl font-black">{data.totalCalories.toLocaleString()}</p>
+                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Cals</p>
                         </div>
                     </div>
 
@@ -204,8 +211,8 @@ export const FunStatsSlide = ({ data, textColor }) => (
                     <p className="text-lg opacity-80 mb-2">You moved for</p>
                     <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
                     <p className="text-lg font-medium">
-                        That's like listening to <br/>
-                        <span className="font-black italic">"{data.funComparisons.song.title}"</span> <br/>
+                        That&apos;s like listening to <br/>
+                        <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
                         <span className="text-4xl font-bold text-brand-orange">{data.funComparisons.song.count}</span> times! 💃
                     </p>
                 </div>
@@ -296,7 +303,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
                 className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm"
             >
                 <p className="text-lg md:text-xl font-medium leading-relaxed">
-                    "{vibeData.description}"
+                    &quot;{vibeData.description}&quot;
                 </p>
             </motion.div>
 

@@ -9,7 +9,7 @@ def verify_app():
             page.goto("http://localhost:5173/StravaReview/")
 
             # Wait for the main text to be visible
-            page.wait_for_selector("text=See your 2025 year in review")
+            page.wait_for_selector(f"text=See your {__import__('datetime').date.today().year - 1} year in review")
 
             # Take a screenshot of the landing page
             page.screenshot(path="verification/landing_page.png")

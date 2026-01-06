@@ -31,7 +31,7 @@ def verify_app():
 
             # Take another screenshot of the demo mode
             # Giving it a second to render animation
-            page.wait_for_timeout(2000)
+            page.wait_for_selector("text=Your Year in Activity")
             page.screenshot(path="verification/demo_mode.png")
             print("Demo mode screenshot taken.")
 

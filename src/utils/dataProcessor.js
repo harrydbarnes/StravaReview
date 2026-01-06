@@ -61,9 +61,9 @@ const getISOWeekAndYear = (d) => {
     };
 };
 
-export const generateMockActivities = () => {
+export const generateMockActivities = (year = new Date().getFullYear()) => {
   const activities = [];
-  const startYear = new Date().getFullYear();
+  const startYear = year;
   const types = ['Run', 'Ride', 'Swim', 'Walk', 'Hike', 'Yoga', 'WeightTraining', 'Kayaking', 'RockClimbing'];
   const locations = ['Central Park', 'Golden Gate Park', 'Thames Path', 'Hyde Park', 'Richmond Park', 'Home Gym'];
 

@@ -65,7 +65,7 @@ function App() {
                 const activities = await fetchActivities(tokenData.access_token);
                 
                 setLoadingStatus('Analyzing your year...');
-                const currentYear = new Date().getFullYear();
+                const currentYear = new Date().getFullYear() - 1;
                 const result = analyzeData(activities, currentYear);
                 
                 if (result) {
@@ -104,20 +104,27 @@ function App() {
   const handleDemo = async () => {
       setLoading(true);
       setLoadingStatus('Generating demo data...');
-      await new Promise(r => setTimeout(r, 800));
 
-      const mock = generateMockActivities();
-      const currentYear = new Date().getFullYear();
-      // Ensure we analyze the same year we generated for
-      const result = analyzeData(mock, currentYear);
+      try {
+        await new Promise(r => setTimeout(r, 800));
 
-      if (result) {
-          setData(result);
-          setStarted(true);
-      } else {
-          setError("Failed to generate demo data.");
+        const targetYear = new Date().getFullYear() - 1;
+        const mock = generateMockActivities(targetYear);
+        // Ensure we analyze the same year we generated for
+        const result = analyzeData(mock, targetYear);
+
+        if (result) {
+            setData(result);
+            setStarted(true);
+        } else {
+            setError("Failed to generate demo data.");
+        }
+      } catch (err) {
+        console.error("Error generating demo data:", err);
+        setError("Failed to generate demo data. Please try again.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
   };
 
   if (!started) {
@@ -132,7 +139,7 @@ function App() {
                 </h1>
                 
                 <p className="text-gray-400 mb-8 text-lg">
-                    See your {new Date().getFullYear()} year in review. <br/> Connect your account to get started.
+                    See your {new Date().getFullYear() - 1} year in review. <br/> Connect your account to get started.
                 </p>
 
                 {error && (

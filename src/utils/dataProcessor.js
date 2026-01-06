@@ -223,8 +223,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       }
 
       // Locations
-      // Only count explicit city names for "Favourite Playground" to avoid skewing data
-      // with broad defaults like "United Kingdom" or timezone cities like "London"
+      // Use explicit city name if available. As a fallback, infer city from timezone.
       let loc = act.location_city?.trim() || null;
 
       // Fallback: Infer city from timezone if available
@@ -232,7 +231,11 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (!loc && act.timezone) {
           const parts = act.timezone.split('/');
           if (parts.length > 1) {
-              loc = parts[parts.length - 1].replace(/_/g, ' ');
+              const potentialLoc = parts[parts.length - 1].replace(/_/g, ' ');
+              // Avoid generic timezone identifiers like GMT, UTC, or region names like Pacific.
+              if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) {
+                  loc = potentialLoc;
+              }
           }
       }
 

@@ -84,7 +84,7 @@ function App() {
     };
 
     handleAuth();
-  }, [targetYear]);
+  }, []);
 
   const handleConnect = () => {
       if (!clientId || !clientSecret) {

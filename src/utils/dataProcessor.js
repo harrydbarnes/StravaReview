@@ -120,13 +120,13 @@ export const generateMockActivities = () => {
   return activities.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
 };
 
-export const analyzeData = (allActivities) => {
+export const analyzeData = (allActivities, year = 2025) => {
   if (!allActivities || allActivities.length === 0) return null;
 
-  // Filter for 2025
+  // Filter for the given year
   const activities = allActivities.filter(a => {
       const d = new Date(a.start_date);
-      return d.getFullYear() === 2025;
+      return d.getFullYear() === year;
   });
 
   if (activities.length === 0) return null; // Or handle empty year gracefully

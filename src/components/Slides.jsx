@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
-const LOCATION_NAME_LENGTH_THRESHOLD = 15;
 
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
@@ -61,7 +60,15 @@ export const NewActivitySlide = ({ data, textColor }) => (
 export const LocationSlide = ({ data, textColor }) => {
     // Dynamic sizing based on length
     const nameLength = data.topLocation.name.length;
-    const textSizeClass = nameLength > LOCATION_NAME_LENGTH_THRESHOLD ? "text-2xl md:text-3xl" : "text-4xl md:text-6xl";
+    let textSizeClass = "text-4xl md:text-6xl"; // Default (Short)
+
+    if (nameLength > 20) {
+        textSizeClass = "text-xl md:text-2xl"; // Extra Long
+    } else if (nameLength > 14) {
+        textSizeClass = "text-2xl md:text-4xl"; // Long
+    } else if (nameLength > 8) {
+        textSizeClass = "text-3xl md:text-5xl"; // Medium
+    }
 
     return (
         <SlideContainer textColor={textColor}>
@@ -73,7 +80,7 @@ export const LocationSlide = ({ data, textColor }) => {
             >
                 📍
             </motion.div>
-            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full whitespace-nowrap overflow-hidden text-ellipsis")}>
+            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
                 {data.topLocation.name}
             </h3>
             <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>

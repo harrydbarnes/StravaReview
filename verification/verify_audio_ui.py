@@ -6,7 +6,8 @@ def verify_app():
         page = browser.new_page()
 
         # Navigate to the app (using default Vite port)
-        page.goto("http://localhost:5173/")
+        app_url = os.environ.get("APP_URL", "http://localhost:5173/")
+        page.goto(app_url)
 
         # Wait for the landing page
         page.wait_for_selector("text=Connect with Strava")

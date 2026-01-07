@@ -247,7 +247,7 @@ function App() {
       (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
       (props) => <LocationSlide data={data} {...props} />,
       (props) => <TopMonthsSlide data={data} {...props} />,
-      (props) => <SummarySlide data={data} {...props} />
+      (props) => <SummarySlide data={data} traits={vibeTraits} {...props} />
   ] : [];
 
   return (

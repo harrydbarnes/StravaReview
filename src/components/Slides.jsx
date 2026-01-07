@@ -56,22 +56,28 @@ export const NewActivitySlide = ({ data, textColor }) => (
   </SlideContainer>
 );
 
-export const LocationSlide = ({ data, textColor }) => (
-    <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favorite Playground</h2>
-        <motion.div 
-            className="text-8xl md:text-9xl mb-4"
-            animate={{ y: [0, -20, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-        >
-            📍
-        </motion.div>
-        <h3 className="text-4xl md:text-6xl font-black uppercase leading-tight">
-            {data.topLocation.name}
-        </h3>
-        <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
-    </SlideContainer>
-);
+export const LocationSlide = ({ data, textColor }) => {
+    // Dynamic sizing based on length
+    const nameLength = data.topLocation.name.length;
+    const textSizeClass = nameLength > 15 ? "text-2xl md:text-4xl" : "text-4xl md:text-6xl";
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favorite Playground</h2>
+            <motion.div
+                className="text-8xl md:text-9xl mb-4"
+                animate={{ y: [0, -20, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+            >
+                📍
+            </motion.div>
+            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight break-words max-w-full")}>
+                {data.topLocation.name}
+            </h3>
+            <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
+        </SlideContainer>
+    );
+};
 
 export const PersonalitySlide = ({ data, textColor, traits }) => {
     const trait = traits[data.personality] || traits["The Mover"];
@@ -114,8 +120,9 @@ export const TopMonthsSlide = ({ data, textColor }) => (
     </SlideContainer>
 );
 
-export const SummarySlide = ({ data, theme, textColor }) => {
+export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
+    const vibeData = traits ? (traits[data.vibe] || traits["Certified Mover"]) : null;
 
     const handleDownload = async () => {
         if (ref.current) {
@@ -130,13 +137,13 @@ export const SummarySlide = ({ data, theme, textColor }) => {
     return (
         <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-between text-center")}>
             <div className={clsx("flex-1 w-full flex flex-col items-center justify-center", textColor)}>
-                <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl", theme.bg, textColor)}>
+                <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl relative", theme.bg, textColor)}>
                     <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
                         STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
                     </h1>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">The Grand Total</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">2025 Grand Total</h2>
 
-                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
+                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-8">
                         <div className="text-center">
                             <p className="text-4xl md:text-6xl font-black">{data.totalActivities}</p>
                             <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Activities</p>
@@ -150,10 +157,17 @@ export const SummarySlide = ({ data, theme, textColor }) => {
                             <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Km</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-4xl md:text-6xl font-black">{data.totalCalories.toLocaleString()}</p>
+                            <p className="text-3xl md:text-5xl font-black">{data.totalCalories.toLocaleString()}</p>
                             <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Cals</p>
                         </div>
                     </div>
+
+                    {vibeData && (
+                        <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 opacity-80">
+                            <span className="text-2xl">{vibeData.icon}</span>
+                            <span className="text-lg font-bold uppercase tracking-widest">{data.vibe}</span>
+                        </div>
+                    )}
 
                 </div>
             </div>
@@ -282,7 +296,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-xl font-bold mb-8 uppercase tracking-[0.2em] opacity-60">2025 Vibe Check</h2>
+            <h2 className="text-xl font-bold mb-8 mt-20 uppercase tracking-[0.2em] opacity-60">2025 Vibe Check</h2>
 
             <motion.div
                 initial={{ scale: 0.5, rotate: -10, opacity: 0 }}

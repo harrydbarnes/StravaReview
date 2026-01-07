@@ -294,7 +294,7 @@ export const SpotlightSlide = ({ data, textColor }) => {
 
 // 4. VIBE SLIDE (Replaces Old Personality Slide)
 export const VibeSlide = ({ data, textColor, traits }) => {
-    const vibeData = traits[data.vibe] || traits[DEFAULT_VIBE];
+    const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
 
     return (
         <SlideContainer textColor={textColor}>

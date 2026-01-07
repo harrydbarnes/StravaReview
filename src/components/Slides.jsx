@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
+const LOCATION_NAME_LENGTH_THRESHOLD = 15;
 
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
@@ -59,7 +60,6 @@ export const NewActivitySlide = ({ data, textColor }) => (
 
 export const LocationSlide = ({ data, textColor }) => {
     // Dynamic sizing based on length
-    const LOCATION_NAME_LENGTH_THRESHOLD = 15;
     const nameLength = data.topLocation.name.length;
     const textSizeClass = nameLength > LOCATION_NAME_LENGTH_THRESHOLD ? "text-2xl md:text-3xl" : "text-4xl md:text-6xl";
 

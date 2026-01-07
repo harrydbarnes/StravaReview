@@ -41,6 +41,13 @@ function App() {
     // Initialize entry audio
     entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.wav');
     entryAudioRef.current.volume = 0.5;
+
+    return () => {
+      if (entryAudioRef.current) {
+        entryAudioRef.current.pause();
+        entryAudioRef.current.src = '';
+      }
+    };
   }, []);
 
   const playEntrySound = () => {

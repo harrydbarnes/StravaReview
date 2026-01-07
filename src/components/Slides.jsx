@@ -141,7 +141,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
                         STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
                     </h1>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">2025 Grand Total</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">{data.year} Grand Total</h2>
 
                     <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-8">
                         <div className="text-center">

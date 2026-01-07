@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
+const DRAMATIC_DELAY = 3;
+const STAGGER_DELAY = 1.5;
 
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
@@ -25,7 +27,7 @@ export const IntroSlide = ({ data, textColor }) => (
     <motion.p 
         initial={{ y: 20, opacity: 0 }} 
         animate={{ y: 0, opacity: 1 }} 
-        transition={{ delay: 0.2 }}
+        transition={{ delay: DRAMATIC_DELAY }}
         className="text-xl font-bold"
     >
         {data.year}
@@ -33,7 +35,7 @@ export const IntroSlide = ({ data, textColor }) => (
     <motion.div 
         initial={{ scale: 0 }} 
         animate={{ scale: 1 }} 
-        transition={{ delay: 0.4, type: 'spring' }}
+        transition={{ delay: DRAMATIC_DELAY + 0.2, type: 'spring' }}
         className="mt-8 text-6xl md:text-8xl"
     >
         🔥
@@ -115,7 +117,7 @@ export const TopMonthsSlide = ({ data, textColor }) => (
                     key={m.month}
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: idx * 0.2 }}
+                    transition={{ delay: DRAMATIC_DELAY + (idx * STAGGER_DELAY) }}
                     className="flex items-center justify-between p-4 border-2 border-current rounded-xl"
                 >
                     <div className="flex items-center gap-4">
@@ -152,7 +154,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     </h1>
                     <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">{data.year} Grand Total</h2>
 
-                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-8">
+                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-4">
                         <div className="text-center">
                             <p className="text-4xl md:text-6xl font-black">{data.totalActivities}</p>
                             <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Activities</p>
@@ -172,7 +174,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     </div>
 
                     {vibeData && (
-                        <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 opacity-80">
+                        <div className="flex items-center justify-center gap-2 opacity-80 mb-4">
                             <span className="text-2xl">{vibeData.icon}</span>
                             <span className="text-lg font-bold uppercase tracking-widest">{data.vibe}</span>
                         </div>
@@ -202,7 +204,7 @@ export const TopSportsSlide = ({ data, textColor }) => (
                     key={sport.type}
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: idx * 0.1 }}
+                    transition={{ delay: DRAMATIC_DELAY + (idx * STAGGER_DELAY) }}
                     className="flex items-center justify-between p-4 border-2 border-current rounded-xl bg-white/5 backdrop-blur-sm"
                 >
                     <div className="flex items-center gap-4">
@@ -228,6 +230,7 @@ export const FunStatsSlide = ({ data, textColor }) => (
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
                 className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
             >
                 <div className="relative z-10">
@@ -244,7 +247,7 @@ export const FunStatsSlide = ({ data, textColor }) => (
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: DRAMATIC_DELAY + STAGGER_DELAY }}
                 className="flex items-center justify-center gap-4"
             >
                 <span className="text-4xl">🎬</span>

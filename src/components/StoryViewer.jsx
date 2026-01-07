@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import clsx from 'clsx';
 // Removed unused imports
 
@@ -16,14 +16,62 @@ const StoryViewer = ({ slides, onClose }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
+  const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef(null);
+
+  const bgMusicRef = useRef(null);
+  const cheerRef = useRef(null);
+
+  useEffect(() => {
+    // Initialize audio with correct base path
+    const baseUrl = import.meta.env.BASE_URL;
+    bgMusicRef.current = new Audio(`${baseUrl}DrumLoop.wav`);
+    bgMusicRef.current.loop = true;
+    bgMusicRef.current.volume = 0.5;
+
+    cheerRef.current = new Audio(`${baseUrl}CrowdCheer.mp3`);
+    cheerRef.current.volume = 0.6;
+
+    return () => {
+      if (bgMusicRef.current) bgMusicRef.current.pause();
+      if (cheerRef.current) cheerRef.current.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!bgMusicRef.current || !cheerRef.current) return;
+
+    if (isMuted) {
+      bgMusicRef.current.pause();
+      cheerRef.current.pause();
+      return;
+    }
+
+    const playAudio = async (audio) => {
+      try {
+        await audio.play();
+      } catch (err) {
+        console.warn('Audio playback failed:', err);
+      }
+    };
+
+    const isLastSlide = currentIndex === slides.length - 1;
+
+    if (isLastSlide) {
+      bgMusicRef.current.pause();
+      playAudio(cheerRef.current);
+    } else {
+      cheerRef.current.pause();
+      cheerRef.current.currentTime = 0;
+      if (bgMusicRef.current.paused) {
+        playAudio(bgMusicRef.current);
+      }
+    }
+  }, [currentIndex, isMuted, slides.length]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {
       setCurrentIndex(prev => prev + 1);
-    } else {
-        // Maybe loop or close? For now, stay on last slide.
-        // We could call onClose() here if we wanted auto-close
     }
   }, [currentIndex, slides.length]);
 
@@ -99,6 +147,13 @@ const StoryViewer = ({ slides, onClose }) => {
 
         {/* Controls Overlay (Theming) */}
         <div className="absolute top-6 right-4 z-30 flex gap-2">
+            <button
+                onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+                className={buttonClass}
+                title={isMuted ? "Unmute" : "Mute"}
+            >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
             <button onClick={() => {
                 const newTheme = theme === 'black' ? 'white' : 'black';
                 setTheme(newTheme);

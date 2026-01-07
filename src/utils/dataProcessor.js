@@ -1,6 +1,7 @@
 // src/utils/dataProcessor.js
 
 // Constants
+export const DEFAULT_VIBE = "Certified Mover";
 const KJ_TO_KCAL = 0.239;
 const KCAL_PER_KM_RIDE = 25;
 const KCAL_PER_KM_DEFAULT = 60;
@@ -449,7 +450,7 @@ const determineVibe = (stats) => {
     if (Object.keys(activityTypes).length > VIBE_THRESHOLD_VARIETY_COUNT)
         return "Side Quest Pro";
 
-    return "Certified Mover";
+    return DEFAULT_VIBE;
 };
 
 export const vibeTraits = {
@@ -459,6 +460,6 @@ export const vibeTraits = {
     "Night Owl": { description: "The city hits different at night. You own the darkness.", icon: "🌙" },
     "Lunch Breaker": { description: "Maximizing every minute. You turned downtime into go-time.", icon: "🥪" },
     "Side Quest Pro": { description: "Why specialize? You're collecting XP in every category possible.", icon: "🎮" },
-    "Certified Mover": { description: "No labels, just movement. You kept it moving all year long.", icon: "👟" },
+    [DEFAULT_VIBE]: { description: "No labels, just movement. You kept it moving all year long.", icon: "👟" },
     "Weekend Warrior": { description: "Living for the weekend adventures.", icon: "🗓️" }
 };

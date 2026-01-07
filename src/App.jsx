@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import StoryViewer from './components/StoryViewer';
 import { generateMockActivities, analyzeData, vibeTraits } from './utils/dataProcessor';
 import {
@@ -33,6 +33,28 @@ function App() {
   const [clientId, setClientId] = useState(import.meta.env.VITE_STRAVA_CLIENT_ID || '');
   const [clientSecret, setClientSecret] = useState(import.meta.env.VITE_STRAVA_CLIENT_SECRET || '');
   const [needsCreds] = useState(!import.meta.env.VITE_STRAVA_CLIENT_ID);
+
+  // Audio ref for entry sound
+  const entryAudioRef = useRef(null);
+
+  useEffect(() => {
+    // Initialize entry audio
+    entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.wav');
+    entryAudioRef.current.volume = 0.5;
+
+    return () => {
+      if (entryAudioRef.current) {
+        entryAudioRef.current.pause();
+        entryAudioRef.current.src = '';
+      }
+    };
+  }, []);
+
+  const playEntrySound = () => {
+    if (entryAudioRef.current) {
+        entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
+    }
+  };
 
   useEffect(() => {
     // Migrate credentials from localStorage to sessionStorage for a seamless user transition.
@@ -97,6 +119,8 @@ function App() {
   }, []);
 
   const handleConnect = () => {
+      playEntrySound();
+
       if (!clientId || !clientSecret) {
           setError("Please enter your Client ID and Client Secret.");
           return;
@@ -112,6 +136,8 @@ function App() {
   };
 
   const handleDemo = async () => {
+      playEntrySound();
+
       setLoading(true);
       setLoadingStatus('Generating demo data...');
 

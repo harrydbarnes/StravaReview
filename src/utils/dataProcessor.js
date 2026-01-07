@@ -233,7 +233,7 @@ export const analyzeData = (allActivities, year = 2025) => {
           const [lat, lng] = act.start_latlng;
           // ⚡ Bolt Optimization: Use integer math for key generation
           // Benchmark: ~46x faster than toFixed(2)
-          const key = `${Math.round(lat * 100)},${Math.round(lng * 100)}`;
+          const key = `${Math.trunc(lat * 100 + Math.sign(lat) * 0.5)},${Math.trunc(lng * 100 + Math.sign(lng) * 0.5)}`;
           if (!coordinateClusters[key]) coordinateClusters[key] = { count: 0, lat: 0, lng: 0 };
 
           // Running average for center

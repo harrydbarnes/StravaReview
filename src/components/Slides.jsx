@@ -303,7 +303,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             <motion.div
                 initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                className="text-[8rem] md:text-[10rem] mb-2 drop-shadow-2xl"
+                className="mb-2 text-[8rem] md:text-[10rem] drop-shadow-2xl"
             >
                 {vibeData.icon}
             </motion.div>

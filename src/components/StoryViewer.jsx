@@ -33,8 +33,14 @@ const StoryViewer = ({ slides, onClose }) => {
     cheerRef.current.volume = 0.6;
 
     return () => {
-      if (bgMusicRef.current) bgMusicRef.current.pause();
-      if (cheerRef.current) cheerRef.current.pause();
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+        bgMusicRef.current.src = '';
+      }
+      if (cheerRef.current) {
+        cheerRef.current.pause();
+        cheerRef.current.src = '';
+      }
     };
   }, []);
 

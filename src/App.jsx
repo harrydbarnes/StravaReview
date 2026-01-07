@@ -43,6 +43,12 @@ function App() {
     entryAudioRef.current.volume = 0.5;
   }, []);
 
+  const playEntrySound = () => {
+    if (entryAudioRef.current) {
+        entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
+    }
+  };
+
   useEffect(() => {
     // Migrate credentials from localStorage to sessionStorage for a seamless user transition.
     const migrateItem = (key) => {
@@ -106,9 +112,7 @@ function App() {
   }, []);
 
   const handleConnect = () => {
-      if (entryAudioRef.current) {
-          entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
-      }
+      playEntrySound();
 
       if (!clientId || !clientSecret) {
           setError("Please enter your Client ID and Client Secret.");
@@ -125,9 +129,7 @@ function App() {
   };
 
   const handleDemo = async () => {
-      if (entryAudioRef.current) {
-          entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
-      }
+      playEntrySound();
 
       setLoading(true);
       setLoadingStatus('Generating demo data...');

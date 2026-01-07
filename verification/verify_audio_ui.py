@@ -61,12 +61,10 @@ def verify_app():
         # or centered on desktop.
 
         # We can use page.viewport_size to calculate.
-        vp = page.viewport_size
-        width = vp['width']
-        height = vp['height']
-
-        # Click at 85% width, 50% height
-        page.mouse.click(width * 0.85, height * 0.5)
+        # A more robust way to click to the next slide
+        clickable_area = page.locator(".flex-1.cursor-pointer")
+        box = clickable_area.bounding_box()
+        page.mouse.click(box['x'] + box['width'] * 0.85, box['y'] + box['height'] * 0.5)
 
         # Wait for Top Sports title to confirm navigation
         # This replaces the brittle fixed timeout

@@ -298,12 +298,12 @@ export const VibeSlide = ({ data, textColor, traits }) => {
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-xl font-bold mb-4 mt-12 md:mt-20 uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
+            <h2 className="mt-8 md:mt-12 mb-2 text-xl font-bold uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
 
             <motion.div
                 initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                className="text-[8rem] md:text-[10rem] mb-4 drop-shadow-2xl"
+                className="mb-2 text-[8rem] md:text-[10rem] drop-shadow-2xl"
             >
                 {vibeData.icon}
             </motion.div>

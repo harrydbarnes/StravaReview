@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 
@@ -58,8 +59,9 @@ export const NewActivitySlide = ({ data, textColor }) => (
 
 export const LocationSlide = ({ data, textColor }) => {
     // Dynamic sizing based on length
+    const LOCATION_NAME_LENGTH_THRESHOLD = 15;
     const nameLength = data.topLocation.name.length;
-    const textSizeClass = nameLength > 15 ? "text-2xl md:text-4xl" : "text-4xl md:text-6xl";
+    const textSizeClass = nameLength > LOCATION_NAME_LENGTH_THRESHOLD ? "text-2xl md:text-3xl" : "text-4xl md:text-6xl";
 
     return (
         <SlideContainer textColor={textColor}>
@@ -71,7 +73,7 @@ export const LocationSlide = ({ data, textColor }) => {
             >
                 📍
             </motion.div>
-            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight break-words max-w-full")}>
+            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full whitespace-nowrap overflow-hidden text-ellipsis")}>
                 {data.topLocation.name}
             </h3>
             <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
@@ -122,7 +124,7 @@ export const TopMonthsSlide = ({ data, textColor }) => (
 
 export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
-    const vibeData = traits ? (traits[data.vibe] || traits["Certified Mover"]) : null;
+    const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
 
     const handleDownload = async () => {
         if (ref.current) {
@@ -292,21 +294,21 @@ export const SpotlightSlide = ({ data, textColor }) => {
 
 // 4. VIBE SLIDE (Replaces Old Personality Slide)
 export const VibeSlide = ({ data, textColor, traits }) => {
-    const vibeData = traits[data.vibe] || traits["Certified Mover"];
+    const vibeData = traits[data.vibe] || traits[DEFAULT_VIBE];
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-xl font-bold mb-8 mt-20 uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
+            <h2 className="text-xl font-bold mb-4 mt-12 md:mt-20 uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
 
             <motion.div
                 initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                className="text-[8rem] md:text-[10rem] mb-6 drop-shadow-2xl"
+                className="text-[8rem] md:text-[10rem] mb-4 drop-shadow-2xl"
             >
                 {vibeData.icon}
             </motion.div>
 
-            <h1 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tight text-center leading-none">
+            <h1 className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight text-center leading-none">
                 {data.vibe}
             </h1>
 
@@ -314,7 +316,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm"
+                className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mb-4"
             >
                 <p className="text-lg md:text-xl font-medium leading-relaxed">
                     &quot;{vibeData.description}&quot;
@@ -322,7 +324,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             </motion.div>
 
             {data.longestStreak > MIN_STREAK_FOR_DISPLAY && (
-                <div className="mt-8 flex items-center gap-2 text-sm font-bold uppercase tracking-widest opacity-75">
+                <div className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest opacity-75">
                     <span>🔥 {data.longestStreak} Week Streak</span>
                 </div>
             )}

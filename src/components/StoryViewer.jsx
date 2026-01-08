@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import clsx from 'clsx';
-// Removed unused imports
 
 const themes = {
   black: { bg: 'bg-black', text: 'text-white', accent: 'text-white' },
@@ -10,6 +9,91 @@ const themes = {
 };
 
 const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
+
+const stopSourceNode = (sourceRef, name) => {
+    if (sourceRef.current) {
+        try {
+            sourceRef.current.stop();
+        } catch (e) {
+            if (e.name !== 'InvalidStateError') {
+                console.warn(`Error stopping ${name}:`, e);
+            }
+        }
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+    }
+};
+
+const Controls = ({
+    className,
+    isMuted,
+    setIsMuted,
+    theme,
+    setTheme,
+    textColor,
+    setTextColor,
+    onClose
+}) => {
+    const buttonClass = theme === 'white'
+        ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
+        : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
+
+    return (
+        <div className={clsx("flex gap-2 z-30", className)}>
+            <button
+                onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+                className={buttonClass}
+                title={isMuted ? "Unmute" : "Mute"}
+                type='button'
+            >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    const newTheme = theme === 'black' ? 'white' : 'black';
+                    setTheme(newTheme);
+                    setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
+                }}
+                className={buttonClass}
+                type='button'
+            >
+                Theme
+            </button>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    // Filter colors based on current theme to avoid invisible text
+                    const invalidColorForTheme = {
+                        black: 'text-black',
+                        white: 'text-white',
+                    };
+                    const availableColors = textColors.filter(c => c !== invalidColorForTheme[theme]);
+
+                    // Find current index in the filtered list or default to 0
+                    const currentFilteredIndex = availableColors.indexOf(textColor);
+                    const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
+
+                    setTextColor(availableColors[nextIdx]);
+                }}
+                className={buttonClass}
+                type='button'
+            >
+                Colour
+            </button>
+            {/* Close button that calls onClose */}
+            {onClose && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClose(); }}
+                    className={buttonClass}
+                    type='button'
+                >
+                    ✕
+                </button>
+            )}
+        </div>
+    );
+};
 
 const StoryViewer = ({ slides, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,80 +104,141 @@ const StoryViewer = ({ slides, onClose }) => {
   const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef(null);
 
-  const loopAudioRef = useRef(null);
-  const cheerRef = useRef(null);
+  // Web Audio API Refs
+  const audioCtxRef = useRef(null);
+  const loopBufferRef = useRef(null);
+  const cheerBufferRef = useRef(null);
+  const loopSourceRef = useRef(null);
+  const cheerSourceRef = useRef(null);
+  const loopGainNodeRef = useRef(null);
+  const cheerGainNodeRef = useRef(null);
 
+  // Initialize Audio Context and Load Buffers
   useEffect(() => {
+    let isMounted = true;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioContext();
+    audioCtxRef.current = ctx;
+
+    // Create Gain Nodes
+    const loopGain = ctx.createGain();
+    loopGain.connect(ctx.destination);
+    loopGain.gain.value = 0.5; // Default volume
+    loopGainNodeRef.current = loopGain;
+
+    const cheerGain = ctx.createGain();
+    cheerGain.connect(ctx.destination);
+    cheerGain.gain.value = 0.6; // Default volume
+    cheerGainNodeRef.current = cheerGain;
+
     const baseUrl = import.meta.env.BASE_URL;
 
-    // Initialize Drum Loop
-    loopAudioRef.current = new Audio(`${baseUrl}DrumLoop.mp3`);
-    loopAudioRef.current.loop = true;
-    loopAudioRef.current.volume = 0.5;
+    const loadBuffer = async (url) => {
+        try {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            if (isMounted) {
+                 return await ctx.decodeAudioData(arrayBuffer);
+            }
+            return null;
+        } catch (error) {
+            console.warn(`Failed to load audio from ${url}:`, error);
+            return null;
+        }
+    };
 
-    // Initialize Cheer
-    cheerRef.current = new Audio(`${baseUrl}CrowdCheer.mp3`);
-    cheerRef.current.volume = 0.6;
+    // Load assets
+    Promise.all([
+        loadBuffer(`${baseUrl}DrumLoop.mp3`),
+        loadBuffer(`${baseUrl}CrowdCheer.mp3`)
+    ]).then(([loopBuffer, cheerBuffer]) => {
+        if (isMounted) {
+            loopBufferRef.current = loopBuffer;
+            cheerBufferRef.current = cheerBuffer;
+        }
+    });
 
     return () => {
-      if (loopAudioRef.current) {
-        loopAudioRef.current.pause();
-        loopAudioRef.current.src = '';
-      }
-      if (cheerRef.current) {
-        cheerRef.current.pause();
-        cheerRef.current.src = '';
-      }
+        isMounted = false;
+        if (ctx.state !== 'closed') {
+            ctx.close();
+        }
     };
   }, []);
 
-  const stopLoop = () => {
-      if (loopAudioRef.current) {
-          loopAudioRef.current.pause();
-      }
-  };
+  // Helper: Play Loop (Gapless)
+  const playWebAudioLoop = useCallback(() => {
+      const ctx = audioCtxRef.current;
+      if (!ctx || !loopBufferRef.current || loopSourceRef.current) return;
 
-  const startLoop = () => {
-      if (!hasStarted || isMuted) return;
-      if (loopAudioRef.current) {
-          loopAudioRef.current.play().catch(e => console.warn("Loop play failed", e));
-      }
-  };
+      const play = () => {
+          const src = ctx.createBufferSource();
+          src.buffer = loopBufferRef.current;
+          src.loop = true;
+          src.connect(loopGainNodeRef.current);
+          src.start(0);
+          loopSourceRef.current = src;
+      };
 
+      if (ctx.state === 'suspended') {
+          ctx.resume().then(play).catch(e => console.warn("Audio Context resume failed", e));
+      } else {
+          play();
+      }
+  }, []);
+
+  // Helper: Stop Loop
+  const stopWebAudioLoop = useCallback(() => {
+      stopSourceNode(loopSourceRef, 'audio loop');
+  }, []);
+
+  // Helper: Play Cheer
+  const playWebAudioCheer = useCallback(() => {
+      const ctx = audioCtxRef.current;
+      if (!ctx || !cheerBufferRef.current) return;
+
+      stopSourceNode(cheerSourceRef, 'existing cheer');
+
+      const src = ctx.createBufferSource();
+      src.buffer = cheerBufferRef.current;
+      src.loop = false;
+      src.connect(cheerGainNodeRef.current);
+      src.start(0);
+      cheerSourceRef.current = src;
+  }, []);
+
+  // Helper: Stop Cheer
+  const stopWebAudioCheer = useCallback(() => {
+      stopSourceNode(cheerSourceRef, 'cheer');
+  }, []);
+
+  // Handle Mute/Unmute
   useEffect(() => {
-    if (isMuted) {
-        if (loopAudioRef.current) loopAudioRef.current.volume = 0;
-        if (cheerRef.current) cheerRef.current.volume = 0;
-    } else {
-        if (loopAudioRef.current) {
-            loopAudioRef.current.volume = 0.5;
-            // Resume if it was supposed to be playing but got muted
-            if (hasStarted && currentIndex !== slides.length - 1) {
-                loopAudioRef.current.play().catch(e => console.warn(e));
-            }
-        }
-        if (cheerRef.current) cheerRef.current.volume = 0.6;
-    }
-  }, [isMuted, hasStarted, currentIndex, slides.length]);
+      if (loopGainNodeRef.current) {
+          loopGainNodeRef.current.gain.value = isMuted ? 0 : 0.5;
+      }
+      if (cheerGainNodeRef.current) {
+          cheerGainNodeRef.current.gain.value = isMuted ? 0 : 0.6;
+      }
+  }, [isMuted]);
 
+
+  // Audio Logic based on Slide Index
   useEffect(() => {
     const isLastSlide = currentIndex === slides.length - 1;
 
     if (isLastSlide) {
-      stopLoop();
-      if (!isMuted && cheerRef.current && hasStarted) {
-          cheerRef.current.play().catch(e => console.warn(e));
+      stopWebAudioLoop();
+      if (!isMuted && hasStarted) {
+          playWebAudioCheer();
       }
     } else {
-      if (cheerRef.current) {
-          cheerRef.current.pause();
-          cheerRef.current.currentTime = 0;
-      }
+      stopWebAudioCheer();
       if (!isMuted && hasStarted) {
-          startLoop();
+          playWebAudioLoop();
       }
     }
-  }, [currentIndex, isMuted, slides.length, hasStarted]);
+  }, [currentIndex, isMuted, slides.length, hasStarted, playWebAudioLoop, stopWebAudioLoop, playWebAudioCheer, stopWebAudioCheer]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {
@@ -124,9 +269,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const handleStart = () => {
       setHasStarted(true);
-      if (!isMuted && loopAudioRef.current) {
-          loopAudioRef.current.play().catch(e => console.warn("Start loop failed", e));
-      }
+      if (!isMuted) playWebAudioLoop();
   };
 
   // Touch/Click handlers
@@ -150,52 +293,6 @@ const StoryViewer = ({ slides, onClose }) => {
 
   if (!SlideComponent) return null;
 
-  const buttonClass = theme === 'white'
-    ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
-    : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
-
-  const Controls = ({ className }) => (
-    <div className={clsx("flex gap-2 z-30", className)}>
-      <button
-        onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
-        className={buttonClass}
-        title={isMuted ? "Unmute" : "Mute"}
-      >
-        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-      </button>
-      <button onClick={(e) => {
-        e.stopPropagation();
-        const newTheme = theme === 'black' ? 'white' : 'black';
-        setTheme(newTheme);
-        setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
-      }} className={buttonClass}>
-        Theme
-      </button>
-      <button onClick={(e) => {
-        e.stopPropagation();
-        // Filter colors based on current theme to avoid invisible text
-        const availableColors = textColors.filter(c =>
-          (theme === 'black' && c !== 'text-black') ||
-          (theme === 'white' && c !== 'text-white')
-        );
-
-        // Find current index in the filtered list or default to 0
-        const currentFilteredIndex = availableColors.indexOf(textColor);
-        const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
-
-        setTextColor(availableColors[nextIdx]);
-      }} className={buttonClass}>
-        Colour
-      </button>
-      {/* Close button that calls onClose */}
-      {onClose && (
-        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={buttonClass}>
-          ✕
-        </button>
-      )}
-    </div>
-  );
-
   return (
     <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].bg)}>
       
@@ -203,7 +300,16 @@ const StoryViewer = ({ slides, onClose }) => {
       <div className="relative w-full h-full md:w-[400px] md:h-[80vh] flex flex-col">
 
         {/* Desktop Controls (Outside Card) */}
-        <Controls className="hidden md:flex absolute -top-12 right-0" />
+        <Controls
+            className="hidden md:flex absolute -top-12 right-0"
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            theme={theme}
+            setTheme={setTheme}
+            textColor={textColor}
+            setTextColor={setTextColor}
+            onClose={onClose}
+        />
 
         {/* Container for Desktop (Mobile mimics full screen) */}
         <div
@@ -248,7 +354,16 @@ const StoryViewer = ({ slides, onClose }) => {
         </div>
 
         {/* Mobile Controls (Inside Card) */}
-        <Controls className="md:hidden absolute top-6 right-4" />
+        <Controls
+            className="md:hidden absolute top-6 right-4"
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            theme={theme}
+            setTheme={setTheme}
+            textColor={textColor}
+            setTextColor={setTextColor}
+            onClose={onClose}
+        />
 
 
         {/* Tap Indicators (First Slide Only) */}

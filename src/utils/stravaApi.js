@@ -69,7 +69,7 @@ export const fetchActivities = async (accessToken, year) => {
     page++;
     
     // Safety break to prevent infinite loops if user has TONS of activities (e.g., > 1000)
-    // 20 pages * 50 = 1000 activities. Should be enough for most.
+    // 20 pages * 200 = 4000 activities. Should be enough for most.
     if (page > 20) break; 
   }
 

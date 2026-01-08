@@ -180,7 +180,7 @@ const StoryViewer = ({ slides, onClose }) => {
       // Attempt to start loop immediately after user interaction
       // We need to bypass the useEffect check here or ensure state updates trigger it
       // Direct call is safer for interaction requirements
-      if (!isMuted && audioBufferRef.current) {
+      if (!isMuted && audioContextRef.current && audioBufferRef.current) {
           if (isLoopPlayingRef.current) return;
           const source = audioContextRef.current.createBufferSource();
           source.buffer = audioBufferRef.current;

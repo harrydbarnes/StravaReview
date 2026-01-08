@@ -220,7 +220,7 @@ export const FunStatsSlide = ({ data, textColor }) => (
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
+                transition={{ delay: DRAMATIC_DELAY - 1 }}
                 className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
             >
                 <div className="relative z-10">
@@ -237,7 +237,7 @@ export const FunStatsSlide = ({ data, textColor }) => (
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY + STAGGER_DELAY }}
+                transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY }}
                 className="flex items-center justify-center gap-4"
             >
                 <span className="text-4xl">🎬</span>

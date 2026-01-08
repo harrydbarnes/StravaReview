@@ -14,6 +14,7 @@ const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500',
 const StoryViewer = ({ slides, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
   const [isMuted, setIsMuted] = useState(false);
@@ -80,6 +81,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   // Helper to play seamless loop
   const startLoop = () => {
+      if (!hasStarted) return;
       if (isLoopPlayingRef.current || !audioContextRef.current || !audioBufferRef.current) return;
 
       const source = audioContextRef.current.createBufferSource();
@@ -126,7 +128,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
     if (isLastSlide) {
       stopLoop();
-      if (!isMuted && cheerRef.current) {
+      if (!isMuted && cheerRef.current && hasStarted) {
           cheerRef.current.play().catch(e => console.warn(e));
       }
     } else {
@@ -134,14 +136,14 @@ const StoryViewer = ({ slides, onClose }) => {
           cheerRef.current.pause();
           cheerRef.current.currentTime = 0;
       }
-      if (!isMuted) {
+      if (!isMuted && hasStarted) {
           // Attempt to start loop if buffer is ready
           // If buffer not ready yet, it won't start, but that's ok (race condition on load)
           // We can add a check in the fetch handler to start if index is 0
           startLoop();
       }
     }
-  }, [currentIndex, isMuted, slides.length, isAudioReady]);
+  }, [currentIndex, isMuted, slides.length, isAudioReady, hasStarted]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {
@@ -156,7 +158,7 @@ const StoryViewer = ({ slides, onClose }) => {
   }, [currentIndex]);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !hasStarted) return;
 
     // Get duration from slide object, default to 6000ms
     const currentDuration = slides[currentIndex].duration || 6000;
@@ -166,12 +168,33 @@ const StoryViewer = ({ slides, onClose }) => {
     }, currentDuration);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, isPaused, handleNext, slides]);
+  }, [currentIndex, isPaused, handleNext, slides, hasStarted]);
 
   const togglePause = () => setIsPaused(!isPaused);
 
+  const handleStart = () => {
+      setHasStarted(true);
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+          audioContextRef.current.resume();
+      }
+      // Attempt to start loop immediately after user interaction
+      // We need to bypass the useEffect check here or ensure state updates trigger it
+      // Direct call is safer for interaction requirements
+      if (!isMuted && audioContextRef.current && audioBufferRef.current) {
+          if (isLoopPlayingRef.current) return;
+          const source = audioContextRef.current.createBufferSource();
+          source.buffer = audioBufferRef.current;
+          source.loop = true;
+          source.connect(gainNodeRef.current);
+          source.start(0);
+          loopSourceRef.current = source;
+          isLoopPlayingRef.current = true;
+      }
+  };
+
   // Touch/Click handlers
   const handleTap = (e) => {
+    if (!hasStarted) return;
     if (!containerRef.current) return;
     
     // Get click coordinates relative to the container
@@ -202,7 +225,19 @@ const StoryViewer = ({ slides, onClose }) => {
         ref={containerRef}
         className="relative w-full h-full md:w-[400px] md:h-[80vh] md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
       >
-        
+        {!hasStarted && (
+            <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center flex-col p-8 text-center">
+                <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">Ready?</h2>
+                <p className="text-gray-300 mb-8">Turn up your volume for the full experience.</p>
+                <button
+                    onClick={handleStart}
+                    className="px-8 py-4 bg-brand-orange text-white text-xl font-bold rounded-full hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-brand-orange/30 animate-pulse"
+                >
+                    Begin Your Journey
+                </button>
+            </div>
+        )}
+
         {/* Progress Bars */}
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
           {slides.map((slide, idx) => {

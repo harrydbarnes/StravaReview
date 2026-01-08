@@ -10,7 +10,9 @@ import {
     VibeSlide,         // <--- New (Replaces PersonalitySlide)
     LocationSlide,
     TopMonthsSlide,
-    SummarySlide
+    SummarySlide,
+    DRAMATIC_DELAY,
+    STAGGER_DELAY
 } from './components/Slides';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
@@ -52,7 +54,12 @@ function App() {
 
   const playEntrySound = () => {
     if (entryAudioRef.current) {
-        entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
+        try {
+            entryAudioRef.current.currentTime = 0;
+            entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
+        } catch(e) {
+            console.warn("Audio error", e);
+        }
     }
   };
 
@@ -264,16 +271,25 @@ function App() {
       );
   }
 
+  // Calculate slide duration logic
+  // "Auto move to next card after two seconds of last stat reveal or after 6 seconds if no big list of stats"
+  const getListDuration = (count) => {
+      // DRAMATIC_DELAY (3s) + (count-1)*STAGGER_DELAY (1.5s) + animation buffer (0.5s) + 2s dwell
+      if (!count) return 6000;
+      const animationEnd = (DRAMATIC_DELAY + (count * STAGGER_DELAY));
+      return (animationEnd + 2) * 1000;
+  };
+
   const slides = data ? [
-      (props) => <IntroSlide data={data} {...props} />,
-      (props) => <TopSportsSlide data={data} {...props} />,
-      ...(data.newActivity ? [(props) => <NewActivitySlide data={data} {...props} />] : []),
-      (props) => <FunStatsSlide data={data} {...props} />,
-      ...((data.mostLikedActivity || data.spotlightActivity) ? [(props) => <SpotlightSlide data={data} {...props} />] : []),
-      (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />,
-      (props) => <LocationSlide data={data} {...props} />,
-      (props) => <TopMonthsSlide data={data} {...props} />,
-      (props) => <SummarySlide data={data} traits={vibeTraits} {...props} />
+      { component: (props) => <IntroSlide data={data} {...props} />, duration: 5000 },
+      { component: (props) => <TopSportsSlide data={data} {...props} />, duration: getListDuration(data.topSports?.length) },
+      ...(data.newActivity ? [{ component: (props) => <NewActivitySlide data={data} {...props} />, duration: 6000 }] : []),
+      { component: (props) => <FunStatsSlide data={data} {...props} />, duration: 8000 }, // Longer for reading
+      ...((data.mostLikedActivity || data.spotlightActivity) ? [{ component: (props) => <SpotlightSlide data={data} {...props} />, duration: 6000 }] : []),
+      { component: (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />, duration: 6000 },
+      { component: (props) => <LocationSlide data={data} {...props} />, duration: 6000 },
+      { component: (props) => <TopMonthsSlide data={data} {...props} />, duration: getListDuration(data.topMonthsByDistance?.length) },
+      { component: (props) => <SummarySlide data={data} traits={vibeTraits} {...props} />, duration: 10000 }
   ] : [];
 
   return (

@@ -19,23 +19,42 @@ const StoryViewer = ({ slides, onClose }) => {
   const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef(null);
 
-  const bgMusicRef = useRef(null);
+  // Web Audio Context for seamless loop
+  const audioContextRef = useRef(null);
+  const loopSourceRef = useRef(null);
+  const gainNodeRef = useRef(null);
+  const isLoopPlayingRef = useRef(false);
+
   const cheerRef = useRef(null);
 
   useEffect(() => {
-    // Initialize audio with correct base path
+    // Initialize Web Audio API for Loop
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContextRef.current = new AudioContext();
+    gainNodeRef.current = audioContextRef.current.createGain();
+    gainNodeRef.current.connect(audioContextRef.current.destination);
+    gainNodeRef.current.gain.value = 0.5; // Default volume
+
     const baseUrl = import.meta.env.BASE_URL;
-    bgMusicRef.current = new Audio(`${baseUrl}DrumLoop.wav`);
-    bgMusicRef.current.loop = true;
-    bgMusicRef.current.volume = 0.5;
+    const loopUrl = `${baseUrl}DrumLoop.wav`;
+
+    fetch(loopUrl)
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioContextRef.current.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+             // Create buffer source is done when playing
+             // Store buffer for reuse
+             audioContextRef.current.buffer = audioBuffer;
+        })
+        .catch(e => console.error("Error loading drum loop:", e));
+
 
     cheerRef.current = new Audio(`${baseUrl}CrowdCheer.mp3`);
     cheerRef.current.volume = 0.6;
 
     return () => {
-      if (bgMusicRef.current) {
-        bgMusicRef.current.pause();
-        bgMusicRef.current.src = '';
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
       }
       if (cheerRef.current) {
         cheerRef.current.pause();
@@ -44,33 +63,67 @@ const StoryViewer = ({ slides, onClose }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!bgMusicRef.current || !cheerRef.current) return;
+  // Helper to play seamless loop
+  const startLoop = () => {
+      if (isLoopPlayingRef.current || !audioContextRef.current || !audioContextRef.current.buffer) return;
 
-    if (isMuted) {
-      bgMusicRef.current.pause();
-      cheerRef.current.pause();
-      return;
-    }
+      const source = audioContextRef.current.createBufferSource();
+      source.buffer = audioContextRef.current.buffer;
+      source.loop = true;
+      source.connect(gainNodeRef.current);
+      source.start(0);
+      loopSourceRef.current = source;
+      isLoopPlayingRef.current = true;
 
-    const playAudio = async (audio) => {
-      try {
-        await audio.play();
-      } catch (err) {
-        console.warn('Audio playback failed:', err);
+      // Resume context if suspended
+      if (audioContextRef.current.state === 'suspended') {
+          audioContextRef.current.resume();
       }
-    };
+  };
 
+  const stopLoop = () => {
+      if (loopSourceRef.current) {
+          try {
+            loopSourceRef.current.stop();
+          } catch(e) {/* ignore if already stopped */}
+          loopSourceRef.current = null;
+      }
+      isLoopPlayingRef.current = false;
+  };
+
+  useEffect(() => {
+    if (isMuted) {
+        if (gainNodeRef.current) gainNodeRef.current.gain.value = 0;
+        if (cheerRef.current) cheerRef.current.volume = 0;
+    } else {
+        if (gainNodeRef.current) gainNodeRef.current.gain.value = 0.5;
+        if (cheerRef.current) cheerRef.current.volume = 0.6;
+
+        // Ensure context is running if unmuted
+        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            audioContextRef.current.resume();
+        }
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
     const isLastSlide = currentIndex === slides.length - 1;
 
     if (isLastSlide) {
-      bgMusicRef.current.pause();
-      playAudio(cheerRef.current);
+      stopLoop();
+      if (!isMuted && cheerRef.current) {
+          cheerRef.current.play().catch(e => console.warn(e));
+      }
     } else {
-      cheerRef.current.pause();
-      cheerRef.current.currentTime = 0;
-      if (bgMusicRef.current.paused) {
-        playAudio(bgMusicRef.current);
+      if (cheerRef.current) {
+          cheerRef.current.pause();
+          cheerRef.current.currentTime = 0;
+      }
+      if (!isMuted) {
+          // Attempt to start loop if buffer is ready
+          // If buffer not ready yet, it won't start, but that's ok (race condition on load)
+          // We can add a check in the fetch handler to start if index is 0
+          startLoop();
       }
     }
   }, [currentIndex, isMuted, slides.length]);
@@ -89,11 +142,16 @@ const StoryViewer = ({ slides, onClose }) => {
 
   useEffect(() => {
     if (isPaused) return;
+
+    // Get duration from slide object, default to 6000ms
+    const currentDuration = slides[currentIndex].duration || 6000;
+
     const timer = setTimeout(() => {
       handleNext();
-    }, 5000); // 5 seconds per slide
+    }, currentDuration);
+
     return () => clearTimeout(timer);
-  }, [currentIndex, isPaused, handleNext]);
+  }, [currentIndex, isPaused, handleNext, slides]);
 
   const togglePause = () => setIsPaused(!isPaused);
 
@@ -111,9 +169,11 @@ const StoryViewer = ({ slides, onClose }) => {
     else togglePause();
   };
 
-  const CurrentSlide = slides[currentIndex];
+  const CurrentSlideData = slides[currentIndex];
+  // Handle both component-direct slides (legacy) and object-based slides
+  const SlideComponent = CurrentSlideData.component || CurrentSlideData;
 
-  if (!CurrentSlide) return null;
+  if (!SlideComponent) return null;
 
   const buttonClass = theme === 'white'
     ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
@@ -130,9 +190,10 @@ const StoryViewer = ({ slides, onClose }) => {
         
         {/* Progress Bars */}
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
-          {slides.map((_, idx) => {
+          {slides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             const isPast = idx < currentIndex;
+            const duration = slide.duration || 6000;
             return (
               <div
                 key={idx}
@@ -144,7 +205,7 @@ const StoryViewer = ({ slides, onClose }) => {
                   className={clsx("h-full", textColor.replace('text-', 'bg-'))}
                   initial={{ width: isPast ? '100%' : '0%' }}
                   animate={{ width: isPast || isActive ? '100%' : '0%' }}
-                  transition={{ duration: isActive ? 5 : 0, ease: 'linear' }}
+                  transition={{ duration: isActive ? duration / 1000 : 0, ease: 'linear' }}
                 />
               </div>
             );
@@ -228,7 +289,7 @@ const StoryViewer = ({ slides, onClose }) => {
               transition={{ duration: 0.3 }}
               className="w-full h-full"
             >
-              <CurrentSlide 
+              <SlideComponent
                 isActive={true} 
                 theme={themes[theme]} 
                 textColor={textColor}

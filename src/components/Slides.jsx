@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
-const DRAMATIC_DELAY = 3;
-const STAGGER_DELAY = 1.5;
+export const DRAMATIC_DELAY = 3;
+export const STAGGER_DELAY = 1.5;
+const INTRO_DELAY = 0.8;
 
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
@@ -27,15 +28,15 @@ export const IntroSlide = ({ data, textColor }) => (
     <motion.p 
         initial={{ y: 20, opacity: 0 }} 
         animate={{ y: 0, opacity: 1 }} 
-        transition={{ delay: DRAMATIC_DELAY }}
+        transition={{ delay: INTRO_DELAY }}
         className="text-xl font-bold"
     >
         {data.year}
     </motion.p>
     <motion.div 
         initial={{ scale: 0 }} 
-        animate={{ scale: 1 }} 
-        transition={{ delay: DRAMATIC_DELAY + 0.2, type: 'spring' }}
+        animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+        transition={{ delay: INTRO_DELAY + 0.4, type: 'spring' }}
         className="mt-8 text-6xl md:text-8xl"
     >
         🔥
@@ -77,15 +78,22 @@ export const LocationSlide = ({ data, textColor }) => {
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favorite Playground</h2>
             <motion.div
                 className="text-8xl md:text-9xl mb-4"
-                animate={{ y: [0, -20, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", bounce: 0.5, duration: 1.5 }}
             >
                 📍
             </motion.div>
-            <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
-                {data.topLocation.name}
-            </h3>
-            <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
+            <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, type: "spring" }}
+            >
+                <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
+                    {data.topLocation.name}
+                </h3>
+                <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
+            </motion.div>
         </SlideContainer>
     );
 };
@@ -311,21 +319,27 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             <h2 className="mt-8 md:mt-12 mb-2 text-xl font-bold uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
 
             <motion.div
-                initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
+                initial={{ scale: 0, rotate: -45, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.2 }}
                 className="mb-2 text-[8rem] md:text-[10rem] drop-shadow-2xl"
             >
                 {vibeData.icon}
             </motion.div>
 
-            <h1 className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight text-center leading-none">
+            <motion.h1
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5, type: "spring" }}
+                className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight text-center leading-none"
+            >
                 {data.vibe}
-            </h1>
+            </motion.h1>
 
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
                 className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mb-4"
             >
                 <p className="text-lg md:text-xl font-medium leading-relaxed">

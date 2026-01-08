@@ -36,7 +36,7 @@ export const IntroSlide = ({ data, textColor }) => (
     <motion.div 
         initial={{ scale: 0 }} 
         animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-        transition={{ delay: INTRO_DELAY + 0.4, type: 'spring' }}
+        transition={{ delay: INTRO_DELAY + 0.4 }}
         className="mt-8 text-6xl md:text-8xl"
     >
         🔥

@@ -17,6 +17,7 @@ const StoryViewer = ({ slides, onClose }) => {
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
   const [isMuted, setIsMuted] = useState(false);
+  const [isAudioReady, setIsAudioReady] = useState(false);
   const containerRef = useRef(null);
 
   // Web Audio Context for seamless loop
@@ -45,6 +46,7 @@ const StoryViewer = ({ slides, onClose }) => {
              // Create buffer source is done when playing
              // Store buffer for reuse
              audioContextRef.current.buffer = audioBuffer;
+             setIsAudioReady(true);
         })
         .catch(e => console.error("Error loading drum loop:", e));
 
@@ -126,7 +128,7 @@ const StoryViewer = ({ slides, onClose }) => {
           startLoop();
       }
     }
-  }, [currentIndex, isMuted, slides.length]);
+  }, [currentIndex, isMuted, slides.length, isAudioReady]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {

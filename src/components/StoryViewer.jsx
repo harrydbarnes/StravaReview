@@ -95,7 +95,7 @@ const Controls = ({
     );
 };
 
-const StoryViewer = ({ slides, onClose }) => {
+const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -268,6 +268,7 @@ const StoryViewer = ({ slides, onClose }) => {
   const togglePause = () => setIsPaused(!isPaused);
 
   const handleStart = () => {
+      if (playEntrySound) playEntrySound();
       setHasStarted(true);
       if (!isMuted) playWebAudioLoop();
   };
@@ -317,15 +318,40 @@ const StoryViewer = ({ slides, onClose }) => {
             className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
         >
             {!hasStarted && (
-            <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center flex-col p-8 text-center">
-                <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">Ready?</h2>
-                <p className="text-gray-300 mb-8">Turn up your volume for the full experience.</p>
-                <button
-                    onClick={handleStart}
-                    className="px-8 py-4 bg-brand-orange text-white text-xl font-bold rounded-full hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-brand-orange/30 animate-pulse"
-                >
-                    Begin Your Journey
-                </button>
+            <div className="absolute inset-0 z-50 bg-black flex items-center justify-center flex-col text-center overflow-hidden">
+                {/* Red Curtain Background */}
+                <div className="absolute inset-0 bg-red-900 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
+
+                {/* Spotlight Animation */}
+                <motion.div
+                    className="absolute w-64 h-64 bg-yellow-200/20 rounded-full blur-3xl"
+                    animate={{
+                        x: ['-50%', '50%', '-30%', '20%'],
+                        y: ['-20%', '30%', '-50%', '10%'],
+                    }}
+                    transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut"
+                    }}
+                    style={{ left: '50%', top: '50%' }}
+                />
+
+                <div className="relative z-10 p-8 flex flex-col items-center">
+                    <h2 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight drop-shadow-2xl">
+                        Lifting the curtain <br/> on your year
+                    </h2>
+                    <p className="text-white/80 mb-10 text-lg font-medium">
+                        Turn up the volume for the show 🎭
+                    </p>
+                    <button
+                        onClick={handleStart}
+                        className="px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
+                    >
+                        Start the Show
+                    </button>
+                </div>
             </div>
         )}
 
@@ -394,23 +420,25 @@ const StoryViewer = ({ slides, onClose }) => {
             className={clsx("flex-1 relative cursor-pointer select-none", themes[theme].bg, themes[theme].text)}
             onClick={handleTap}
         >
-          <AnimatePresence mode='wait'>
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-              className="w-full h-full"
-            >
-              <SlideComponent
-                isActive={true} 
-                theme={themes[theme]} 
-                textColor={textColor}
-                onExport={handleNext} 
-              />
-            </motion.div>
-          </AnimatePresence>
+          {hasStarted && (
+              <AnimatePresence mode='wait'>
+                <motion.div
+                  key={currentIndex}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full h-full"
+                >
+                  <SlideComponent
+                    isActive={true}
+                    theme={themes[theme]}
+                    textColor={textColor}
+                    onExport={handleNext}
+                  />
+                </motion.div>
+              </AnimatePresence>
+          )}
         </div>
 
         </div>

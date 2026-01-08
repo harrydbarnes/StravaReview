@@ -23,17 +23,19 @@ const getListDuration = (count) => {
     return (animationEnd + 2) * 1000;
 };
 
-const StoryContainer = ({ data, onClose }) => {
+const StoryContainer = ({ data, onClose, playEntrySound }) => {
 
   const slides = useMemo(() => {
       if (!data) return [];
 
+      const hasNewActivity = !!data.newActivity;
+
       return [
         { component: (props) => <IntroSlide data={data} {...props} />, duration: 5000 },
         { component: (props) => <TopSportsSlide data={data} {...props} />, duration: getListDuration(data.topSports?.length) },
-        ...(data.newActivity ? [{ component: (props) => <NewActivitySlide data={data} {...props} />, duration: 6000 }] : []),
+        ...(hasNewActivity ? [{ component: (props) => <NewActivitySlide data={data} showClickHint={true} {...props} />, duration: 6000 }] : []),
         { component: (props) => <FunStatsSlide data={data} {...props} />, duration: 8000 },
-        ...((data.mostLikedActivity || data.spotlightActivity) ? [{ component: (props) => <SpotlightSlide data={data} {...props} />, duration: 6000 }] : []),
+        ...((data.mostLikedActivity || data.spotlightActivity) ? [{ component: (props) => <SpotlightSlide data={data} showClickHint={!hasNewActivity} {...props} />, duration: 6000 }] : []),
         { component: (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />, duration: 6000 },
         { component: (props) => <LocationSlide data={data} {...props} />, duration: 6000 },
         { component: (props) => <TopMonthsSlide data={data} {...props} />, duration: getListDuration(data.topMonthsByDistance?.length) },
@@ -45,6 +47,7 @@ const StoryContainer = ({ data, onClose }) => {
       <StoryViewer
           slides={slides}
           onClose={onClose}
+          playEntrySound={playEntrySound}
       />
   );
 };

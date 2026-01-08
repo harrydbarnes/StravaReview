@@ -11,13 +11,17 @@ export const useDoubleClick = (onDoubleClick) => {
   }, []);
 
   useEffect(() => {
-    if (clickCount === 1) {
-      const timer = setTimeout(() => setClickCount(0), DOUBLE_CLICK_TIMEOUT);
-      return () => clearTimeout(timer);
-    }
-    if (clickCount === 2) {
-      onDoubleClick?.();
-      setClickCount(0);
+    switch (clickCount) {
+      case 1: {
+        const timer = setTimeout(() => setClickCount(0), DOUBLE_CLICK_TIMEOUT);
+        return () => clearTimeout(timer);
+      }
+      case 2:
+        onDoubleClick?.();
+        setClickCount(0);
+        break;
+      default:
+        break;
     }
   }, [clickCount, onDoubleClick]);
 

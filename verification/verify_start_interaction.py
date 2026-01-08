@@ -31,8 +31,8 @@ def verify_start_button():
         # The first slide is "IntroSlide" which has "YOUR YEAR" text.
         page.wait_for_selector("text=Your Year", timeout=5000)
 
-        # Wait a bit for animations
-        page.wait_for_timeout(2000)
+        # Wait for the emoji animation to complete
+        page.wait_for_selector('text=🔥', timeout=5000)
 
         # Take a screenshot of the first slide
         page.screenshot(path="verification/first_slide.png")

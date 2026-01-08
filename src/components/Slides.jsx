@@ -187,7 +187,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 // 1. TOP SPORTS SLIDE
 export const TopSportsSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 uppercase">Your Top Sports</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 mt-12 uppercase">Your Top Sports</h2>
         <div className="w-full max-w-md space-y-4">
             {data.topSports.map((sport, idx) => (
                 <motion.div

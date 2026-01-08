@@ -15,15 +15,15 @@ import {
     STAGGER_DELAY
 } from './Slides';
 
-const StoryContainer = ({ data, onClose }) => {
+// Calculate slide duration logic
+const getListDuration = (count) => {
+    // DRAMATIC_DELAY (3s) + (count-1)*STAGGER_DELAY (1.5s) + animation buffer (0.5s) + 2s dwell
+    if (!count) return 6000;
+    const animationEnd = (DRAMATIC_DELAY + (count * STAGGER_DELAY));
+    return (animationEnd + 2) * 1000;
+};
 
-  // Calculate slide duration logic
-  const getListDuration = (count) => {
-      // DRAMATIC_DELAY (3s) + (count-1)*STAGGER_DELAY (1.5s) + animation buffer (0.5s) + 2s dwell
-      if (!count) return 6000;
-      const animationEnd = (DRAMATIC_DELAY + (count * STAGGER_DELAY));
-      return (animationEnd + 2) * 1000;
-  };
+const StoryContainer = ({ data, onClose }) => {
 
   const slides = useMemo(() => {
       if (!data) return [];

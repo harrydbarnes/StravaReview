@@ -1,23 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import StoryViewer from './components/StoryViewer';
-import { generateMockActivities, analyzeData, vibeTraits } from './utils/dataProcessor';
-import {
-    IntroSlide,
-    TopSportsSlide,    // <--- New
-    NewActivitySlide,  // <--- Existing (kept)
-    FunStatsSlide,     // <--- New
-    SpotlightSlide,    // <--- New
-    VibeSlide,         // <--- New (Replaces PersonalitySlide)
-    LocationSlide,
-    TopMonthsSlide,
-    SummarySlide,
-    DRAMATIC_DELAY,
-    STAGGER_DELAY
-} from './components/Slides';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { generateMockActivities, analyzeData } from './utils/dataProcessor';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 import HowToSetup from './components/HowToSetup';
+
+// Lazy load the StoryContainer which holds all the heavy slide logic and framer-motion dependencies
+const StoryContainer = React.lazy(() => import('./components/StoryContainer'));
 
 const STORAGE_KEY_CLIENT_ID = 'strava_client_id';
 const STORAGE_KEY_CLIENT_SECRET = 'strava_client_secret';
@@ -41,7 +30,7 @@ function App() {
 
   useEffect(() => {
     // Initialize entry audio
-    entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.wav');
+    entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.mp3');
     entryAudioRef.current.volume = 0.5;
 
     return () => {
@@ -272,33 +261,22 @@ function App() {
       );
   }
 
-  // Calculate slide duration logic
-  // "Auto move to next card after two seconds of last stat reveal or after 6 seconds if no big list of stats"
-  const getListDuration = (count) => {
-      // DRAMATIC_DELAY (3s) + (count-1)*STAGGER_DELAY (1.5s) + animation buffer (0.5s) + 2s dwell
-      if (!count) return 6000;
-      const animationEnd = (DRAMATIC_DELAY + (count * STAGGER_DELAY));
-      return (animationEnd + 2) * 1000;
-  };
-
-  const slides = data ? [
-      { component: (props) => <IntroSlide data={data} {...props} />, duration: 5000 },
-      { component: (props) => <TopSportsSlide data={data} {...props} />, duration: getListDuration(data.topSports?.length) },
-      ...(data.newActivity ? [{ component: (props) => <NewActivitySlide data={data} {...props} />, duration: 6000 }] : []),
-      { component: (props) => <FunStatsSlide data={data} {...props} />, duration: 8000 }, // Longer for reading
-      ...((data.mostLikedActivity || data.spotlightActivity) ? [{ component: (props) => <SpotlightSlide data={data} {...props} />, duration: 6000 }] : []),
-      { component: (props) => <VibeSlide data={data} traits={vibeTraits} {...props} />, duration: 6000 },
-      { component: (props) => <LocationSlide data={data} {...props} />, duration: 6000 },
-      { component: (props) => <TopMonthsSlide data={data} {...props} />, duration: getListDuration(data.topMonthsByDistance?.length) },
-      { component: (props) => <SummarySlide data={data} traits={vibeTraits} {...props} />, duration: 10000 }
-  ] : [];
+  // Reuse the loading spinner for Suspense fallback
+  const LoadingFallback = () => (
+    <div className="h-screen w-full bg-black flex flex-col items-center justify-center gap-4">
+        <div className="w-8 h-8 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
+        <p className="text-white text-sm font-medium animate-pulse">Loading experience...</p>
+    </div>
+  );
 
   return (
     <div className="h-screen w-full bg-black overflow-hidden">
-        <StoryViewer 
-            slides={slides} 
-            onClose={() => setStarted(false)} 
-        />
+        <Suspense fallback={<LoadingFallback />}>
+            <StoryContainer
+                data={data}
+                onClose={() => setStarted(false)}
+            />
+        </Suspense>
     </div>
   );
 }

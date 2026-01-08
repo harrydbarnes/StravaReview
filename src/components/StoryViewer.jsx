@@ -18,59 +18,27 @@ const StoryViewer = ({ slides, onClose }) => {
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
   const [isMuted, setIsMuted] = useState(false);
-  const [isAudioReady, setIsAudioReady] = useState(false);
   const containerRef = useRef(null);
 
-  // Web Audio Context for seamless loop
-  const audioContextRef = useRef(null);
-  const audioBufferRef = useRef(null);
-  const loopSourceRef = useRef(null);
-  const gainNodeRef = useRef(null);
-  const isLoopPlayingRef = useRef(false);
-
+  const loopAudioRef = useRef(null);
   const cheerRef = useRef(null);
 
   useEffect(() => {
-    let isMounted = true;
-
-    // Initialize Web Audio API for Loop
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioContextRef.current = new AudioContext();
-    gainNodeRef.current = audioContextRef.current.createGain();
-    gainNodeRef.current.connect(audioContextRef.current.destination);
-    gainNodeRef.current.gain.value = 0.5; // Default volume
-
     const baseUrl = import.meta.env.BASE_URL;
-    const loopUrl = `${baseUrl}DrumLoop.wav`;
 
-    fetch(loopUrl)
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => {
-            if (isMounted && audioContextRef.current) {
-                return audioContextRef.current.decodeAudioData(arrayBuffer);
-            }
-            return null;
-        })
-        .then(audioBuffer => {
-             if (isMounted && audioBuffer && audioContextRef.current) {
-                 // Create buffer source is done when playing
-                 // Store buffer for reuse
-                 audioBufferRef.current = audioBuffer;
-                 setIsAudioReady(true);
-             }
-        })
-        .catch(e => {
-            if (isMounted) console.error("Error loading drum loop:", e);
-        });
+    // Initialize Drum Loop
+    loopAudioRef.current = new Audio(`${baseUrl}DrumLoop.mp3`);
+    loopAudioRef.current.loop = true;
+    loopAudioRef.current.volume = 0.5;
 
-
+    // Initialize Cheer
     cheerRef.current = new Audio(`${baseUrl}CrowdCheer.mp3`);
     cheerRef.current.volume = 0.6;
 
     return () => {
-      isMounted = false;
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
+      if (loopAudioRef.current) {
+        loopAudioRef.current.pause();
+        loopAudioRef.current.src = '';
       }
       if (cheerRef.current) {
         cheerRef.current.pause();
@@ -79,49 +47,34 @@ const StoryViewer = ({ slides, onClose }) => {
     };
   }, []);
 
-  // Helper to play seamless loop
-  const startLoop = () => {
-      if (!hasStarted) return;
-      if (isLoopPlayingRef.current || !audioContextRef.current || !audioBufferRef.current) return;
-
-      const source = audioContextRef.current.createBufferSource();
-      source.buffer = audioBufferRef.current;
-      source.loop = true;
-      source.connect(gainNodeRef.current);
-      source.start(0);
-      loopSourceRef.current = source;
-      isLoopPlayingRef.current = true;
-
-      // Resume context if suspended
-      if (audioContextRef.current.state === 'suspended') {
-          audioContextRef.current.resume();
+  const stopLoop = () => {
+      if (loopAudioRef.current) {
+          loopAudioRef.current.pause();
       }
   };
 
-  const stopLoop = () => {
-      if (loopSourceRef.current) {
-          try {
-            loopSourceRef.current.stop();
-          } catch(e) {/* ignore if already stopped */}
-          loopSourceRef.current = null;
+  const startLoop = () => {
+      if (!hasStarted || isMuted) return;
+      if (loopAudioRef.current) {
+          loopAudioRef.current.play().catch(e => console.warn("Loop play failed", e));
       }
-      isLoopPlayingRef.current = false;
   };
 
   useEffect(() => {
     if (isMuted) {
-        if (gainNodeRef.current) gainNodeRef.current.gain.value = 0;
+        if (loopAudioRef.current) loopAudioRef.current.volume = 0;
         if (cheerRef.current) cheerRef.current.volume = 0;
     } else {
-        if (gainNodeRef.current) gainNodeRef.current.gain.value = 0.5;
-        if (cheerRef.current) cheerRef.current.volume = 0.6;
-
-        // Ensure context is running if unmuted
-        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-            audioContextRef.current.resume();
+        if (loopAudioRef.current) {
+            loopAudioRef.current.volume = 0.5;
+            // Resume if it was supposed to be playing but got muted
+            if (hasStarted && currentIndex !== slides.length - 1) {
+                loopAudioRef.current.play().catch(e => console.warn(e));
+            }
         }
+        if (cheerRef.current) cheerRef.current.volume = 0.6;
     }
-  }, [isMuted]);
+  }, [isMuted, hasStarted, currentIndex, slides.length]);
 
   useEffect(() => {
     const isLastSlide = currentIndex === slides.length - 1;
@@ -137,13 +90,10 @@ const StoryViewer = ({ slides, onClose }) => {
           cheerRef.current.currentTime = 0;
       }
       if (!isMuted && hasStarted) {
-          // Attempt to start loop if buffer is ready
-          // If buffer not ready yet, it won't start, but that's ok (race condition on load)
-          // We can add a check in the fetch handler to start if index is 0
           startLoop();
       }
     }
-  }, [currentIndex, isMuted, slides.length, isAudioReady, hasStarted]);
+  }, [currentIndex, isMuted, slides.length, hasStarted]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {
@@ -174,21 +124,8 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const handleStart = () => {
       setHasStarted(true);
-      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-          audioContextRef.current.resume();
-      }
-      // Attempt to start loop immediately after user interaction
-      // We need to bypass the useEffect check here or ensure state updates trigger it
-      // Direct call is safer for interaction requirements
-      if (!isMuted && audioContextRef.current && audioBufferRef.current) {
-          if (isLoopPlayingRef.current) return;
-          const source = audioContextRef.current.createBufferSource();
-          source.buffer = audioBufferRef.current;
-          source.loop = true;
-          source.connect(gainNodeRef.current);
-          source.start(0);
-          loopSourceRef.current = source;
-          isLoopPlayingRef.current = true;
+      if (!isMuted && loopAudioRef.current) {
+          loopAudioRef.current.play().catch(e => console.warn("Start loop failed", e));
       }
   };
 

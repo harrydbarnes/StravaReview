@@ -303,11 +303,13 @@ export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
     // Fallback if no kudos data
     const activity = data.mostLikedActivity || data.spotlightActivity;
 
-    const { clickCount, handleClick } = useDoubleClick(() => {
+    const handleDoubleClick = React.useCallback(() => {
         if (activity) {
             window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer');
         }
-    });
+    }, [activity]);
+
+    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 
     if (!activity) return null;
 

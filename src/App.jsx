@@ -41,7 +41,7 @@ function App() {
 
   useEffect(() => {
     // Initialize entry audio
-    entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.wav');
+    entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.mp3');
     entryAudioRef.current.volume = 0.5;
 
     return () => {

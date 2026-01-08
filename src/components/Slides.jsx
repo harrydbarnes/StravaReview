@@ -98,24 +98,6 @@ export const LocationSlide = ({ data, textColor }) => {
     );
 };
 
-export const PersonalitySlide = ({ data, textColor, traits }) => {
-    const trait = traits[data.personality] || traits["The Mover"];
-    return (
-        <SlideContainer textColor={textColor}>
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase tracking-widest">Activity Personality</h2>
-            <motion.div 
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-9xl md:text-[10rem] mb-6"
-            >
-                {trait.icon}
-            </motion.div>
-            <h1 className="text-5xl md:text-7xl font-black mb-4 uppercase">{data.personality}</h1>
-            <p className="text-xl md:text-2xl font-medium max-w-xs">{trait.description}</p>
-        </SlideContainer>
-    );
-};
-
 export const TopMonthsSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Peak Performance Months</h2>

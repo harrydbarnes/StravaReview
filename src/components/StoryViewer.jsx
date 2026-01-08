@@ -22,6 +22,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   // Web Audio Context for seamless loop
   const audioContextRef = useRef(null);
+  const audioBufferRef = useRef(null);
   const loopSourceRef = useRef(null);
   const gainNodeRef = useRef(null);
   const isLoopPlayingRef = useRef(false);
@@ -53,7 +54,7 @@ const StoryViewer = ({ slides, onClose }) => {
              if (isMounted && audioBuffer && audioContextRef.current) {
                  // Create buffer source is done when playing
                  // Store buffer for reuse
-                 audioContextRef.current.buffer = audioBuffer;
+                 audioBufferRef.current = audioBuffer;
                  setIsAudioReady(true);
              }
         })
@@ -79,10 +80,10 @@ const StoryViewer = ({ slides, onClose }) => {
 
   // Helper to play seamless loop
   const startLoop = () => {
-      if (isLoopPlayingRef.current || !audioContextRef.current || !audioContextRef.current.buffer) return;
+      if (isLoopPlayingRef.current || !audioContextRef.current || !audioBufferRef.current) return;
 
       const source = audioContextRef.current.createBufferSource();
-      source.buffer = audioContextRef.current.buffer;
+      source.buffer = audioBufferRef.current;
       source.loop = true;
       source.connect(gainNodeRef.current);
       source.start(0);

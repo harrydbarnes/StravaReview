@@ -50,10 +50,11 @@ const Controls = ({
                 onClick={(e) => {
                     e.stopPropagation();
                     // Filter colors based on current theme to avoid invisible text
-                    const availableColors = textColors.filter(c =>
-                    (theme === 'black' && c !== 'text-black') ||
-                    (theme === 'white' && c !== 'text-white')
-                    );
+                    const invalidColorForTheme = {
+                        black: 'text-black',
+                        white: 'text-white',
+                    };
+                    const availableColors = textColors.filter(c => c !== invalidColorForTheme[theme]);
 
                     // Find current index in the filtered list or default to 0
                     const currentFilteredIndex = availableColors.indexOf(textColor);
@@ -100,6 +101,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   // Initialize Audio Context and Load Buffers
   useEffect(() => {
+    let isMounted = true;
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const ctx = new AudioContext();
     audioCtxRef.current = ctx;
@@ -121,7 +123,10 @@ const StoryViewer = ({ slides, onClose }) => {
         try {
             const response = await fetch(url);
             const arrayBuffer = await response.arrayBuffer();
-            return await ctx.decodeAudioData(arrayBuffer);
+            if (isMounted) {
+                 return await ctx.decodeAudioData(arrayBuffer);
+            }
+            return null;
         } catch (error) {
             console.warn(`Failed to load audio from ${url}:`, error);
             return null;
@@ -133,11 +138,14 @@ const StoryViewer = ({ slides, onClose }) => {
         loadBuffer(`${baseUrl}DrumLoop.mp3`),
         loadBuffer(`${baseUrl}CrowdCheer.mp3`)
     ]).then(([loopBuffer, cheerBuffer]) => {
-        loopBufferRef.current = loopBuffer;
-        cheerBufferRef.current = cheerBuffer;
+        if (isMounted) {
+            loopBufferRef.current = loopBuffer;
+            cheerBufferRef.current = cheerBuffer;
+        }
     });
 
     return () => {
+        isMounted = false;
         if (ctx.state !== 'closed') {
             ctx.close();
         }
@@ -168,8 +176,10 @@ const StoryViewer = ({ slides, onClose }) => {
       if (loopSourceRef.current) {
           try {
               loopSourceRef.current.stop();
-          } catch {
-              // Ignore errors if already stopped
+          } catch (e) {
+              if (e.name !== 'InvalidStateNodeError') {
+                  console.warn('Error stopping audio loop:', e);
+              }
           }
           loopSourceRef.current.disconnect();
           loopSourceRef.current = null;
@@ -183,7 +193,13 @@ const StoryViewer = ({ slides, onClose }) => {
 
       // Stop existing cheer if any
       if (cheerSourceRef.current) {
-          try { cheerSourceRef.current.stop(); } catch { /* ignore */ }
+          try {
+              cheerSourceRef.current.stop();
+          } catch (e) {
+              if (e.name !== 'InvalidStateNodeError') {
+                  console.warn('Error stopping existing cheer:', e);
+              }
+          }
           cheerSourceRef.current.disconnect();
       }
 
@@ -198,7 +214,13 @@ const StoryViewer = ({ slides, onClose }) => {
   // Helper: Stop Cheer
   const stopWebAudioCheer = useCallback(() => {
       if (cheerSourceRef.current) {
-          try { cheerSourceRef.current.stop(); } catch { /* ignore */ }
+          try {
+              cheerSourceRef.current.stop();
+          } catch (e) {
+              if (e.name !== 'InvalidStateNodeError') {
+                  console.warn('Error stopping cheer:', e);
+              }
+          }
           cheerSourceRef.current.disconnect();
           cheerSourceRef.current = null;
       }

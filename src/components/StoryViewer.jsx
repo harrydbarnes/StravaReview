@@ -10,6 +10,20 @@ const themes = {
 
 const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
 
+const stopSourceNode = (sourceRef, name) => {
+    if (sourceRef.current) {
+        try {
+            sourceRef.current.stop();
+        } catch (e) {
+            if (e.name !== 'InvalidStateNodeError') {
+                console.warn(`Error stopping ${name}:`, e);
+            }
+        }
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+    }
+};
+
 const Controls = ({
     className,
     isMuted,
@@ -155,35 +169,27 @@ const StoryViewer = ({ slides, onClose }) => {
   // Helper: Play Loop (Gapless)
   const playWebAudioLoop = useCallback(() => {
       const ctx = audioCtxRef.current;
-      if (!ctx || !loopBufferRef.current) return;
-      if (loopSourceRef.current) return; // Already playing
+      if (!ctx || !loopBufferRef.current || loopSourceRef.current) return;
 
-      // Ensure context is running (needed if it was suspended or paused)
+      const play = () => {
+          const src = ctx.createBufferSource();
+          src.buffer = loopBufferRef.current;
+          src.loop = true;
+          src.connect(loopGainNodeRef.current);
+          src.start(0);
+          loopSourceRef.current = src;
+      };
+
       if (ctx.state === 'suspended') {
-          ctx.resume().catch(e => console.warn("Audio Context resume failed", e));
+          ctx.resume().then(play).catch(e => console.warn("Audio Context resume failed", e));
+      } else {
+          play();
       }
-
-      const src = ctx.createBufferSource();
-      src.buffer = loopBufferRef.current;
-      src.loop = true;
-      src.connect(loopGainNodeRef.current);
-      src.start(0);
-      loopSourceRef.current = src;
   }, []);
 
   // Helper: Stop Loop
   const stopWebAudioLoop = useCallback(() => {
-      if (loopSourceRef.current) {
-          try {
-              loopSourceRef.current.stop();
-          } catch (e) {
-              if (e.name !== 'InvalidStateNodeError') {
-                  console.warn('Error stopping audio loop:', e);
-              }
-          }
-          loopSourceRef.current.disconnect();
-          loopSourceRef.current = null;
-      }
+      stopSourceNode(loopSourceRef, 'audio loop');
   }, []);
 
   // Helper: Play Cheer
@@ -191,17 +197,7 @@ const StoryViewer = ({ slides, onClose }) => {
       const ctx = audioCtxRef.current;
       if (!ctx || !cheerBufferRef.current) return;
 
-      // Stop existing cheer if any
-      if (cheerSourceRef.current) {
-          try {
-              cheerSourceRef.current.stop();
-          } catch (e) {
-              if (e.name !== 'InvalidStateNodeError') {
-                  console.warn('Error stopping existing cheer:', e);
-              }
-          }
-          cheerSourceRef.current.disconnect();
-      }
+      stopSourceNode(cheerSourceRef, 'existing cheer');
 
       const src = ctx.createBufferSource();
       src.buffer = cheerBufferRef.current;
@@ -213,17 +209,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   // Helper: Stop Cheer
   const stopWebAudioCheer = useCallback(() => {
-      if (cheerSourceRef.current) {
-          try {
-              cheerSourceRef.current.stop();
-          } catch (e) {
-              if (e.name !== 'InvalidStateNodeError') {
-                  console.warn('Error stopping cheer:', e);
-              }
-          }
-          cheerSourceRef.current.disconnect();
-          cheerSourceRef.current = null;
-      }
+      stopSourceNode(cheerSourceRef, 'cheer');
   }, []);
 
   // Handle Mute/Unmute
@@ -283,14 +269,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const handleStart = () => {
       setHasStarted(true);
-      // Resume AudioContext on user interaction
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-          audioCtxRef.current.resume().then(() => {
-              if (!isMuted) playWebAudioLoop();
-          }).catch(e => console.warn("Resume failed", e));
-      } else {
-          if (!isMuted) playWebAudioLoop();
-      }
+      if (!isMuted) playWebAudioLoop();
   };
 
   // Touch/Click handlers

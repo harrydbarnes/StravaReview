@@ -24,7 +24,7 @@ const CountUp = ({ value, label, delay = 0 }) => {
                 if (ref.current) {
                     ref.current.textContent = isInt
                         ? Math.round(v).toLocaleString()
-                        : v.toFixed(1).toLocaleString();
+                        : v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
                 }
             }
         });

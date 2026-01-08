@@ -85,10 +85,10 @@ export const IntroSlide = ({ data, textColor }) => (
 );
 
 export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
-  const handleDoubleClick = () => {
+  const handleDoubleClick = React.useCallback(() => {
       if (!data.newActivity.id) return;
       window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer');
-  };
+  }, [data.newActivity.id]);
 
   const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 

@@ -338,7 +338,7 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
                 <div
                     className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"
                     style={{
-                        background: 'repeating-linear-gradient(90deg, #450a0a, #450a0a 20px, #7f1d1d 20px, #7f1d1d 40px)'
+                        background: 'repeating-linear-gradient(90deg, var(--color-red-950), var(--color-red-950) 20px, var(--color-red-900) 20px, var(--color-red-900) 40px)'
                     }}
                 />
 

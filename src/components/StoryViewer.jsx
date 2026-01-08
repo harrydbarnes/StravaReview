@@ -15,7 +15,7 @@ const stopSourceNode = (sourceRef, name) => {
         try {
             sourceRef.current.stop();
         } catch (e) {
-            if (e.name !== 'InvalidStateNodeError') {
+            if (e.name !== 'InvalidStateError') {
                 console.warn(`Error stopping ${name}:`, e);
             }
         }

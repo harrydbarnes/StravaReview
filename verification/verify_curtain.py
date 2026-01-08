@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
 
 def verify_curtain(page):
-    page.goto("http://localhost:5173/StravaReview/")
+    page.goto(os.environ.get("E2E_TARGET_URL", "http://localhost:5173/StravaReview/"))
 
     # Click "Try Demo Mode"
     page.get_by_text("Try Demo Mode").click()

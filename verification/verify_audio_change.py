@@ -23,7 +23,7 @@ def verify_app_loads():
 
             # Wait for StoryViewer "Ready?" screen or Loading
             # It might take a moment to generate data
-            page.wait_for_timeout(2000)
+            page.wait_for_selector("text=Ready?", timeout=10000)
 
             # Take a screenshot of the loading or ready state
             page.screenshot(path="verification/demo_loading.png")

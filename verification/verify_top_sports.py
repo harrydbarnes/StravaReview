@@ -32,8 +32,8 @@ def verify_top_sports_layout():
         # Wait for "Your Top Sports" header
         page.wait_for_selector("text=Your Top Sports", timeout=5000)
 
-        # Wait a bit for animations
-        page.wait_for_timeout(1000)
+        # Wait for the first list item to appear
+        page.wait_for_selector("text=#1", timeout=5000)
 
         # Take a screenshot
         page.screenshot(path="verification/top_sports_slide.png")

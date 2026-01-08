@@ -48,6 +48,7 @@ function App() {
       if (entryAudioRef.current) {
         entryAudioRef.current.pause();
         entryAudioRef.current.src = '';
+        entryAudioRef.current = null;
       }
     };
   }, []);

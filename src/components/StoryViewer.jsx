@@ -29,6 +29,8 @@ const StoryViewer = ({ slides, onClose }) => {
   const cheerRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     // Initialize Web Audio API for Loop
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     audioContextRef.current = new AudioContext();
@@ -41,20 +43,30 @@ const StoryViewer = ({ slides, onClose }) => {
 
     fetch(loopUrl)
         .then(response => response.arrayBuffer())
-        .then(arrayBuffer => audioContextRef.current.decodeAudioData(arrayBuffer))
-        .then(audioBuffer => {
-             // Create buffer source is done when playing
-             // Store buffer for reuse
-             audioContextRef.current.buffer = audioBuffer;
-             setIsAudioReady(true);
+        .then(arrayBuffer => {
+            if (isMounted && audioContextRef.current) {
+                return audioContextRef.current.decodeAudioData(arrayBuffer);
+            }
+            return null;
         })
-        .catch(e => console.error("Error loading drum loop:", e));
+        .then(audioBuffer => {
+             if (isMounted && audioBuffer && audioContextRef.current) {
+                 // Create buffer source is done when playing
+                 // Store buffer for reuse
+                 audioContextRef.current.buffer = audioBuffer;
+                 setIsAudioReady(true);
+             }
+        })
+        .catch(e => {
+            if (isMounted) console.error("Error loading drum loop:", e);
+        });
 
 
     cheerRef.current = new Audio(`${baseUrl}CrowdCheer.mp3`);
     cheerRef.current.volume = 0.6;
 
     return () => {
+      isMounted = false;
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }

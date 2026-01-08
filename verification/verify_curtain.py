@@ -9,10 +9,8 @@ def verify_curtain(page):
     # Wait for the text to appear (Story Viewer curtain)
     page.wait_for_selector("text=LIFT THE CURTAIN ON YOUR YEAR", timeout=10000)
 
-    # Wait a bit for the animation/render
-    page.wait_for_timeout(1000)
-
-    page.screenshot(path="verification/curtain.png")
+    # Take a deterministic screenshot by disabling animations, avoiding flaky waits.
+    page.screenshot(path="verification/curtain.png", animations="disabled")
     print("Screenshot taken")
 
 if __name__ == "__main__":

@@ -317,13 +317,21 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
             ref={containerRef}
             className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
         >
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
             {!hasStarted && (
             <motion.div
                 key="curtain"
-                initial={{ y: 0 }}
-                exit={{ y: '-100%' }}
-                transition={{ duration: 1.2, delay: 0.6, ease: "easeInOut" }}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={{
+                    initial: { y: 0 },
+                    animate: { y: 0 },
+                    exit: {
+                        y: '-100%',
+                        transition: { duration: 1.2, delay: 0.6, ease: "easeInOut" }
+                    }
+                }}
                 className="absolute inset-0 z-50 bg-black flex items-center justify-center flex-col text-center overflow-hidden"
             >
                 {/* Red Curtain Background */}
@@ -353,19 +361,21 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
                 {/* Whiteout Effect (Flash) */}
                 <motion.div
                     key="whiteout"
-                    initial={{ opacity: 0 }}
-                    exit={{ opacity: 1 }}
-                    transition={{ duration: 0.6 }}
+                    variants={{
+                        initial: { opacity: 0 },
+                        exit: { opacity: 1, transition: { duration: 0.6 } }
+                    }}
                     className="absolute inset-0 bg-white z-40 pointer-events-none"
                 />
 
                 <motion.div
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    variants={{
+                        exit: { opacity: 0, transition: { duration: 0.3 } }
+                    }}
                     className="relative z-50 p-8 flex flex-col items-center"
                 >
                     <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tight drop-shadow-2xl">
-                        LIFT THE CURTAIN
+                        LIFT THE CURTAIN ON YOUR YEAR
                     </h2>
                     <p className="text-white/80 mb-10 text-lg font-medium max-w-xs leading-relaxed">
                         Turn up the volume, sit back, and enjoy the show

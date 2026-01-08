@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
+import { useDoubleClick } from '../hooks/useDoubleClick';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 export const DRAMATIC_DELAY = 3;
@@ -84,20 +85,12 @@ export const IntroSlide = ({ data, textColor }) => (
 );
 
 export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
-  const [clickCount, setClickCount] = React.useState(0);
-
-  const handleClick = (e) => {
-      e.stopPropagation();
+  const handleDoubleClick = () => {
       if (!data.newActivity.id) return;
-
-      const newCount = clickCount + 1;
-      setClickCount(newCount);
-
-      if (newCount === 2) {
-          window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer');
-          setClickCount(0);
-      }
+      window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer');
   };
+
+  const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 
   return (
       <SlideContainer textColor={textColor}>
@@ -309,27 +302,21 @@ export const FunStatsSlide = ({ data, textColor }) => (
 export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
     // Fallback if no kudos data
     const activity = data.mostLikedActivity || data.spotlightActivity;
-    const [clickCount, setClickCount] = React.useState(0);
+
+    const { clickCount, handleClick } = useDoubleClick(() => {
+        if (activity) {
+            window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer');
+        }
+    });
 
     if (!activity) return null;
-
-    const handleClick = (e) => {
-        e.stopPropagation();
-        const newCount = clickCount + 1;
-        setClickCount(newCount);
-
-        if (newCount === 2) {
-            window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer');
-            setClickCount(0);
-        }
-    };
 
     return (
         <SlideContainer textColor={textColor}>
             <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 0 }}
-                animate={{ opacity: 1, scale: 1, rotate: 3 }}
-                transition={{ delay: 1.5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 1 }}
+                transition={{ delay: 1.0 }}
                 className="absolute top-10 right-10"
             >
                 <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">

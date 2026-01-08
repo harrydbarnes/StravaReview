@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
+import { useDoubleClick } from '../hooks/useDoubleClick';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 export const DRAMATIC_DELAY = 3;
@@ -83,22 +84,42 @@ export const IntroSlide = ({ data, textColor }) => (
   </SlideContainer>
 );
 
-export const NewActivitySlide = ({ data, textColor }) => (
-  <SlideContainer textColor={textColor}>
-      <h2 className="text-3xl md:text-4xl font-bold mb-8">You tried something new!</h2>
-      <motion.div 
-        initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
-        animate={{ rotate: 0, scale: 1, opacity: 1 }}
-        transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
-        className={clsx("p-8 border-4 border-current rounded-3xl", data.newActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
-        onClick={() => data.newActivity.id && window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer')}
-      >
-          <div className="text-5xl md:text-7xl mb-4">🆕</div>
-          <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
-          <p className="mt-2 opacity-80">Tried on {new Date(data.newActivity.firstDate).toLocaleDateString()}</p>
-      </motion.div>
-  </SlideContainer>
-);
+export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
+  const handleDoubleClick = React.useCallback(() => {
+      if (!data.newActivity.id) return;
+      window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer');
+  }, [data.newActivity.id]);
+
+  const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
+
+  return (
+      <SlideContainer textColor={textColor}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">You Tried Something New</h2>
+          <motion.div
+            initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
+            animate={{ rotate: 0, scale: 1, opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
+            className={clsx("p-8 border-4 border-current rounded-3xl relative", data.newActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
+            onClick={handleClick}
+          >
+              <div className="text-5xl md:text-7xl mb-4">🆕</div>
+              <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
+              <p className="mt-2 opacity-80">Tried on {new Date(data.newActivity.firstDate).toLocaleDateString()}</p>
+
+              {showClickHint && clickCount < 2 && (
+                  <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: DRAMATIC_DELAY + 1 }}
+                      className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                  >
+                      (Click twice to open activity!)
+                  </motion.div>
+              )}
+          </motion.div>
+      </SlideContainer>
+  );
+};
 
 export const LocationSlide = ({ data, textColor }) => {
     // Dynamic sizing based on length
@@ -215,7 +236,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 // 1. TOP SPORTS SLIDE
 export const TopSportsSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 uppercase">Your Top Sports</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">Your Top Sports</h2>
         <div className="w-full max-w-md space-y-4">
             {data.topSports.map((sport, idx) => (
                 <motion.div
@@ -242,7 +263,7 @@ export const TopSportsSlide = ({ data, textColor }) => (
 // 2. FUN STATS (Time Comparison) SLIDE
 export const FunStatsSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 uppercase text-center">Time Well Spent</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Time Well Spent</h2>
 
         <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
             <motion.div
@@ -278,26 +299,40 @@ export const FunStatsSlide = ({ data, textColor }) => (
 );
 
 // 3. SPOTLIGHT / KUDOS SLIDE
-export const SpotlightSlide = ({ data, textColor }) => {
+export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
     // Fallback if no kudos data
     const activity = data.mostLikedActivity || data.spotlightActivity;
+
+    const handleDoubleClick = React.useCallback(() => {
+        if (activity) {
+            window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer');
+        }
+    }, [activity]);
+
+    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
+
     if (!activity) return null;
 
     return (
         <SlideContainer textColor={textColor}>
-            <div className="absolute top-10 right-10 rotate-12">
+            <motion.div
+                initial={{ opacity: 0, scale: 0, rotate: 0 }}
+                animate={{ opacity: 1, scale: 1, rotate: 1 }}
+                transition={{ delay: 1.0 }}
+                className="absolute top-10 right-10"
+            >
                 <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">
                     🏆 Fan Favorite
                 </div>
-            </div>
+            </motion.div>
 
-            <h2 className="text-3xl font-bold mb-8 opacity-80">The Crowd went Wild</h2>
+            <h2 className="text-3xl font-bold mb-8 opacity-80">The Crowd Went Wild</h2>
 
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="p-8 border-4 border-current rounded-3xl max-w-md w-full hover:scale-105 transition-transform cursor-pointer"
-                onClick={() => window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer')}
+                className="p-8 border-4 border-current rounded-3xl max-w-md w-full hover:scale-105 transition-transform cursor-pointer relative"
+                onClick={handleClick}
             >
                 <div className="flex justify-between items-start mb-6">
                     <span className="text-5xl">👍</span>
@@ -315,6 +350,17 @@ export const SpotlightSlide = ({ data, textColor }) => {
                         {Math.round(activity.moving_time / 60)} min
                     </div>
                 </div>
+
+                {showClickHint && clickCount < 2 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1 }}
+                        className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                    >
+                        (Click twice to open activity!)
+                    </motion.div>
+                )}
             </motion.div>
         </SlideContainer>
     );

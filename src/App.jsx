@@ -116,8 +116,6 @@ function App() {
   }, []);
 
   const handleConnect = () => {
-      playEntrySound();
-
       if (!clientId || !clientSecret) {
           setError("Please enter your Client ID and Client Secret.");
           return;
@@ -133,8 +131,6 @@ function App() {
   };
 
   const handleDemo = async () => {
-      playEntrySound();
-
       setLoading(true);
       setLoadingStatus('Generating demo data...');
 
@@ -275,6 +271,7 @@ function App() {
             <StoryContainer
                 data={data}
                 onClose={() => setStarted(false)}
+                playEntrySound={playEntrySound}
             />
         </Suspense>
     </div>

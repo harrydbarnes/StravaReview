@@ -5,6 +5,11 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+:root {
+  --color-red-900: theme('colors.red.900');
+  --color-red-950: theme('colors.red.950');
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;

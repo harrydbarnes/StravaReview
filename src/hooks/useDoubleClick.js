@@ -7,25 +7,19 @@ export const useDoubleClick = (onDoubleClick) => {
 
   const handleClick = useCallback((e) => {
     e.stopPropagation();
+    setClickCount((c) => c + 1);
+  }, []);
 
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-
-    if (newCount === 2) {
-      if (onDoubleClick) {
-        onDoubleClick();
-      }
-      setClickCount(0);
-    }
-  }, [clickCount, onDoubleClick]);
-
-  // Reset click count if user waits too long between clicks
   useEffect(() => {
-    if (clickCount > 0) {
+    if (clickCount === 1) {
       const timer = setTimeout(() => setClickCount(0), DOUBLE_CLICK_TIMEOUT);
       return () => clearTimeout(timer);
     }
-  }, [clickCount]);
+    if (clickCount === 2) {
+      onDoubleClick?.();
+      setClickCount(0);
+    }
+  }, [clickCount, onDoubleClick]);
 
   return { clickCount, handleClick };
 };

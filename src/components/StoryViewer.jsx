@@ -154,15 +154,63 @@ const StoryViewer = ({ slides, onClose }) => {
     ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
     : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
 
+  const Controls = ({ className }) => (
+    <div className={clsx("flex gap-2 z-30", className)}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+        className={buttonClass}
+        title={isMuted ? "Unmute" : "Mute"}
+      >
+        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+      </button>
+      <button onClick={(e) => {
+        e.stopPropagation();
+        const newTheme = theme === 'black' ? 'white' : 'black';
+        setTheme(newTheme);
+        setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
+      }} className={buttonClass}>
+        Theme
+      </button>
+      <button onClick={(e) => {
+        e.stopPropagation();
+        // Filter colors based on current theme to avoid invisible text
+        const availableColors = textColors.filter(c =>
+          (theme === 'black' && c !== 'text-black') ||
+          (theme === 'white' && c !== 'text-white')
+        );
+
+        // Find current index in the filtered list or default to 0
+        const currentFilteredIndex = availableColors.indexOf(textColor);
+        const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
+
+        setTextColor(availableColors[nextIdx]);
+      }} className={buttonClass}>
+        Colour
+      </button>
+      {/* Close button that calls onClose */}
+      {onClose && (
+        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={buttonClass}>
+          ✕
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].bg)}>
       
-      {/* Container for Desktop (Mobile mimics full screen) */}
-      <div 
-        ref={containerRef}
-        className="relative w-full h-full md:w-[400px] md:h-[80vh] md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
-      >
-        {!hasStarted && (
+      {/* Wrapper for Desktop Layout */}
+      <div className="relative w-full h-full md:w-[400px] md:h-[80vh] flex flex-col">
+
+        {/* Desktop Controls (Outside Card) */}
+        <Controls className="hidden md:flex absolute -top-12 right-0" />
+
+        {/* Container for Desktop (Mobile mimics full screen) */}
+        <div
+            ref={containerRef}
+            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
+        >
+            {!hasStarted && (
             <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center flex-col p-8 text-center">
                 <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">Ready?</h2>
                 <p className="text-gray-300 mb-8">Turn up your volume for the full experience.</p>
@@ -199,44 +247,8 @@ const StoryViewer = ({ slides, onClose }) => {
           })}
         </div>
 
-        {/* Controls Overlay (Theming) */}
-        <div className="absolute top-6 right-4 z-30 flex gap-2">
-            <button
-                onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
-                className={buttonClass}
-                title={isMuted ? "Unmute" : "Mute"}
-            >
-                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </button>
-            <button onClick={() => {
-                const newTheme = theme === 'black' ? 'white' : 'black';
-                setTheme(newTheme);
-                setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
-            }} className={buttonClass}>
-                Theme
-            </button>
-             <button onClick={() => {
-                 // Filter colors based on current theme to avoid invisible text
-                 const availableColors = textColors.filter(c =>
-                     (theme === 'black' && c !== 'text-black') ||
-                     (theme === 'white' && c !== 'text-white')
-                 );
-
-                 // Find current index in the filtered list or default to 0
-                 const currentFilteredIndex = availableColors.indexOf(textColor);
-                 const nextIdx = (currentFilteredIndex + 1) % availableColors.length;
-
-                 setTextColor(availableColors[nextIdx]);
-             }} className={buttonClass}>
-                Colour
-            </button>
-             {/* Close button that calls onClose */}
-             {onClose && (
-                 <button onClick={onClose} className={buttonClass}>
-                     ✕
-                 </button>
-             )}
-        </div>
+        {/* Mobile Controls (Inside Card) */}
+        <Controls className="md:hidden absolute top-6 right-4" />
 
 
         {/* Tap Indicators (First Slide Only) */}
@@ -286,6 +298,7 @@ const StoryViewer = ({ slides, onClose }) => {
           </AnimatePresence>
         </div>
 
+        </div>
       </div>
     </div>
   );

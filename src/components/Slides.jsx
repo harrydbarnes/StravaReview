@@ -1,12 +1,51 @@
 import React from 'react';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion, animate } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 export const DRAMATIC_DELAY = 3;
 export const STAGGER_DELAY = 1.5;
 const INTRO_DELAY = 0.8;
+
+const CountUp = ({ value, label, delay = 0 }) => {
+    const ref = React.useRef(null);
+    const numericValue = typeof value === 'string'
+        ? parseFloat(value.replace(/,/g, ''))
+        : value;
+    const isInt = Number.isInteger(numericValue);
+
+    React.useEffect(() => {
+        const controls = animate(0, numericValue, {
+            duration: 2.5,
+            delay: delay,
+            ease: "easeOut",
+            onUpdate: (v) => {
+                if (ref.current) {
+                    ref.current.textContent = isInt
+                        ? Math.round(v).toLocaleString()
+                        : v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                }
+            }
+        });
+        return controls.stop;
+    }, [numericValue, delay, isInt]);
+
+    return (
+        <div className="text-center">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: delay, duration: 0.5 }}
+            >
+                <p className="text-4xl md:text-6xl font-black">
+                    <span ref={ref}>0</span>
+                </p>
+                <p className="text-sm md:text-base uppercase tracking-widest opacity-75">{label}</p>
+            </motion.div>
+        </div>
+    );
+};
 
 export const SlideContainer = ({ children, textColor, className }) => (
   <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
@@ -48,8 +87,9 @@ export const NewActivitySlide = ({ data, textColor }) => (
   <SlideContainer textColor={textColor}>
       <h2 className="text-3xl md:text-4xl font-bold mb-8">You tried something new!</h2>
       <motion.div 
-        initial={{ rotate: -10, scale: 0.8 }}
-        animate={{ rotate: 0, scale: 1 }}
+        initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
+        animate={{ rotate: 0, scale: 1, opacity: 1 }}
+        transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
         className={clsx("p-8 border-4 border-current rounded-3xl", data.newActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
         onClick={() => data.newActivity.id && window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer')}
       >
@@ -78,16 +118,16 @@ export const LocationSlide = ({ data, textColor }) => {
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favorite Playground</h2>
             <motion.div
                 className="text-8xl md:text-9xl mb-4"
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", bounce: 0.5, duration: 1.5 }}
+                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.5, duration: 1.5, delay: DRAMATIC_DELAY }}
             >
                 📍
             </motion.div>
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, type: "spring" }}
+                transition={{ delay: DRAMATIC_DELAY + 0.5, type: "spring" }}
             >
                 <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
                     {data.topLocation.name}
@@ -145,22 +185,10 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">{data.year} Grand Total</h2>
 
                     <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-4">
-                        <div className="text-center">
-                            <p className="text-4xl md:text-6xl font-black">{data.totalActivities}</p>
-                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Activities</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-4xl md:text-6xl font-black">{data.totalHours}</p>
-                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Hours</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-4xl md:text-6xl font-black">{data.totalDistance}</p>
-                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Km</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-3xl md:text-5xl font-black">{data.totalCalories.toLocaleString()}</p>
-                            <p className="text-sm md:text-base uppercase tracking-widest opacity-75">Cals</p>
-                        </div>
+                        <CountUp value={data.totalActivities} label="Activities" delay={0.5} />
+                        <CountUp value={data.totalHours} label="Hours" delay={1.0} />
+                        <CountUp value={data.totalDistance} label="Km" delay={1.5} />
+                        <CountUp value={data.totalCalories} label="Cals" delay={2.0} />
                     </div>
 
                     {vibeData && (
@@ -303,7 +331,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             <motion.div
                 initial={{ scale: 0, rotate: -45, opacity: 0 }}
                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.2 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10, delay: DRAMATIC_DELAY }}
                 className="mb-2 text-[8rem] md:text-[10rem] drop-shadow-2xl"
             >
                 {vibeData.icon}
@@ -312,7 +340,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             <motion.h1
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.5, type: "spring" }}
+                transition={{ delay: DRAMATIC_DELAY + 0.5, type: "spring" }}
                 className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight text-center leading-none"
             >
                 {data.vibe}
@@ -321,7 +349,7 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: DRAMATIC_DELAY + 0.8 }}
                 className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mb-4"
             >
                 <p className="text-lg md:text-xl font-medium leading-relaxed">

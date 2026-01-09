@@ -258,7 +258,7 @@ const StoryViewer = ({ slides, onClose }) => {
         }
     }
 
-    // Cleanup on component unmount.
+    // Cleanup for the audio effect.
     return () => {
         stopWebAudioLoop();
         stopWebAudioCheer();

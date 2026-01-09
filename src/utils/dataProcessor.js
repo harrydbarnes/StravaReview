@@ -7,10 +7,10 @@ const KCAL_PER_KM_RIDE = 25;
 const KCAL_PER_KM_DEFAULT = 60;
 
 // Month Names for Performance Optimization
-const MONTH_NAMES = [
+const MONTH_NAMES = Object.freeze([
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
-];
+]);
 
 // Metric Constants
 export const BIG_BEN_METERS = 96;

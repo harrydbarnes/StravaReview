@@ -44,7 +44,7 @@ const Controls = ({
                 onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
                 className={buttonClass}
                 title={isMuted ? "Unmute" : "Mute"}
-                aria-label={isMuted ? "Unmute" : "Mute"}
+                aria-label={isMuted ? "Unmute story audio" : "Mute story audio"}
                 type='button'
             >
                 {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}

@@ -140,6 +140,8 @@ export const analyzeData = (allActivities, year = 2025) => {
   let totalDistance = 0;
   let totalCalories = 0;
   let totalTime = 0;
+  let totalKudos = 0;
+  let totalElevation = 0;
 
   // Trackers
   const activeDaysSet = new Set();
@@ -148,6 +150,15 @@ export const analyzeData = (allActivities, year = 2025) => {
   let mostLikedActivity = null;
   let maxDuration = -1;
   let spotlightActivity = null;
+
+  // New Metrics Trackers
+  const hourlyCounts = new Array(24).fill(0);
+  const dailyCounts = new Array(7).fill(0); // Mon-Sun
+  let maxSpeedGlobal = 0;
+  let minSpeedGlobal = Infinity;
+  let slowestActivity = null;
+  let shortestActivity = null;
+  let minDistanceGlobal = Infinity;
 
   const months = {};
   const activityTypes = {};
@@ -184,6 +195,8 @@ export const analyzeData = (allActivities, year = 2025) => {
       // Globals
       totalDistance += dist;
       totalTime += time;
+      totalElevation += (act.total_elevation_gain || 0);
+
       if (act.calories) {
         totalCalories += act.calories;
       } else if (act.kilojoules) {
@@ -193,6 +206,39 @@ export const analyzeData = (allActivities, year = 2025) => {
         const distKm = dist / 1000;
         if (act.type === 'Ride') totalCalories += (distKm * KCAL_PER_KM_RIDE);
         else totalCalories += (distKm * KCAL_PER_KM_DEFAULT);
+      }
+
+      const kudos = act.kudos_count || 0;
+      totalKudos += kudos;
+
+      // Charts (Heatmap & Patterns)
+      // Standardize on UTC
+      const hour = date.getUTCHours();
+      const dayIndex = date.getUTCDay(); // 0 = Sun, 1 = Mon
+      hourlyCounts[hour]++;
+      // Map Sun(0) to 6, Mon(1) to 0
+      const monSunIndex = (dayIndex + 6) % 7;
+      dailyCounts[monSunIndex]++;
+
+      // Speed Stats
+      // Strava max_speed is m/s. Convert to km/h: * 3.6
+      const actMaxSpeed = (act.max_speed || 0) * 3.6;
+      if (actMaxSpeed > maxSpeedGlobal) maxSpeedGlobal = actMaxSpeed;
+
+      // Min Speed (Slowest non-zero)
+      // Use average speed (distance/time)
+      if (time > 0 && dist > 0) {
+          const avgSpeed = (dist / time) * 3.6; // km/h
+          if (avgSpeed < minSpeedGlobal) {
+              minSpeedGlobal = avgSpeed;
+              slowestActivity = act;
+          }
+      }
+
+      // Shortest Activity (Non-zero distance)
+      if (dist > 0 && dist < minDistanceGlobal) {
+          minDistanceGlobal = dist;
+          shortestActivity = act;
       }
 
       // Active Days & Weeks
@@ -258,21 +304,16 @@ export const analyzeData = (allActivities, year = 2025) => {
       }
 
       // Most Liked (Kudos)
-      const kudos = act.kudos_count || 0;
       if (kudos > maxKudos) {
           maxKudos = kudos;
           mostLikedActivity = act;
       }
 
       // Vibe Counters (Time of Day / Week)
-      // Standardize on UTC to match dateString and avoid local timezone variance
-      const hour = date.getUTCHours();
-      const day = date.getUTCDay(); // 0 = Sun, 6 = Sat
-
       if (hour >= 4 && hour < 9) morningCount++;
       if (hour >= 20 && hour < 24) nightCount++;
       if (hour >= 11 && hour < 14) lunchCount++;
-      if (day === 0 || day === 6) weekendCount++;
+      if (dayIndex === 0 || dayIndex === 6) weekendCount++;
   }
 
   // Post-Processing: Top 5 Sports
@@ -377,6 +418,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
 
   // Fun Stats
   const totalHours = Math.round(totalTime / 3600);
+  const percentTimeMoving = (totalHours / 8760) * 100;
 
   // Select random comparisons
   const song = SONGS[Math.floor(Math.random() * SONGS.length)];
@@ -384,6 +426,30 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
 
   const movie = MOVIES[Math.floor(Math.random() * MOVIES.length)];
   const movieCount = Math.floor((totalTime / 60) / movie.duration);
+
+  // New Derived Metrics
+  const runStats = activityTypes['Run'] || { distance: 0, time: 0 };
+  const rideStats = activityTypes['Ride'] || { distance: 0, time: 0 };
+  const swimStats = activityTypes['Swim'] || { distance: 0 };
+
+  // Pace Logic
+  let avgRunPace = "N/A";
+  if (runStats.distance > 0 && runStats.time > 0) {
+      // min/km = (time_in_min) / (dist_in_km)
+      const paceVal = (runStats.time / 60) / (runStats.distance / 1000);
+      const pMin = Math.floor(paceVal);
+      const pSec = Math.round((paceVal - pMin) * 60);
+      avgRunPace = `${pMin}:${pSec.toString().padStart(2, '0')}/km`;
+  }
+
+  let avgRideSpeed = "N/A";
+  if (rideStats.distance > 0 && rideStats.time > 0) {
+      // km/h
+      const speedVal = (rideStats.distance / 1000) / (rideStats.time / 3600);
+      avgRideSpeed = `${speedVal.toFixed(1)} km/h`;
+  }
+
+  const speedDiffPercent = maxSpeedGlobal > 0 ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
   
   // Vibe Check
   const vibe = determineVibe({
@@ -404,6 +470,38 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     totalTime,
     totalHours,
     activeDays: activeDaysSet.size,
+    percentTimeMoving,
+    elevation: {
+        total: Math.round(totalElevation),
+        everestCount: (totalElevation / 8848).toFixed(1)
+    },
+    food: {
+        pizza: Math.floor(totalCalories / 285),
+        donuts: Math.floor(totalCalories / 250)
+    },
+    kudosRatio: totalDistance > 0 ? (totalKudos / (totalDistance / 1000)).toFixed(1) : 0,
+    speed: {
+        max: Math.round(maxSpeedGlobal),
+        min: isFinite(minSpeedGlobal) ? minSpeedGlobal.toFixed(1) : 0,
+        diffPercent: Math.round(speedDiffPercent),
+        slowestActivity
+    },
+    averagePace: {
+        run: avgRunPace,
+        ride: avgRideSpeed
+    },
+    shortestActivity: shortestActivity ? {
+        ...shortestActivity,
+        distanceKm: (shortestActivity.distance / 1000).toFixed(2)
+    } : null,
+    charts: {
+        hourly: hourlyCounts,
+        daily: dailyCounts
+    },
+    olympics: {
+        sprints: Math.floor(runStats.distance / 100),
+        poolLengths: Math.floor(swimStats.distance / 50)
+    },
     funComparisons: {
         song: { title: song.title, count: songCount },
         movie: { title: movie.title, count: movieCount }

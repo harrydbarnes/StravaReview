@@ -84,6 +84,394 @@ export const IntroSlide = ({ data, textColor }) => (
   </SlideContainer>
 );
 
+export const PercentSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">Life in Motion</h2>
+        <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY - 2 }}
+            className="mb-8"
+        >
+            <p className="text-6xl md:text-8xl font-black text-brand-orange mb-2">
+                {data.percentTimeMoving.toFixed(1)}%
+            </p>
+            <p className="text-xl font-bold">of your year spent moving</p>
+        </motion.div>
+
+        <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY }}
+            className="max-w-md bg-white/10 p-6 rounded-xl backdrop-blur-sm"
+        >
+            <p className="mb-4 text-lg">For comparison, you spent about <span className="font-bold">29%</span> of your year sleeping.</p>
+            <p className="text-xl font-bold italic opacity-90">
+                &quot;You were definitely awake for the fun parts.&quot;
+            </p>
+        </motion.div>
+    </SlideContainer>
+);
+
+export const OlympicsSlide = ({ data, textColor }) => {
+    // Logic: Prioritize Swim data if available, else Run. If neither, return null (but structure handles that).
+    // The slide might be rendered even if 0, so we check data.
+    const isSwim = data.olympics.poolLengths > 0;
+    const isRun = data.olympics.sprints > 0;
+
+    if (!isSwim && !isRun) return null;
+
+    const emoji = isSwim ? "🏊" : "🏃";
+    const title = isSwim ? "Olympic Dreams" : "Track Star";
+    const statText = isSwim
+        ? `You swam ${data.olympics.poolLengths} Olympic Pool lengths`
+        : `You ran the 100m Dash ${data.olympics.sprints} times`;
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">LA 2028 Calling?</h2>
+            <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
+                className="text-8xl mb-6"
+            >
+                {emoji}
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY - 1 }}
+                className="text-2xl font-bold mb-8 max-w-md"
+            >
+                {statText}
+            </motion.div>
+
+            <motion.div
+                 initial={{ scale: 0.9, opacity: 0 }}
+                 animate={{ scale: 1, opacity: 1 }}
+                 transition={{ delay: DRAMATIC_DELAY + 1 }}
+                 className="bg-current/10 p-6 rounded-xl max-w-md"
+            >
+                <p className="font-bold italic">
+                    &quot;But you wouldn&apos;t have broken any World Records. Sorry. Try again in 2028. 🥇&quot;
+                </p>
+            </motion.div>
+        </SlideContainer>
+    );
+};
+
+export const ShortestSlide = ({ data, textColor }) => {
+    if (!data.shortestActivity) return null;
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">What was this one, btw?</h2>
+
+            <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY - 1.5 }}
+                className="p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5"
+            >
+                <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
+                <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
+            </motion.div>
+
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+            >
+                <p className="text-xl font-bold mb-2">
+                     &quot;{data.shortestActivity.name}&quot;
+                </p>
+                <p className="opacity-80 italic">Short, sweet, and complete. Every step counts!</p>
+            </motion.div>
+        </SlideContainer>
+    );
+};
+
+export const ElevationSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">The Vertical Limit</h2>
+
+        <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="flex items-end justify-center gap-1 mb-8"
+        >
+            <div className="w-8 h-16 bg-current opacity-20 rounded-t-lg"></div>
+            <div className="w-12 h-24 bg-current opacity-40 rounded-t-lg"></div>
+            <div className="w-16 h-40 bg-current opacity-60 rounded-t-lg"></div>
+            <div className="w-20 h-64 bg-current rounded-t-lg relative">
+                 <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2 }}
+                    className="absolute -top-12 left-0 right-0 font-black text-2xl"
+                 >
+                     {data.elevation.total}m
+                 </motion.div>
+            </div>
+        </motion.div>
+
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY }}
+            className="text-xl font-bold max-w-md"
+        >
+            That&apos;s equal to summiting Mount Everest <span className="text-3xl text-brand-orange block my-2">{data.elevation.everestCount} times! 🏔️</span>
+        </motion.div>
+    </SlideContainer>
+);
+
+export const FuelSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Fuel Tank</h2>
+
+        <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", duration: 1.5, delay: 0.5 }}
+            className="text-[8rem] mb-8"
+        >
+            🍕
+        </motion.div>
+
+        <div className="flex flex-col gap-4 text-xl font-bold">
+            <motion.p
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+            >
+                Burned <span className="text-3xl font-black">{data.totalCalories.toLocaleString()}</span> Calories
+            </motion.p>
+             <motion.p
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY + 1 }}
+                className="opacity-90"
+            >
+                You earned <span className="text-2xl font-black text-brand-orange">{data.food.pizza}</span> Slices of Pizza! <br/>
+                <span className="text-sm font-normal opacity-70">(Zero guilt attached)</span>
+            </motion.p>
+        </div>
+    </SlideContainer>
+);
+
+export const PaceSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-12">The Consistent Cruiser</h2>
+
+        <div className="flex flex-col gap-8 w-full max-w-md">
+            {data.averagePace.run !== "N/A" && (
+                <motion.div
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY - 1.5 }}
+                    className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
+                >
+                    <div className="text-left">
+                        <p className="text-sm font-bold uppercase opacity-70">Avg Run Pace</p>
+                        <p className="text-4xl font-black">{data.averagePace.run}</p>
+                    </div>
+                    <span className="text-4xl">🏃</span>
+                </motion.div>
+            )}
+
+             {data.averagePace.ride !== "N/A" && (
+                <motion.div
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY - 0.5 }}
+                    className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
+                >
+                    <div className="text-left">
+                        <p className="text-sm font-bold uppercase opacity-70">Avg Ride Speed</p>
+                        <p className="text-4xl font-black">{data.averagePace.ride}</p>
+                    </div>
+                    <span className="text-4xl">🚴</span>
+                </motion.div>
+            )}
+
+            {data.averagePace.run === "N/A" && data.averagePace.ride === "N/A" && (
+                 <p className="text-xl">Just cruising at your own speed.</p>
+            )}
+        </div>
+    </SlideContainer>
+);
+
+export const SpeedSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Need for Speed</h2>
+
+        <motion.div
+            animate={{ x: [-10, 10, -10] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+            className="text-8xl mb-8"
+        >
+            🦖
+        </motion.div>
+
+        <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY - 1 }}
+            className="mb-8"
+        >
+            <p className="text-sm uppercase font-bold opacity-70 mb-2">Top Speed Reached</p>
+            <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">km/h</span></p>
+        </motion.div>
+
+        <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: DRAMATIC_DELAY }}
+            className="text-lg max-w-sm"
+        >
+            {data.speed.max > 27
+                ? "Faster than a T-Rex (27km/h). You'd survive Jurassic Park!"
+                : "A T-Rex (27km/h) might catch you. Run faster next year!"}
+        </motion.p>
+    </SlideContainer>
+);
+
+export const SlowestSlide = ({ data, textColor }) => {
+    if (!data.speed.slowestActivity) return null;
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">Slow and Steady Wins... a Race</h2>
+
+            <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 3, ease: "linear" }}
+                className="text-8xl mb-8"
+            >
+                🐌
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md"
+            >
+                <p className="text-xl font-bold mb-4 line-clamp-2">&quot;{data.speed.slowestActivity.name}&quot;</p>
+                <p className="opacity-90">
+                    Was <span className="font-black text-brand-orange">{data.speed.diffPercent}%</span> slower than your fastest.
+                </p>
+                <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
+            </motion.div>
+        </SlideContainer>
+    );
+};
+
+export const HeatmapSlide = ({ data, textColor }) => {
+    // Find peak hour
+    const maxVal = Math.max(...data.charts.hourly);
+    const peakHour = data.charts.hourly.indexOf(maxVal);
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">Clockwatcher</h2>
+
+            <div className="flex items-end gap-1 h-48 mb-8 w-full max-w-md justify-between">
+                {data.charts.hourly.map((val, idx) => (
+                    <motion.div
+                        key={idx}
+                        initial={{ height: 0 }}
+                        animate={{ height: `${(val / maxVal) * 100}%` }}
+                        transition={{ delay: idx * 0.05 + 0.5 }}
+                        className={clsx("flex-1 rounded-t-sm min-h-[4px]", idx === peakHour ? "bg-brand-orange" : "bg-current opacity-50")}
+                    />
+                ))}
+            </div>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+            >
+                <p className="text-2xl font-bold">
+                    You are most active at <span className="text-4xl block my-2">{peakHour}:00</span>
+                </p>
+            </motion.div>
+        </SlideContainer>
+    );
+};
+
+export const WeeklyPatternSlide = ({ data, textColor }) => {
+    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const maxVal = Math.max(...data.charts.daily);
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-12">The Weekly Grind</h2>
+
+            <div className="w-full max-w-md relative h-64 mb-8">
+                 <div className="flex items-end justify-between h-full w-full px-4">
+                     {data.charts.daily.map((val, idx) => (
+                         <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end w-1/12">
+                             <motion.div
+                                initial={{ height: 0 }}
+                                animate={{ height: `${(val / maxVal) * 80}%` }}
+                                transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
+                                className="w-full bg-brand-orange rounded-t-lg relative group"
+                             >
+                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded">
+                                     {val}
+                                 </div>
+                             </motion.div>
+                             <span className="font-bold opacity-70">{days[idx]}</span>
+                         </div>
+                     ))}
+                 </div>
+                 {/* Line connection effect could be svg but bars are clearer for discrete data */}
+            </div>
+
+            <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="text-xl font-bold opacity-90"
+            >
+                Your week in motion.
+            </motion.p>
+        </SlideContainer>
+    );
+};
+
+export const KudosSlide = ({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Social Butterfly</h2>
+
+        <motion.div
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
+            className="text-[8rem] mb-8"
+        >
+            👍
+        </motion.div>
+
+        <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ delay: DRAMATIC_DELAY }}
+             className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm"
+        >
+            <p className="text-6xl font-black mb-4">{data.kudosRatio}</p>
+            <p className="text-xl font-bold">high-fives for every km you moved!</p>
+        </motion.div>
+    </SlideContainer>
+);
+
 export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
   const handleDoubleClick = React.useCallback(() => {
       if (!data.newActivity.id) return;

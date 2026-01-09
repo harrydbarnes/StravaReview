@@ -326,9 +326,9 @@ export const analyzeData = (allActivities, year = 2025) => {
           // Benchmark: ~4.8x faster and avoids string allocation for every activity
           const latKey = Math.trunc(lat * 100 + Math.sign(lat) * 0.5);
           const lngKey = Math.trunc(lng * 100 + Math.sign(lng) * 0.5);
-          // Key mapping: Shift to positive integer space for 32-bit safety and uniqueness
-          // Lat range approx -9000..9000, Lng -18000..18000
-          const key = (latKey + 9000) * 40000 + (lngKey + 18000);
+          // Key mapping: Shift to positive integer space for uniqueness.
+          const LAT_OFFSET = 9000, LNG_OFFSET = 18000, LNG_MULTIPLIER = 40000;
+          const key = (latKey + LAT_OFFSET) * LNG_MULTIPLIER + (lngKey + LNG_OFFSET);
 
           let cluster = coordinateClusters.get(key);
           if (!cluster) {

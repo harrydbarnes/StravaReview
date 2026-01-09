@@ -3,10 +3,10 @@ import { generateMockActivities, analyzeData } from './utils/dataProcessor';
 import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
 import { AlertCircle, HelpCircle } from 'lucide-react';
-import HowToSetup from './components/HowToSetup';
 
 // Lazy load the StoryContainer which holds all the heavy slide logic and framer-motion dependencies
 const StoryContainer = React.lazy(() => import('./components/StoryContainer'));
+const HowToSetup = React.lazy(() => import('./components/HowToSetup'));
 
 const STORAGE_KEY_CLIENT_ID = 'strava_client_id';
 const STORAGE_KEY_CLIENT_SECRET = 'strava_client_secret';
@@ -258,7 +258,9 @@ function App() {
                     </div>
                 )}
               </div>
-              <HowToSetup isOpen={showHowTo} onClose={() => setShowHowTo(false)} />
+              <Suspense fallback={null}>
+                  <HowToSetup isOpen={showHowTo} onClose={() => setShowHowTo(false)} />
+              </Suspense>
           </div>
       );
   }

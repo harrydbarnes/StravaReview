@@ -74,6 +74,9 @@ function App() {
         const storedClientSecret = sessionStorage.getItem(STORAGE_KEY_CLIENT_SECRET);
         
         if (code && storedClientId && storedClientSecret) {
+            // Trigger entry sound immediately on valid auth redirection
+            playEntrySound();
+
             setLoading(true);
             setLoadingStatus('Authenticating with Strava...');
             // Clear code from URL to clean up
@@ -274,7 +277,6 @@ function App() {
             <StoryContainer
                 data={data}
                 onClose={() => setStarted(false)}
-                playEntrySound={playEntrySound}
             />
         </Suspense>
     </div>

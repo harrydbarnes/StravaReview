@@ -95,7 +95,7 @@ const Controls = ({
     );
 };
 
-const StoryViewer = ({ slides, onClose, playEntrySound }) => {
+const StoryViewer = ({ slides, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -208,6 +208,7 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
       const ctx = audioCtxRef.current;
       if (!ctx || !cheerBufferRef.current) return;
 
+      // Ensure any existing cheer is stopped first
       stopSourceNode(cheerSourceRef, 'existing cheer');
 
       const src = ctx.createBufferSource();
@@ -238,18 +239,34 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   useEffect(() => {
     const isLastSlide = currentIndex === slides.length - 1;
 
-    if (isLastSlide) {
-      stopWebAudioLoop();
-      if (!isMuted && hasStarted) {
-          playWebAudioCheer();
-      }
-    } else {
-      stopWebAudioCheer();
-      if (!isMuted && hasStarted) {
-          shouldPlayLoopRef.current = true;
-          playWebAudioLoop();
-      }
+    // Strict cleanup first
+    stopWebAudioLoop();
+    stopWebAudioCheer();
+
+    if (hasStarted) {
+        if (isLastSlide) {
+            // Last Slide: Only play Cheer
+            if (!isMuted) {
+                playWebAudioCheer();
+            }
+        } else {
+            // Other Slides: Only play Loop
+            if (!isMuted) {
+                shouldPlayLoopRef.current = true;
+                playWebAudioLoop();
+            }
+        }
     }
+
+    // Cleanup on effect re-run (or unmount)
+    return () => {
+        stopWebAudioLoop();
+        // We don't necessarily stop cheer immediately on unmount of effect to allow overlap if we were fading,
+        // but here we want strict separation so we stop it.
+        // However, if we stop everything here, it might cut off audio between slide transitions abruptly if we aren't careful.
+        // But the requirement is "Strictly enforce only one audio source is active".
+        // The effect runs when currentIndex changes. So stopping everything at start of effect is correct.
+    };
   }, [currentIndex, isMuted, slides.length, hasStarted, playWebAudioLoop, stopWebAudioLoop, playWebAudioCheer, stopWebAudioCheer]);
 
   const handleNext = useCallback(() => {
@@ -280,12 +297,8 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   const togglePause = () => setIsPaused(!isPaused);
 
   const handleStart = () => {
-      if (playEntrySound) playEntrySound();
       setHasStarted(true);
-      if (!isMuted) {
-          shouldPlayLoopRef.current = true;
-          playWebAudioLoop();
-      }
+      // Removed playEntrySound() call here as it's moved to App.jsx
   };
 
   // Touch/Click handlers

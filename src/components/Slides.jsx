@@ -8,7 +8,7 @@ const MIN_STREAK_FOR_DISPLAY = 5;
 export const DRAMATIC_DELAY = 3;
 export const STAGGER_DELAY = 1.5;
 const INTRO_DELAY = 0.8;
-const T_REX_SPEED_KMH = 27;
+const T_REX_SPEED_MPH = 18;
 
 const CountUp = ({ value, label, delay = 0 }) => {
     const ref = React.useRef(null);
@@ -162,8 +162,15 @@ export const OlympicsSlide = ({ data, textColor }) => {
     );
 };
 
-export const ShortestSlide = ({ data, textColor }) => {
+export const ShortestSlide = ({ data, textColor, showClickHint }) => {
     if (!data.shortestActivity) return null;
+
+    const handleDoubleClick = React.useCallback(() => {
+        if (!data.shortestActivity.id) return;
+        window.open(`https://www.strava.com/activities/${data.shortestActivity.id}`, '_blank', 'noopener,noreferrer');
+    }, [data.shortestActivity.id]);
+
+    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 
     return (
         <SlideContainer textColor={textColor}>
@@ -173,10 +180,22 @@ export const ShortestSlide = ({ data, textColor }) => {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: DRAMATIC_DELAY - 1.5 }}
-                className="p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5"
+                className={clsx("p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5 relative", data.shortestActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
+                onClick={handleClick}
             >
                 <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
                 <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
+
+                {clickCount < 2 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: DRAMATIC_DELAY + 1 }}
+                        className="absolute -bottom-16 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                    >
+                        (Click twice to open!)
+                    </motion.div>
+                )}
             </motion.div>
 
             <motion.div
@@ -195,7 +214,7 @@ export const ShortestSlide = ({ data, textColor }) => {
 
 export const ElevationSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">The Vertical Limit</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-20">The Vertical Limit</h2>
 
         <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -206,12 +225,12 @@ export const ElevationSlide = ({ data, textColor }) => (
             <div className="w-8 h-16 bg-current opacity-20 rounded-t-lg"></div>
             <div className="w-12 h-24 bg-current opacity-40 rounded-t-lg"></div>
             <div className="w-16 h-40 bg-current opacity-60 rounded-t-lg"></div>
-            <div className="w-20 h-64 bg-current rounded-t-lg relative">
+            <div className="w-20 h-64 bg-current rounded-t-lg relative flex flex-col items-center justify-end">
                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 2 }}
-                    className="absolute -top-12 left-0 right-0 font-black text-2xl"
+                    className="absolute -top-16 left-1/2 -translate-x-1/2 font-black text-2xl whitespace-nowrap z-10"
                  >
                      {data.elevation.total}m
                  </motion.div>
@@ -224,7 +243,7 @@ export const ElevationSlide = ({ data, textColor }) => (
             transition={{ delay: DRAMATIC_DELAY }}
             className="text-xl font-bold max-w-md"
         >
-            That&apos;s equal to summiting Mount Everest <span className="text-3xl text-brand-orange block my-2">{data.elevation.everestCount} times! 🏔️</span>
+            That&apos;s equal to stacking Big Ben <span className="text-3xl text-brand-orange block my-2">{data.elevation.bigBenCount} times! 🕰️</span>
         </motion.div>
     </SlideContainer>
 );
@@ -324,7 +343,7 @@ export const SpeedSlide = ({ data, textColor }) => (
             className="mb-8"
         >
             <p className="text-sm uppercase font-bold opacity-70 mb-2">Top Speed Reached</p>
-            <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">km/h</span></p>
+            <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">mph</span></p>
         </motion.div>
 
         <motion.p
@@ -333,15 +352,22 @@ export const SpeedSlide = ({ data, textColor }) => (
             transition={{ delay: DRAMATIC_DELAY }}
             className="text-lg max-w-sm"
         >
-            {data.speed.max > T_REX_SPEED_KMH
-                ? `Faster than a T-Rex (${T_REX_SPEED_KMH}km/h). You'd survive Jurassic Park!`
-                : `A T-Rex (${T_REX_SPEED_KMH}km/h) might catch you. Run faster next year!`}
+            {data.speed.max > T_REX_SPEED_MPH
+                ? `Faster than a T-Rex (${T_REX_SPEED_MPH}mph). You'd survive Jurassic Park!`
+                : `A T-Rex (${T_REX_SPEED_MPH}mph) might catch you. Run faster next year!`}
         </motion.p>
     </SlideContainer>
 );
 
-export const SlowestSlide = ({ data, textColor }) => {
+export const SlowestSlide = ({ data, textColor, showClickHint }) => {
     if (!data.speed.slowestActivity) return null;
+
+    const handleDoubleClick = React.useCallback(() => {
+        if (!data.speed.slowestActivity.id) return;
+        window.open(`https://www.strava.com/activities/${data.speed.slowestActivity.id}`, '_blank', 'noopener,noreferrer');
+    }, [data.speed.slowestActivity.id]);
+
+    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 
     return (
         <SlideContainer textColor={textColor}>
@@ -360,43 +386,82 @@ export const SlowestSlide = ({ data, textColor }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: DRAMATIC_DELAY }}
-                className="bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md"
+                className={clsx("bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md relative", data.speed.slowestActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
+                onClick={handleClick}
             >
                 <p className="text-xl font-bold mb-4 line-clamp-2">&quot;{data.speed.slowestActivity.name}&quot;</p>
                 <p className="opacity-90">
                     Was <span className="font-black text-brand-orange">{data.speed.diffPercent}%</span> slower than your fastest.
                 </p>
                 <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
+
+                {clickCount < 2 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1 }}
+                        className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                    >
+                        (Click twice to open!)
+                    </motion.div>
+                )}
             </motion.div>
         </SlideContainer>
     );
 };
 
 export const HeatmapSlide = ({ data, textColor }) => {
-    // Find peak hour
-    const maxVal = Math.max(...data.charts.hourly);
-    const peakHour = data.charts.hourly.indexOf(maxVal);
+    // Trim leading/trailing zeros
+    const hourly = data.charts.hourly;
+    const firstActive = hourly.findIndex(v => v > 0);
+    const lastActive = hourly.findLastIndex(v => v > 0);
+
+    // If no data, fallback to full range
+    const startIdx = firstActive === -1 ? 0 : firstActive;
+    const endIdx = lastActive === -1 ? 23 : lastActive;
+
+    const displayData = hourly.slice(startIdx, endIdx + 1);
+    const maxVal = Math.max(...displayData);
+
+    // Original peak logic relative to full day
+    const peakHour = hourly.indexOf(Math.max(...hourly));
 
     return (
         <SlideContainer textColor={textColor}>
             <h2 className="text-3xl md:text-4xl font-bold mb-8">Clockwatcher</h2>
 
-            <div className="flex items-end gap-1 h-48 mb-8 w-full max-w-md justify-between">
-                {data.charts.hourly.map((val, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ height: 0 }}
-                        animate={{ height: `${maxVal > 0 ? (val / maxVal) * 100 : 0}%` }}
-                        transition={{ delay: idx * 0.05 + 0.5 }}
-                        className={clsx("flex-1 rounded-t-sm min-h-[4px]", idx === peakHour ? "bg-brand-orange" : "bg-current opacity-50")}
-                    />
-                ))}
+            <div className="flex flex-col w-full max-w-md">
+                <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
+                    {displayData.map((val, idx) => {
+                        const actualHour = startIdx + idx;
+                        return (
+                            <motion.div
+                                key={actualHour}
+                                initial={{ height: 0 }}
+                                animate={{ height: `${maxVal > 0 ? (val / maxVal) * 100 : 0}%` }}
+                                transition={{ delay: idx * 0.05 + 0.5 }}
+                                className={clsx("flex-1 rounded-t-sm min-h-[4px]", actualHour === peakHour ? "bg-brand-orange" : "bg-current opacity-50")}
+                            />
+                        );
+                    })}
+                </div>
+
+                {/* X-Axis Legend */}
+                <div className="flex justify-between text-xs font-bold opacity-60 px-1">
+                    <span>{startIdx}:00</span>
+                    {/* Show midpoint if range is wide enough */}
+                    {endIdx - startIdx > 6 && (
+                        <span>{Math.floor((startIdx + endIdx) / 2)}:00</span>
+                    )}
+                    <span>{endIdx}:00</span>
+                </div>
             </div>
 
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: DRAMATIC_DELAY }}
+                className="mt-6"
             >
                 <p className="text-2xl font-bold">
                     You are most active at <span className="text-4xl block my-2">{peakHour}:00</span>
@@ -410,6 +475,17 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const maxVal = Math.max(...data.charts.daily);
 
+    // Identify top 3 days
+    const indexedDaily = data.charts.daily.map((val, i) => ({ val, i }));
+    // Sort descending by value
+    indexedDaily.sort((a, b) => b.val - a.val);
+
+    // Create a map of index -> rank (0, 1, 2 for top 3)
+    const rankMap = {};
+    indexedDaily.slice(0, 3).forEach((item, rank) => {
+        if (item.val > 0) rankMap[item.i] = rank;
+    });
+
     return (
         <SlideContainer textColor={textColor}>
             <h2 className="text-3xl md:text-4xl font-bold mb-12">The Weekly Grind</h2>
@@ -418,13 +494,20 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
                  <div className="flex items-end h-full w-full px-4 gap-1">
                      {data.charts.daily.map((val, idx) => {
                          const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
+
+                         // Determine color based on rank
+                         let barColor = "bg-brand-orange"; // default
+                         if (rankMap[idx] === 0) barColor = "bg-[#FFD700]"; // Gold
+                         else if (rankMap[idx] === 1) barColor = "bg-[#C0C0C0]"; // Silver
+                         else if (rankMap[idx] === 2) barColor = "bg-[#CD7F32]"; // Bronze
+
                          return (
                              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
                                  <motion.div
                                     initial={{ height: 0 }}
                                     animate={{ height: `${heightPercent}%` }}
                                     transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
-                                    className="w-full bg-brand-orange rounded-t-lg relative group"
+                                    className={clsx("w-full rounded-t-lg relative group", barColor)}
                                  >
                                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded">
                                          {val}

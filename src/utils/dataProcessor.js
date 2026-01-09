@@ -153,12 +153,14 @@ export const analyzeData = (allActivities, year = 2025) => {
   // ⚡ Bolt Optimization: Fast string comparison to filter year before date parsing
   const yearPrefix = `${year}-`;
   const activities = allActivities.filter(a => {
-      if (typeof a.start_date === 'string') {
+      // Fast-path for the common ISO date string format "YYYY-MM-..."
+      // ⚡ Bolt Optimization: Check for ISO format characteristic (hyphen at index 4) before using startsWith
+      if (typeof a.start_date === 'string' && a.start_date.length > 4 && a.start_date.charAt(4) === '-') {
           // Check for UTC string match (e.g. "2025-")
           // This aligns with "standardize on UTC" directive.
           return a.start_date.startsWith(yearPrefix);
       }
-      // Fallback for non-string dates (unlikely with Strava API)
+      // Fallback for non-string dates or other string formats to ensure correctness
       const d = new Date(a.start_date);
       return d.getUTCFullYear() === year;
   });

@@ -163,14 +163,15 @@ export const OlympicsSlide = ({ data, textColor }) => {
 };
 
 export const ShortestSlide = ({ data, textColor, showClickHint }) => {
-    if (!data.shortestActivity) return null;
-
     const handleDoubleClick = React.useCallback(() => {
-        if (!data.shortestActivity.id) return;
-        window.open(`https://www.strava.com/activities/${data.shortestActivity.id}`, '_blank', 'noopener,noreferrer');
-    }, [data.shortestActivity.id]);
+        if (data.shortestActivity && data.shortestActivity.id) {
+            window.open(`https://www.strava.com/activities/${data.shortestActivity.id}`, '_blank', 'noopener,noreferrer');
+        }
+    }, [data.shortestActivity]);
 
     const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
+
+    if (!data.shortestActivity) return null;
 
     return (
         <SlideContainer textColor={textColor}>
@@ -360,14 +361,15 @@ export const SpeedSlide = ({ data, textColor }) => (
 );
 
 export const SlowestSlide = ({ data, textColor, showClickHint }) => {
-    if (!data.speed.slowestActivity) return null;
-
     const handleDoubleClick = React.useCallback(() => {
-        if (!data.speed.slowestActivity.id) return;
-        window.open(`https://www.strava.com/activities/${data.speed.slowestActivity.id}`, '_blank', 'noopener,noreferrer');
-    }, [data.speed.slowestActivity.id]);
+        if (data.speed.slowestActivity && data.speed.slowestActivity.id) {
+            window.open(`https://www.strava.com/activities/${data.speed.slowestActivity.id}`, '_blank', 'noopener,noreferrer');
+        }
+    }, [data.speed.slowestActivity]);
 
     const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
+
+    if (!data.speed.slowestActivity) return null;
 
     return (
         <SlideContainer textColor={textColor}>

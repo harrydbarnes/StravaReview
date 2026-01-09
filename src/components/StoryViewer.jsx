@@ -79,10 +79,10 @@ const Controls = ({
                     setTextColor(availableColors[nextIdx]);
                 }}
                 className={buttonClass}
-                aria-label="Change text color"
+                aria-label="Change text colour"
                 type='button'
             >
-                Color
+                Colour
             </button>
             {/* Close button that calls onClose */}
             {onClose && (
@@ -244,31 +244,51 @@ const StoryViewer = ({ slides, onClose }) => {
   useEffect(() => {
     const isLastSlide = currentIndex === slides.length - 1;
 
-    // Strict cleanup first
-    stopWebAudioLoop();
-    stopWebAudioCheer();
-
     if (hasStarted) {
         if (isLastSlide) {
-            // Last Slide: Only play Cheer
+            // Last Slide: Stop Loop, Play Cheer
+            stopWebAudioLoop();
             if (!isMuted) {
                 playWebAudioCheer();
+            } else {
+                stopWebAudioCheer();
             }
         } else {
-            // Other Slides: Only play Loop
+            // Other Slides: Ensure Loop is playing, Stop Cheer
+            stopWebAudioCheer();
             if (!isMuted) {
-                shouldPlayLoopRef.current = true;
-                playWebAudioLoop();
+                // Only start if not already effectively playing (tracked by ref logic)
+                if (!shouldPlayLoopRef.current) {
+                    shouldPlayLoopRef.current = true;
+                    playWebAudioLoop();
+                }
+            } else {
+                stopWebAudioLoop();
             }
         }
-    }
-
-    // Cleanup for the audio effect.
-    return () => {
+    } else {
+        // Not started yet
         stopWebAudioLoop();
         stopWebAudioCheer();
-    };
+    }
+
+    // Cleanup on UNMOUNT (not on every effect run) handled by a separate effect
+    // or we rely on the logic here to manage state transitions.
+    // Ideally, we don't want to stop the loop when currentIndex changes 0->1->2...
+    // The previous implementation stopped it every time.
+
+    // We do NOT return a cleanup function here that stops everything,
+    // because that would stop audio on every slide transition.
+
   }, [currentIndex, isMuted, slides.length, hasStarted, playWebAudioLoop, stopWebAudioLoop, playWebAudioCheer, stopWebAudioCheer]);
+
+  // Unmount cleanup ONLY
+  useEffect(() => {
+      return () => {
+          stopWebAudioLoop();
+          stopWebAudioCheer();
+      };
+  }, [stopWebAudioLoop, stopWebAudioCheer]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {

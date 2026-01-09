@@ -58,7 +58,7 @@ const StoryContainer = ({ data, onClose, playEntrySound }) => {
         // 4. SPEED FREAK (Fast, Slow, Short)
         { component: (props) => <SpeedSlide data={data} {...props} />, duration: 6000 },
         ...(data.speed.slowestActivity ? [{ component: (props) => <SlowestSlide data={data} {...props} />, duration: 7000 }] : []),
-        ...(data.shortestActivity ? [{ component: (props) => <ShortestSlide data={data} {...props} />, duration: 6000 }] : []),
+        ...(data.shortestActivity ? [{ component: (props) => <ShortestSlide data={data} showClickHint={true} {...props} />, duration: 6000 }] : []),
 
         // 5. THE SCHEDULE (Heatmaps & Patterns)
         { component: (props) => <HeatmapSlide data={data} {...props} />, duration: 8000 },

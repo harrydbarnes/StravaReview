@@ -368,6 +368,20 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (dayIndex === 0 || dayIndex === 6) weekendCount++;
   }
 
+  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport)
+  let maxDiffPercent = -1;
+  Object.values(activityTypes).forEach(sport => {
+      if (sport.maxSpeed > 0 && isFinite(sport.minSpeed)) {
+          const diff = ((sport.maxSpeed - sport.minSpeed) / sport.maxSpeed) * 100;
+          if (diff > maxDiffPercent) {
+              maxDiffPercent = diff;
+              slowestActivity = sport.slowestAct;
+              minSpeedGlobal = sport.minSpeed; // Update global for display consistency if needed
+          }
+      }
+  });
+  const speedDiffPercent = maxDiffPercent > 0 ? maxDiffPercent : 0;
+
   // Post-Processing: Top 5 Sports
   const topSports = Object.values(activityTypes)
       .map(sport => ({
@@ -416,11 +430,16 @@ export const analyzeData = (allActivities, year = 2025) => {
     }
   }
 
-  // Top Months
-  const topMonthsByDistance = Object.entries(months)
-    .sort(([, a], [, b]) => b.distance - a.distance)
-    .slice(0, 3)
-    .map(([month, stats]) => ({ month, ...stats }));
+  // Top Months & Monthly Stats
+  const monthlyStats = MONTH_NAMES.map(month => ({
+      month,
+      distance: months[month] ? months[month].distance : 0,
+      count: months[month] ? months[month].count : 0
+  }));
+
+  const topMonthsByDistance = [...monthlyStats]
+    .sort((a, b) => b.distance - a.distance)
+    .slice(0, 3);
 
   // Top Location Selection Logic
   // Strategy: Explicit City > Coordinate Cluster > Timezone Fallback > Generic Default
@@ -503,8 +522,6 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRideSpeed = `${speedVal.toFixed(1)} mph`;
   }
 
-  const speedDiffPercent = maxSpeedGlobal > 0 && isFinite(minSpeedGlobal) ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
-  
   // Vibe Check
   const vibe = determineVibe({
       activityTypes,
@@ -566,6 +583,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     mostLikedActivity,
     newActivity: newActivity ? { type: newActivity.type, firstDate: newActivity.firstDate, id: activities.find(a => a.type === newActivity.type)?.id } : null,
     topMonthsByDistance,
+    monthlyStats,
     topLocation,
     vibe
   };

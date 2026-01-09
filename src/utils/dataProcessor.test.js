@@ -41,8 +41,9 @@ describe('dataProcessor', () => {
         const topMonths = result.topMonthsByDistance;
 
         // Should have December then January, sorted by distance
-        expect(topMonths).toHaveLength(2);
+        expect(topMonths).toHaveLength(3);
         expect(topMonths[0].month).toBe('December');
         expect(topMonths[1].month).toBe('January');
+        expect(topMonths[2].distance).toBe(0);
     });
 });

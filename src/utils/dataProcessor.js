@@ -13,6 +13,7 @@ export const CALORIES_DONUT = 250;
 export const OLYMPIC_SPRINT_METERS = 100;
 export const OLYMPIC_POOL_METERS = 50;
 export const MPH_CONVERSION = 2.23694;
+export const KMH_TO_MPH = 0.621371;
 
 // Fun Comparison Constants
 // Songs (seconds)
@@ -458,7 +459,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
   let avgRideSpeed = null;
   if (rideStats.distance > 0 && rideStats.time > 0) {
       // km/h -> mph
-      const speedVal = ((rideStats.distance / 1000) / (rideStats.time / 3600)) * 0.621371;
+      const speedVal = ((rideStats.distance / 1000) / (rideStats.time / 3600)) * KMH_TO_MPH;
       avgRideSpeed = `${speedVal.toFixed(1)} mph`;
   }
 

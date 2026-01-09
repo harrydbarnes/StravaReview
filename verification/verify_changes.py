@@ -25,7 +25,8 @@ def verify_changes():
         time.sleep(2)
 
         def next_slide():
-            page.mouse.click(350, 300)
+            # page.mouse.click(350, 300)
+            page.get_by_test_id("click-next").click(force=True)
 
         # Slide 0: Intro
         print("Slide 0: Intro")

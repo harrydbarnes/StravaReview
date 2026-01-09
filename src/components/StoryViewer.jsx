@@ -258,14 +258,10 @@ const StoryViewer = ({ slides, onClose }) => {
         }
     }
 
-    // Cleanup on effect re-run (or unmount)
+    // Cleanup for the audio effect.
     return () => {
         stopWebAudioLoop();
-        // We don't necessarily stop cheer immediately on unmount of effect to allow overlap if we were fading,
-        // but here we want strict separation so we stop it.
-        // However, if we stop everything here, it might cut off audio between slide transitions abruptly if we aren't careful.
-        // But the requirement is "Strictly enforce only one audio source is active".
-        // The effect runs when currentIndex changes. So stopping everything at start of effect is correct.
+        stopWebAudioCheer();
     };
   }, [currentIndex, isMuted, slides.length, hasStarted, playWebAudioLoop, stopWebAudioLoop, playWebAudioCheer, stopWebAudioCheer]);
 
@@ -455,6 +451,14 @@ const StoryViewer = ({ slides, onClose }) => {
             onClose={onClose}
         />
 
+        {/* Click Zones for Playwright / Interaction mapping */}
+        {hasStarted && (
+            <div className="absolute inset-0 z-10 flex pointer-events-none">
+                <div data-testid="click-prev" className="flex-1" />
+                <div data-testid="click-pause" className="flex-1" />
+                <div data-testid="click-next" className="flex-1" />
+            </div>
+        )}
 
         {/* Tap Indicators (First Slide Only) */}
         {currentIndex === 0 && (

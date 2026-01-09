@@ -6,6 +6,13 @@ const KJ_TO_KCAL = 0.239;
 const KCAL_PER_KM_RIDE = 25;
 const KCAL_PER_KM_DEFAULT = 60;
 
+// Metric Constants
+export const EVEREST_METERS = 8848;
+export const CALORIES_PIZZA = 285;
+export const CALORIES_DONUT = 250;
+export const OLYMPIC_SPRINT_METERS = 100;
+export const OLYMPIC_POOL_METERS = 50;
+
 // Fun Comparison Constants
 // Songs (seconds)
 const SONGS = [
@@ -60,6 +67,10 @@ const getISOWeekAndYear = (d) => {
         year: d.getUTCFullYear(),
         week: Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
     };
+};
+
+const getHoursInYear = (year) => {
+    return (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 8784 : 8760;
 };
 
 export const generateMockActivities = (year = new Date().getFullYear()) => {
@@ -418,7 +429,8 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
 
   // Fun Stats
   const totalHours = Math.round(totalTime / 3600);
-  const percentTimeMoving = (totalHours / 8760) * 100;
+  const hoursInYear = getHoursInYear(year);
+  const percentTimeMoving = (totalHours / hoursInYear) * 100;
 
   // Select random comparisons
   const song = SONGS[Math.floor(Math.random() * SONGS.length)];
@@ -433,7 +445,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
   const swimStats = activityTypes['Swim'] || { distance: 0 };
 
   // Pace Logic
-  let avgRunPace = "N/A";
+  let avgRunPace = null;
   if (runStats.distance > 0 && runStats.time > 0) {
       // min/km = (time_in_min) / (dist_in_km)
       const paceVal = (runStats.time / 60) / (runStats.distance / 1000);
@@ -442,7 +454,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRunPace = `${pMin}:${pSec.toString().padStart(2, '0')}/km`;
   }
 
-  let avgRideSpeed = "N/A";
+  let avgRideSpeed = null;
   if (rideStats.distance > 0 && rideStats.time > 0) {
       // km/h
       const speedVal = (rideStats.distance / 1000) / (rideStats.time / 3600);
@@ -473,11 +485,11 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     percentTimeMoving,
     elevation: {
         total: Math.round(totalElevation),
-        everestCount: (totalElevation / 8848).toFixed(1)
+        everestCount: (totalElevation / EVEREST_METERS).toFixed(1)
     },
     food: {
-        pizza: Math.floor(totalCalories / 285),
-        donuts: Math.floor(totalCalories / 250)
+        pizza: Math.floor(totalCalories / CALORIES_PIZZA),
+        donuts: Math.floor(totalCalories / CALORIES_DONUT)
     },
     kudosRatio: totalDistance > 0 ? (totalKudos / (totalDistance / 1000)).toFixed(1) : 0,
     speed: {
@@ -499,8 +511,8 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
         daily: dailyCounts
     },
     olympics: {
-        sprints: Math.floor(runStats.distance / 100),
-        poolLengths: Math.floor(swimStats.distance / 50)
+        sprints: Math.floor(runStats.distance / OLYMPIC_SPRINT_METERS),
+        poolLengths: Math.floor(swimStats.distance / OLYMPIC_POOL_METERS)
     },
     funComparisons: {
         song: { title: song.title, count: songCount },

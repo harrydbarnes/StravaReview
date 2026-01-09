@@ -8,6 +8,7 @@ const MIN_STREAK_FOR_DISPLAY = 5;
 export const DRAMATIC_DELAY = 3;
 export const STAGGER_DELAY = 1.5;
 const INTRO_DELAY = 0.8;
+const T_REX_SPEED_KMH = 27;
 
 const CountUp = ({ value, label, delay = 0 }) => {
     const ref = React.useRef(null);
@@ -122,7 +123,6 @@ export const OlympicsSlide = ({ data, textColor }) => {
     if (!isSwim && !isRun) return null;
 
     const emoji = isSwim ? "🏊" : "🏃";
-    const title = isSwim ? "Olympic Dreams" : "Track Star";
     const statText = isSwim
         ? `You swam ${data.olympics.poolLengths} Olympic Pool lengths`
         : `You ran the 100m Dash ${data.olympics.sprints} times`;
@@ -268,7 +268,7 @@ export const PaceSlide = ({ data, textColor }) => (
         <h2 className="text-3xl md:text-4xl font-bold mb-12">The Consistent Cruiser</h2>
 
         <div className="flex flex-col gap-8 w-full max-w-md">
-            {data.averagePace.run !== "N/A" && (
+            {data.averagePace.run && (
                 <motion.div
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -283,7 +283,7 @@ export const PaceSlide = ({ data, textColor }) => (
                 </motion.div>
             )}
 
-             {data.averagePace.ride !== "N/A" && (
+             {data.averagePace.ride && (
                 <motion.div
                     initial={{ x: 50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -298,7 +298,7 @@ export const PaceSlide = ({ data, textColor }) => (
                 </motion.div>
             )}
 
-            {data.averagePace.run === "N/A" && data.averagePace.ride === "N/A" && (
+            {!data.averagePace.run && !data.averagePace.ride && (
                  <p className="text-xl">Just cruising at your own speed.</p>
             )}
         </div>
@@ -333,9 +333,9 @@ export const SpeedSlide = ({ data, textColor }) => (
             transition={{ delay: DRAMATIC_DELAY }}
             className="text-lg max-w-sm"
         >
-            {data.speed.max > 27
-                ? "Faster than a T-Rex (27km/h). You'd survive Jurassic Park!"
-                : "A T-Rex (27km/h) might catch you. Run faster next year!"}
+            {data.speed.max > T_REX_SPEED_KMH
+                ? `Faster than a T-Rex (${T_REX_SPEED_KMH}km/h). You'd survive Jurassic Park!`
+                : `A T-Rex (${T_REX_SPEED_KMH}km/h) might catch you. Run faster next year!`}
         </motion.p>
     </SlideContainer>
 );
@@ -386,7 +386,7 @@ export const HeatmapSlide = ({ data, textColor }) => {
                     <motion.div
                         key={idx}
                         initial={{ height: 0 }}
-                        animate={{ height: `${(val / maxVal) * 100}%` }}
+                        animate={{ height: `${maxVal > 0 ? (val / maxVal) * 100 : 0}%` }}
                         transition={{ delay: idx * 0.05 + 0.5 }}
                         className={clsx("flex-1 rounded-t-sm min-h-[4px]", idx === peakHour ? "bg-brand-orange" : "bg-current opacity-50")}
                     />
@@ -416,23 +416,25 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
 
             <div className="w-full max-w-md relative h-64 mb-8">
                  <div className="flex items-end justify-between h-full w-full px-4">
-                     {data.charts.daily.map((val, idx) => (
-                         <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end w-1/12">
-                             <motion.div
-                                initial={{ height: 0 }}
-                                animate={{ height: `${(val / maxVal) * 80}%` }}
-                                transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
-                                className="w-full bg-brand-orange rounded-t-lg relative group"
-                             >
-                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded">
-                                     {val}
-                                 </div>
-                             </motion.div>
-                             <span className="font-bold opacity-70">{days[idx]}</span>
-                         </div>
-                     ))}
+                     {data.charts.daily.map((val, idx) => {
+                         const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
+                         return (
+                             <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end w-1/12">
+                                 <motion.div
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${heightPercent}%` }}
+                                    transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
+                                    className="w-full bg-brand-orange rounded-t-lg relative group"
+                                 >
+                                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded">
+                                         {val}
+                                     </div>
+                                 </motion.div>
+                                 <span className="font-bold opacity-70">{days[idx]}</span>
+                             </div>
+                         );
+                     })}
                  </div>
-                 {/* Line connection effect could be svg but bars are clearer for discrete data */}
             </div>
 
             <motion.p

@@ -64,7 +64,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                 <div className="pl-8 text-sm space-y-2">
                   <p>If you don&apos;t have one, create a new application with:</p>
                   <ul className="list-disc pl-4 space-y-1 text-gray-400">
-                    <li><strong>Application Name:</strong> Wrapped App (or similar - the name should not contain "Strava")</li>
+                    <li><strong>Application Name:</strong> Wrapped App (or similar - the name should not contain &quot;Strava&quot;)</li>
                     <li><strong>Category:</strong> Visualizer</li>
                     <li><strong>Authorization Callback Domain:</strong>
                         <code className="mx-1 px-1 bg-white/10 rounded select-all">{hostname}</code>

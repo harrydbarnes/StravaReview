@@ -9,7 +9,7 @@ def verify_changes():
         page = context.new_page()
 
         # 1. Navigate to the app (assuming default Vite port)
-        page.goto("http://localhost:5173/StravaReview/")
+        page.goto(os.environ.get("APP_URL", "http://localhost:5173/StravaReview/"))
 
         # Wait for loading to finish (or click Demo Mode if needed)
         # The app requires interaction to start.

@@ -39,7 +39,7 @@ def verify_changes():
 
         # Slide 2: Elevation (Big Ben)
         print("Slide 2: Elevation")
-        time.sleep(4) # Wait for DRAMATIC_DELAY (3s) + animation
+        expect(page.get_by_text("Big Ben")).to_be_visible(timeout=5000)
         page.screenshot(path="verification/slide_2_elevation.png")
 
         # Verify text

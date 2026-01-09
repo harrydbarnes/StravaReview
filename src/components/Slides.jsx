@@ -496,10 +496,8 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
                          const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
 
                          // Determine color based on rank
-                         let barColor = "bg-brand-orange"; // default
-                         if (rankMap[idx] === 0) barColor = "bg-[#FFD700]"; // Gold
-                         else if (rankMap[idx] === 1) barColor = "bg-[#C0C0C0]"; // Silver
-                         else if (rankMap[idx] === 2) barColor = "bg-[#CD7F32]"; // Bronze
+                         const podiumColors = { 0: 'bg-[#FFD700]', 1: 'bg-[#C0C0C0]', 2: 'bg-[#CD7F32]' };
+                         const barColor = podiumColors[rankMap[idx]] ?? "bg-brand-orange";
 
                          return (
                              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">

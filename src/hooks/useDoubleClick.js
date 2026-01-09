@@ -1,10 +1,18 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const DOUBLE_CLICK_TIMEOUT = 500; // ms
 
 export const useDoubleClick = (onDoubleClick) => {
   const [clickCount, setClickCount] = useState(0);
   const timerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const handleClick = useCallback((e) => {
     e.stopPropagation();

@@ -23,28 +23,24 @@ def verify_changes():
         page.get_by_text("Start the Show").click()
 
         # Wait for the first slide (Intro)
-        time.sleep(2)
+        # Wait for the first slide to load
+        page.wait_for_selector('text=Your Year in Activity')
 
-        # Navigate through slides to reach SpotlightSlide (slide 5)
-        # Intro -> Top Sports -> New Activity -> Fun Stats -> Spotlight
-        # Assuming demo data has New Activity and Spotlight.
+        story_container = page.locator('div[class*="md:rounded-xl"]').first
 
-        # Tap right side to advance
-        # Slide 1 (Intro) -> 2 (Top Sports)
-        page.mouse.click(300, 300)
-        time.sleep(1)
+        def advance_slide(expected_text):
+            # Click on the right side of the container to advance.
+            # Using a position is better than global mouse coordinates.
+            story_container.click(position={'x': 300, 'y': 300})
+            page.wait_for_selector(f'text={expected_text}')
 
-        # Slide 2 -> 3 (New Activity)
-        page.mouse.click(300, 300)
-        time.sleep(1)
-
-        # Slide 3 -> 4 (Fun Stats)
-        page.mouse.click(300, 300)
-        time.sleep(1)
-
-        # Slide 4 -> 5 (Spotlight)
-        page.mouse.click(300, 300)
-        time.sleep(1)
+        # Navigate through the slides by waiting for expected content
+        advance_slide('Your Top Sports')
+        advance_slide('You Tried Something New')
+        # The location slide is likely present in demo data
+        advance_slide('Your Favorite Playground')
+        advance_slide('Time Well Spent')
+        advance_slide('The Crowd Went Wild') # This is the Spotlight slide
 
         # Wait for animation
         time.sleep(2)

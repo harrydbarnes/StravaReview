@@ -485,7 +485,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
         {/* Slide Content */}
         <div 
-            className={clsx("flex-1 relative cursor-pointer select-none", themes[theme].bg, themes[theme].text)}
+            className={clsx("flex-1 relative cursor-pointer select-none touch-manipulation", themes[theme].bg, themes[theme].text)}
             onClick={handleTap}
         >
           {hasStarted && (

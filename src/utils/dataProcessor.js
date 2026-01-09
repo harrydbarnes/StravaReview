@@ -213,8 +213,13 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (isNaN(dateObj.getTime())) continue;
 
       // ⚡ Bolt Optimization: Use substring for strings, fallback to ISO method
-      // Using substring is significantly faster than toISOString() + substring
-      const dateString = typeof act.start_date === 'string'
+      // Check for ISO format characteristic (hyphen at index 4 and 7) for safety
+      const isIsoString = typeof act.start_date === 'string' &&
+                          act.start_date.length >= 10 &&
+                          act.start_date.charAt(4) === '-' &&
+                          act.start_date.charAt(7) === '-';
+
+      const dateString = isIsoString
           ? act.start_date.substring(0, 10)
           : dateObj.toISOString().substring(0, 10);
 

@@ -461,7 +461,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRideSpeed = `${speedVal.toFixed(1)} km/h`;
   }
 
-  const speedDiffPercent = maxSpeedGlobal > 0 ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
+  const speedDiffPercent = maxSpeedGlobal > 0 && isFinite(minSpeedGlobal) ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
   
   // Vibe Check
   const vibe = determineVibe({

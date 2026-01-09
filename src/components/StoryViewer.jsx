@@ -44,6 +44,7 @@ const Controls = ({
                 onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
                 className={buttonClass}
                 title={isMuted ? "Unmute" : "Mute"}
+                aria-label={isMuted ? "Unmute story audio" : "Mute story audio"}
                 type='button'
             >
                 {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -56,6 +57,7 @@ const Controls = ({
                     setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
                 }}
                 className={buttonClass}
+                aria-label="Toggle theme"
                 type='button'
             >
                 Theme
@@ -77,15 +79,18 @@ const Controls = ({
                     setTextColor(availableColors[nextIdx]);
                 }}
                 className={buttonClass}
+                aria-label="Change text color"
                 type='button'
             >
-                Colour
+                Color
             </button>
             {/* Close button that calls onClose */}
             {onClose && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onClose(); }}
                     className={buttonClass}
+                    title="Close"
+                    aria-label="Close story"
                     type='button'
                 >
                     ✕

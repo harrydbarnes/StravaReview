@@ -7,11 +7,12 @@ const KCAL_PER_KM_RIDE = 25;
 const KCAL_PER_KM_DEFAULT = 60;
 
 // Metric Constants
-export const EVEREST_METERS = 8848;
+export const BIG_BEN_METERS = 96;
 export const CALORIES_PIZZA = 285;
 export const CALORIES_DONUT = 250;
 export const OLYMPIC_SPRINT_METERS = 100;
 export const OLYMPIC_POOL_METERS = 50;
+export const MPH_CONVERSION = 2.23694;
 
 // Fun Comparison Constants
 // Songs (seconds)
@@ -232,14 +233,14 @@ export const analyzeData = (allActivities, year = 2025) => {
       dailyCounts[monSunIndex]++;
 
       // Speed Stats
-      // Strava max_speed is m/s. Convert to km/h: * 3.6
-      const actMaxSpeed = (act.max_speed || 0) * 3.6;
+      // Strava max_speed is m/s. Convert to mph: * 2.23694
+      const actMaxSpeed = (act.max_speed || 0) * MPH_CONVERSION;
       if (actMaxSpeed > maxSpeedGlobal) maxSpeedGlobal = actMaxSpeed;
 
       // Min Speed (Slowest non-zero)
       // Use average speed (distance/time)
       if (time > 0 && dist > 0) {
-          const avgSpeed = (dist / time) * 3.6; // km/h
+          const avgSpeed = (dist / time) * MPH_CONVERSION; // mph
           if (avgSpeed < minSpeedGlobal) {
               minSpeedGlobal = avgSpeed;
               slowestActivity = act;
@@ -456,9 +457,9 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
 
   let avgRideSpeed = null;
   if (rideStats.distance > 0 && rideStats.time > 0) {
-      // km/h
-      const speedVal = (rideStats.distance / 1000) / (rideStats.time / 3600);
-      avgRideSpeed = `${speedVal.toFixed(1)} km/h`;
+      // km/h -> mph
+      const speedVal = ((rideStats.distance / 1000) / (rideStats.time / 3600)) * 0.621371;
+      avgRideSpeed = `${speedVal.toFixed(1)} mph`;
   }
 
   const speedDiffPercent = maxSpeedGlobal > 0 && isFinite(minSpeedGlobal) ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
@@ -485,7 +486,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     percentTimeMoving,
     elevation: {
         total: Math.round(totalElevation),
-        everestCount: (totalElevation / EVEREST_METERS).toFixed(1)
+        bigBenCount: (totalElevation / BIG_BEN_METERS).toFixed(1)
     },
     food: {
         pizza: Math.floor(totalCalories / CALORIES_PIZZA),

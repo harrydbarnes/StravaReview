@@ -79,10 +79,10 @@ const Controls = ({
                     setTextColor(availableColors[nextIdx]);
                 }}
                 className={buttonClass}
-                aria-label="Change text colour"
+                aria-label="Change text color"
                 type='button'
             >
-                Colour
+                Color
             </button>
             {/* Close button that calls onClose */}
             {onClose && (

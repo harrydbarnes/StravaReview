@@ -34,7 +34,7 @@ export const useDoubleClick = (onDoubleClick) => {
                 timerRef.current = null;
             }
             onDoubleClick?.();
-            return 0;
+            return 2;
         }
 
         // Should not happen usually given logic above, but safe fallback

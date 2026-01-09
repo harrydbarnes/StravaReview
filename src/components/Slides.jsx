@@ -395,7 +395,7 @@ export const SlowestSlide = ({ data, textColor, showClickHint }) => {
                 </p>
                 <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
 
-                {clickCount < 2 && (
+                {showClickHint && clickCount < 2 && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}

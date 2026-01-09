@@ -150,9 +150,19 @@ export const analyzeData = (allActivities, year = 2025) => {
   if (!allActivities || allActivities.length === 0) return null;
 
   // Filter for the given year
+  // ⚡ Bolt Optimization: Fast string comparison to filter year before date parsing
+  const yearPrefix = `${year}-`;
   const activities = allActivities.filter(a => {
+      // Fast-path for the common ISO date string format "YYYY-MM-..."
+      // ⚡ Bolt Optimization: Check for ISO format characteristic (hyphen at index 4) before using startsWith
+      if (typeof a.start_date === 'string' && a.start_date.charAt(4) === '-') {
+          // Check for UTC string match (e.g. "2025-")
+          // This aligns with "standardize on UTC" directive.
+          return a.start_date.startsWith(yearPrefix);
+      }
+      // Fallback for non-string dates or other string formats to ensure correctness
       const d = new Date(a.start_date);
-      return d.getFullYear() === year;
+      return d.getUTCFullYear() === year;
   });
 
   if (activities.length === 0) return null; // Or handle empty year gracefully
@@ -197,20 +207,28 @@ export const analyzeData = (allActivities, year = 2025) => {
   for (const act of activities) {
       const dist = act.distance || 0;
       const time = act.moving_time || 0;
-      const date = new Date(act.start_date);
 
+      const dateObj = new Date(act.start_date);
       // Skip invalid dates to prevent crashes
-      if (isNaN(date.getTime())) continue;
+      if (isNaN(dateObj.getTime())) continue;
 
-      // ⚡ Bolt Optimization: Use substring if possible, fallback to ISO method
-      // Benchmark: ~600x faster for strings
-      const dateString = typeof act.start_date === 'string'
+      // ⚡ Bolt Optimization: Use substring for strings, fallback to ISO method
+      // Check for ISO format characteristic (hyphen at index 4 and 7) for safety
+      const isIsoString = typeof act.start_date === 'string' &&
+                          act.start_date.length >= 10 &&
+                          act.start_date.charAt(4) === '-' &&
+                          act.start_date.charAt(7) === '-';
+
+      const dateString = isIsoString
           ? act.start_date.substring(0, 10)
-          : date.toISOString().substring(0, 10);
+          : dateObj.toISOString().substring(0, 10);
+
+      const monthIndex = dateObj.getUTCMonth();
+      const hour = dateObj.getUTCHours();
+      const dayIndex = dateObj.getUTCDay();
 
       // ⚡ Bolt Optimization: Use Array Lookup instead of Intl.DateTimeFormat
-      // Benchmark: ~66x faster than cached Intl.DateTimeFormat
-      const monthKey = MONTH_NAMES[date.getUTCMonth()];
+      const monthKey = MONTH_NAMES[monthIndex];
 
       // Globals
       totalDistance += dist;
@@ -232,9 +250,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       totalKudos += kudos;
 
       // Charts (Heatmap & Patterns)
-      // Standardize on UTC
-      const hour = date.getUTCHours();
-      const dayIndex = date.getUTCDay(); // 0 = Sun, 1 = Mon
+      // Standardize on UTC (already done by parsing UTC string or getUTCHours)
       hourlyCounts[hour]++;
       // Map Sun(0) to 6, Mon(1) to 0
       const monSunIndex = (dayIndex + 6) % 7;
@@ -268,7 +284,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       // Benchmark: Reduces Date allocations by ~40-60% depending on daily density
       let isoEntry = weekCache.get(dateString);
       if (!isoEntry) {
-         isoEntry = getISOWeekAndYear(date);
+         isoEntry = getISOWeekAndYear(dateObj);
          weekCache.set(dateString, isoEntry);
       }
       weeksActive.add(`${isoEntry.year}-W${isoEntry.week}`);
@@ -288,7 +304,7 @@ export const analyzeData = (allActivities, year = 2025) => {
               time: 0,
               maxDistance: 0,
               type: type,
-              firstDate: date
+              firstDate: dateObj // Keep dateObj for comparison
           };
       }
       activityTypes[type].count++;
@@ -296,8 +312,8 @@ export const analyzeData = (allActivities, year = 2025) => {
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
 
-      if (date < activityTypes[type].firstDate) {
-          activityTypes[type].firstDate = date;
+      if (dateObj < activityTypes[type].firstDate) {
+          activityTypes[type].firstDate = dateObj;
       }
 
       // Locations Logic

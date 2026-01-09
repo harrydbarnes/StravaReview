@@ -186,7 +186,7 @@ export const ShortestSlide = ({ data, textColor, showClickHint }) => {
                 <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
                 <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
 
-                {clickCount < 2 && (
+                {showClickHint && clickCount < 2 && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}

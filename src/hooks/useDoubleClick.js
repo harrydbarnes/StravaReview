@@ -37,8 +37,8 @@ export const useDoubleClick = (onDoubleClick) => {
             return 2;
         }
 
-        // Should not happen usually given logic above, but safe fallback
-        return 0;
+        // For subsequent clicks, keep the count at 2 to prevent the hint from reappearing.
+        return 2;
     });
   }, [onDoubleClick]);
 

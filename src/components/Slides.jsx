@@ -415,11 +415,11 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
             <h2 className="text-3xl md:text-4xl font-bold mb-12">The Weekly Grind</h2>
 
             <div className="w-full max-w-md relative h-64 mb-8">
-                 <div className="flex items-end justify-between h-full w-full px-4">
+                 <div className="flex items-end h-full w-full px-4 gap-1">
                      {data.charts.daily.map((val, idx) => {
                          const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
                          return (
-                             <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end w-1/12">
+                             <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
                                  <motion.div
                                     initial={{ height: 0 }}
                                     animate={{ height: `${heightPercent}%` }}

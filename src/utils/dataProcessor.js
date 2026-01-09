@@ -305,6 +305,9 @@ export const analyzeData = (allActivities, year = 2025) => {
               distance: 0,
               time: 0,
               maxDistance: 0,
+              maxSpeed: 0,
+              minSpeed: Infinity,
+              slowestAct: null,
               type: type,
               firstDate: dateObj // Keep dateObj for comparison
           };
@@ -313,6 +316,17 @@ export const analyzeData = (allActivities, year = 2025) => {
       activityTypes[type].distance += dist;
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
+
+      // Per-Sport Speed Tracking
+      if (actMaxSpeed > activityTypes[type].maxSpeed) activityTypes[type].maxSpeed = actMaxSpeed;
+
+      if (time > 0 && dist > 0) {
+          const avgSpeed = (dist / time) * MPH_CONVERSION;
+          if (avgSpeed < activityTypes[type].minSpeed) {
+              activityTypes[type].minSpeed = avgSpeed;
+              activityTypes[type].slowestAct = act;
+          }
+      }
 
       if (dateObj < activityTypes[type].firstDate) {
           activityTypes[type].firstDate = dateObj;

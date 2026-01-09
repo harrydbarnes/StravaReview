@@ -113,6 +113,9 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   const loopGainNodeRef = useRef(null);
   const cheerGainNodeRef = useRef(null);
 
+  // Ref to track if loop *should* be playing, to handle async resume race conditions
+  const shouldPlayLoopRef = useRef(false);
+
   // Initialize Audio Context and Load Buffers
   useEffect(() => {
     let isMounted = true;
@@ -170,8 +173,13 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   const playWebAudioLoop = useCallback(() => {
       const ctx = audioCtxRef.current;
       if (!ctx || !loopBufferRef.current || loopSourceRef.current) return;
+      // If we've determined we shouldn't play (e.g. stopped while waiting for resume), bail out.
+      if (!shouldPlayLoopRef.current) return;
 
       const play = () => {
+          // Double check inside the async callback
+          if (!shouldPlayLoopRef.current) return;
+
           const src = ctx.createBufferSource();
           src.buffer = loopBufferRef.current;
           src.loop = true;
@@ -181,7 +189,9 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
       };
 
       if (ctx.state === 'suspended') {
-          ctx.resume().then(play).catch(e => console.warn("Audio Context resume failed", e));
+          ctx.resume().then(() => {
+              if (shouldPlayLoopRef.current) play();
+          }).catch(e => console.warn("Audio Context resume failed", e));
       } else {
           play();
       }
@@ -189,6 +199,7 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
 
   // Helper: Stop Loop
   const stopWebAudioLoop = useCallback(() => {
+      shouldPlayLoopRef.current = false;
       stopSourceNode(loopSourceRef, 'audio loop');
   }, []);
 
@@ -235,6 +246,7 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
     } else {
       stopWebAudioCheer();
       if (!isMuted && hasStarted) {
+          shouldPlayLoopRef.current = true;
           playWebAudioLoop();
       }
     }
@@ -270,7 +282,10 @@ const StoryViewer = ({ slides, onClose, playEntrySound }) => {
   const handleStart = () => {
       if (playEntrySound) playEntrySound();
       setHasStarted(true);
-      if (!isMuted) playWebAudioLoop();
+      if (!isMuted) {
+          shouldPlayLoopRef.current = true;
+          playWebAudioLoop();
+      }
   };
 
   // Touch/Click handlers

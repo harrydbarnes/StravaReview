@@ -317,9 +317,9 @@ export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
         <SlideContainer textColor={textColor}>
             <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 0 }}
-                animate={{ opacity: 1, scale: 1, rotate: 1 }}
+                animate={{ opacity: 1, scale: 1, rotate: 15 }}
                 transition={{ delay: 1.0 }}
-                className="absolute top-10 right-10"
+                className="absolute top-20 right-10"
             >
                 <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">
                     🏆 Fan Favorite

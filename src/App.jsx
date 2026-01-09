@@ -131,6 +131,9 @@ function App() {
   };
 
   const handleDemo = async () => {
+      // Start music immediately
+      playEntrySound();
+
       setLoading(true);
       setLoadingStatus('Generating demo data...');
 

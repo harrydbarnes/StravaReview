@@ -40,9 +40,9 @@ describe('dataProcessor', () => {
         const result = analyzeData(activities, 2025);
         const topMonths = result.topMonthsByDistance;
 
-        // Should have January and December
-        const monthsFound = topMonths.map(m => m.month);
-        expect(monthsFound).toContain('January');
-        expect(monthsFound).toContain('December');
+        // Should have December then January, sorted by distance
+        expect(topMonths).toHaveLength(2);
+        expect(topMonths[0].month).toBe('December');
+        expect(topMonths[1].month).toBe('January');
     });
 });

@@ -50,6 +50,7 @@ def verify_changes():
         time.sleep(2)
 
         # Take screenshot of Spotlight Slide to verify "Fan Favorite" sticker
+        expect(page.get_by_text("🏆 Fan Favorite")).to_be_visible()
         page.screenshot(path="verification/spotlight_slide.png")
 
         browser.close()

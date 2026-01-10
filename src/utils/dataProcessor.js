@@ -261,15 +261,6 @@ export const analyzeData = (allActivities, year = 2025) => {
       const actMaxSpeed = (act.max_speed || 0) * MPH_CONVERSION;
       if (actMaxSpeed > maxSpeedGlobal) maxSpeedGlobal = actMaxSpeed;
 
-      // Min Speed (Slowest non-zero)
-      // Use average speed (distance/time)
-      if (time > 0 && dist > 0) {
-          const avgSpeed = (dist / time) * MPH_CONVERSION; // mph
-          if (avgSpeed < minSpeedGlobal) {
-              minSpeedGlobal = avgSpeed;
-              slowestActivity = act;
-          }
-      }
 
       // Shortest Activity (Non-zero distance)
       if (dist > 0 && dist < minDistanceGlobal) {

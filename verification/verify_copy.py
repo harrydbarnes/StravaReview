@@ -26,10 +26,15 @@ def run():
             # It has aria-label "Copy domain to clipboard"
             copy_button = page.get_by_role("button", name="Copy domain to clipboard")
             expect(copy_button).to_be_visible()
+            copy_button.click()
 
-            # Take a screenshot of the modal with the button
-            page.screenshot(path="verification/verification.png")
-            print("Screenshot saved to verification/verification.png")
+            # Assert that the icon changes to a checkmark after clicking
+            check_icon = copy_button.locator("svg.text-green-400")
+            expect(check_icon).to_be_visible(timeout=1000)
+
+            # Take a screenshot of the modal with the button after click
+            page.screenshot(path="verification/verification_after_copy.png")
+            print("Screenshot saved to verification/verification_after_copy.png")
 
         except Exception as e:
             print(f"Error: {e}")

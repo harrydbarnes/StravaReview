@@ -455,20 +455,6 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
       if (dayIndex === 0 || dayIndex === 6) weekendCount++;
   }
 
-  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport)
-  let maxDiffPercent = -1;
-  Object.values(activityTypes).forEach(sport => {
-      if (sport.maxSpeed > 0 && isFinite(sport.minSpeed)) {
-          const diff = ((sport.maxSpeed - sport.minSpeed) / sport.maxSpeed) * 100;
-          if (diff > maxDiffPercent) {
-              maxDiffPercent = diff;
-              slowestActivity = sport.slowestAct;
-              minSpeedGlobal = sport.minSpeed; // Update global for display consistency if needed
-          }
-      }
-  });
-  const speedDiffPercent = maxDiffPercent > 0 ? maxDiffPercent : 0;
-
   // Post-Processing: Top 5 Sports
   const topSports = Object.values(activityTypes)
       .map(sport => ({
@@ -482,6 +468,20 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
       }))
       .sort((a, b) => b.metric - a.metric)
       .slice(0, 5);
+
+  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport, restricted to Top 2 Sports)
+  let maxDiffPercent = -1;
+  topSports.slice(0, 2).forEach(sport => {
+      if (sport.maxSpeed > 0 && isFinite(sport.minSpeed)) {
+          const diff = ((sport.maxSpeed - sport.minSpeed) / sport.maxSpeed) * 100;
+          if (diff > maxDiffPercent) {
+              maxDiffPercent = diff;
+              slowestActivity = sport.slowestAct;
+              minSpeedGlobal = sport.minSpeed; // Update global for display consistency if needed
+          }
+      }
+  });
+  const speedDiffPercent = maxDiffPercent > 0 ? maxDiffPercent : 0;
 
   // Post-Processing: New Activity
   const sortedByCount = Object.values(activityTypes).sort((a, b) => a.count - b.count);

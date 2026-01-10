@@ -438,8 +438,8 @@ export const analyzeData = (allActivities, year = 2025) => {
   // Top Months & Monthly Stats
   const monthlyStats = MONTH_NAMES.map(month => ({
       month,
-      distance: months[month] ? months[month].distance : 0,
-      count: months[month] ? months[month].count : 0
+      distance: months[month]?.distance ?? 0,
+      count: months[month]?.count ?? 0
   }));
 
   const topMonthsByDistance = [...monthlyStats]

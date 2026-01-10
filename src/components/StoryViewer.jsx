@@ -330,30 +330,32 @@ const StoryViewer = ({ slides, onClose }) => {
   };
 
   // Keyboard Navigation
-  useEffect(() => {
+  const handleKeyDown = useCallback((e) => {
     if (!hasStarted) return;
 
-    const handleKeyDown = (e) => {
-      switch (e.key) {
-        case KEYBOARD_KEYS.ARROW_RIGHT:
-          handleNext();
-          break;
-        case KEYBOARD_KEYS.ARROW_LEFT:
-          handlePrev();
-          break;
-        case KEYBOARD_KEYS.SPACE:
-        case KEYBOARD_KEYS.SPACEBAR:
-          e.preventDefault();
-          togglePause();
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    switch (e.key) {
+      case KEYBOARD_KEYS.ARROW_RIGHT:
+        handleNext();
+        break;
+      case KEYBOARD_KEYS.ARROW_LEFT:
+        handlePrev();
+        break;
+      case KEYBOARD_KEYS.SPACE:
+      case KEYBOARD_KEYS.SPACEBAR:
+        e.preventDefault();
+        togglePause();
+        break;
+      default:
+        break;
+    }
   }, [hasStarted, handleNext, handlePrev, togglePause]);
+
+  // Focus the container when the story starts to enable keyboard navigation
+  useEffect(() => {
+    if (hasStarted && containerRef.current) {
+      containerRef.current.focus({ preventScroll: true });
+    }
+  }, [hasStarted]);
 
   // Touch/Click handlers
   const handleTap = (e) => {
@@ -397,7 +399,9 @@ const StoryViewer = ({ slides, onClose }) => {
         {/* Container for Desktop (Mobile mimics full screen) */}
         <div
             ref={containerRef}
-            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
+            tabIndex="-1"
+            onKeyDown={handleKeyDown}
+            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none"
         >
             <AnimatePresence mode="wait">
             {!hasStarted && (

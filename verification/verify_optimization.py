@@ -40,7 +40,8 @@ def verify_story_viewer():
 
             # Toggle Theme
             theme_btn.click()
-            time.sleep(1) # Wait for transition
+            # Wait for the theme change to be visually complete by waiting for the new background class.
+            page.wait_for_function("() => document.querySelector('.fixed.inset-0.z-50').classList.contains('bg-white')")
 
             # Take screenshot after toggle
             page.screenshot(path="verification/after_toggle.png")

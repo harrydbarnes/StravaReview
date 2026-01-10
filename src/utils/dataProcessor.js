@@ -261,15 +261,6 @@ export const analyzeData = (allActivities, year = 2025) => {
       const actMaxSpeed = (act.max_speed || 0) * MPH_CONVERSION;
       if (actMaxSpeed > maxSpeedGlobal) maxSpeedGlobal = actMaxSpeed;
 
-      // Min Speed (Slowest non-zero)
-      // Use average speed (distance/time)
-      if (time > 0 && dist > 0) {
-          const avgSpeed = (dist / time) * MPH_CONVERSION; // mph
-          if (avgSpeed < minSpeedGlobal) {
-              minSpeedGlobal = avgSpeed;
-              slowestActivity = act;
-          }
-      }
 
       // Shortest Activity (Non-zero distance)
       if (dist > 0 && dist < minDistanceGlobal) {
@@ -305,6 +296,9 @@ export const analyzeData = (allActivities, year = 2025) => {
               distance: 0,
               time: 0,
               maxDistance: 0,
+              maxSpeed: 0,
+              minSpeed: Infinity,
+              slowestAct: null,
               type: type,
               firstDate: dateObj // Keep dateObj for comparison
           };
@@ -313,6 +307,17 @@ export const analyzeData = (allActivities, year = 2025) => {
       activityTypes[type].distance += dist;
       activityTypes[type].time += time;
       if (dist > activityTypes[type].maxDistance) activityTypes[type].maxDistance = dist;
+
+      // Per-Sport Speed Tracking
+      if (actMaxSpeed > activityTypes[type].maxSpeed) activityTypes[type].maxSpeed = actMaxSpeed;
+
+      if (time > 0 && dist > 0) {
+          const avgSpeed = (dist / time) * MPH_CONVERSION;
+          if (avgSpeed < activityTypes[type].minSpeed) {
+              activityTypes[type].minSpeed = avgSpeed;
+              activityTypes[type].slowestAct = act;
+          }
+      }
 
       if (dateObj < activityTypes[type].firstDate) {
           activityTypes[type].firstDate = dateObj;
@@ -368,6 +373,20 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (dayIndex === 0 || dayIndex === 6) weekendCount++;
   }
 
+  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport)
+  let maxDiffPercent = -1;
+  Object.values(activityTypes).forEach(sport => {
+      if (sport.maxSpeed > 0 && isFinite(sport.minSpeed)) {
+          const diff = ((sport.maxSpeed - sport.minSpeed) / sport.maxSpeed) * 100;
+          if (diff > maxDiffPercent) {
+              maxDiffPercent = diff;
+              slowestActivity = sport.slowestAct;
+              minSpeedGlobal = sport.minSpeed; // Update global for display consistency if needed
+          }
+      }
+  });
+  const speedDiffPercent = maxDiffPercent > 0 ? maxDiffPercent : 0;
+
   // Post-Processing: Top 5 Sports
   const topSports = Object.values(activityTypes)
       .map(sport => ({
@@ -416,11 +435,16 @@ export const analyzeData = (allActivities, year = 2025) => {
     }
   }
 
-  // Top Months
-  const topMonthsByDistance = Object.entries(months)
-    .sort(([, a], [, b]) => b.distance - a.distance)
-    .slice(0, 3)
-    .map(([month, stats]) => ({ month, ...stats }));
+  // Top Months & Monthly Stats
+  const monthlyStats = MONTH_NAMES.map(month => ({
+      month,
+      distance: months[month]?.distance ?? 0,
+      count: months[month]?.count ?? 0
+  }));
+
+  const topMonthsByDistance = [...monthlyStats]
+    .sort((a, b) => b.distance - a.distance)
+    .slice(0, 3);
 
   // Top Location Selection Logic
   // Strategy: Explicit City > Coordinate Cluster > Timezone Fallback > Generic Default
@@ -503,8 +527,6 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRideSpeed = `${speedVal.toFixed(1)} mph`;
   }
 
-  const speedDiffPercent = maxSpeedGlobal > 0 && isFinite(minSpeedGlobal) ? ((maxSpeedGlobal - minSpeedGlobal) / maxSpeedGlobal) * 100 : 0;
-  
   // Vibe Check
   const vibe = determineVibe({
       activityTypes,
@@ -566,6 +588,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     mostLikedActivity,
     newActivity: newActivity ? { type: newActivity.type, firstDate: newActivity.firstDate, id: activities.find(a => a.type === newActivity.type)?.id } : null,
     topMonthsByDistance,
+    monthlyStats,
     topLocation,
     vibe
   };

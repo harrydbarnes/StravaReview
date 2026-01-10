@@ -187,17 +187,18 @@ export const ShortestSlide = ({ data, textColor, showClickHint }) => {
                 <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
                 <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
 
-                {showClickHint && clickCount < 2 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: DRAMATIC_DELAY + 1 }}
-                        className="absolute -bottom-16 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
-                    >
-                        (Click twice to open!)
-                    </motion.div>
-                )}
             </motion.div>
+
+            {showClickHint && clickCount < 2 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: DRAMATIC_DELAY + 1 }}
+                    className="text-sm font-bold uppercase tracking-widest opacity-75 mb-8"
+                >
+                    (Click twice to open!)
+                </motion.div>
+            )}
 
             <motion.div
                 initial={{ y: 20, opacity: 0 }}

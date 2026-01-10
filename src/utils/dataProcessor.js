@@ -101,7 +101,8 @@ const getISOWeekInt = (y, m, d) => {
     if (dow === 0) dow = 7;
 
     // Days in Month array
-    const isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+    const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const isLeap = isLeapYear(y);
     const daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     let doy = d;
@@ -113,7 +114,7 @@ const getISOWeekInt = (y, m, d) => {
         const prevY = y - 1;
         // P(y) logic for weeks in year
         const p = (prevY + Math.floor(prevY/4) - Math.floor(prevY/100) + Math.floor(prevY/400)) % 7;
-        const weeksInPrev = (p === 4 || (p === 3 && ((prevY % 4 === 0 && prevY % 100 !== 0) || (prevY % 400 === 0)))) ? 53 : 52;
+        const weeksInPrev = (p === 4 || (p === 3 && isLeapYear(prevY))) ? 53 : 52;
         return { year: prevY, week: weeksInPrev };
     } else if (week === 53) {
         const p = (y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400)) % 7;

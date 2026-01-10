@@ -176,7 +176,7 @@ export const analyzeData = (allActivities, year = 2025) => {
 
   // Trackers
   const activeDaysSet = new Set();
-  const weeksActive = new Set();
+  const weeksActive = new Set(); // Stores packed integers: (year * 100) + week
   const weekCache = new Map(); // ⚡ Bolt Optimization: Cache week calcs
   let maxKudos = -1;
   let mostLikedActivity = null;
@@ -273,14 +273,14 @@ export const analyzeData = (allActivities, year = 2025) => {
 
       // ⚡ Bolt Optimization: Memoize ISO Week calculation
       // Benchmark: Reduces Date allocations by ~40-60% depending on daily density
-      // ⚡ Bolt Update: Cache the string directly to avoid string allocations on hit
-      let weekStr = weekCache.get(dateString);
-      if (!weekStr) {
+      // ⚡ Bolt Update: Cache packed integer directly to avoid string allocations and splitting
+      let packedWeek = weekCache.get(dateString);
+      if (packedWeek === undefined) {
          const isoEntry = getISOWeekAndYear(dateObj);
-         weekStr = `${isoEntry.year}-W${isoEntry.week}`;
-         weekCache.set(dateString, weekStr);
+         packedWeek = (isoEntry.year * 100) + isoEntry.week;
+         weekCache.set(dateString, packedWeek);
       }
-      weeksActive.add(weekStr);
+      weeksActive.add(packedWeek);
 
       // Monthly Stats
       if (!months[monthKey]) months[monthKey] = { count: 0, distance: 0, time: 0 };
@@ -405,11 +405,8 @@ export const analyzeData = (allActivities, year = 2025) => {
   const newActivity = sortedByCount[0];
 
   // Post-Processing: Streak Logic
-  const sortedWeeks = Array.from(weeksActive).sort((a, b) => {
-    const [yA, wA] = a.split('-W').map(Number);
-    const [yB, wB] = b.split('-W').map(Number);
-    return yA - yB || wA - wB;
-  });
+  // ⚡ Bolt Optimization: Sort integers instead of splitting strings (O(N) vs O(N*M))
+  const sortedWeeks = Array.from(weeksActive).sort((a, b) => a - b);
   let currentStreak = 0;
   let maxStreak = 0;
 
@@ -417,16 +414,26 @@ export const analyzeData = (allActivities, year = 2025) => {
     currentStreak = 1;
     maxStreak = 1;
     for (let i = 1; i < sortedWeeks.length; i++) {
-      const [prevY, prevW] = sortedWeeks[i - 1].split('-W').map(Number);
-      const [currY, currW] = sortedWeeks[i].split('-W').map(Number);
+      const prevPacked = sortedWeeks[i - 1];
+      const currPacked = sortedWeeks[i];
+
+      const prevY = Math.floor(prevPacked / 100);
+      const prevW = prevPacked % 100;
+      const currY = Math.floor(currPacked / 100);
+      const currW = currPacked % 100;
 
       // ⚡ Bolt Optimization: Use UTC to match helper expectation
-      const { week: weeksInPrevYear } = getISOWeekAndYear(new Date(Date.UTC(prevY, 11, 28)));
+      // Only calculate max weeks if crossing a year boundary
+      let isConsecutive = false;
 
-      if (
-        (currY === prevY && currW === prevW + 1) ||
-        (currY === prevY + 1 && currW === 1 && prevW === weeksInPrevYear)
-      ) {
+      if (currY === prevY) {
+          isConsecutive = (currW === prevW + 1);
+      } else if (currY === prevY + 1 && currW === 1) {
+           const { week: weeksInPrevYear } = getISOWeekAndYear(new Date(Date.UTC(prevY, 11, 28)));
+           isConsecutive = (prevW === weeksInPrevYear);
+      }
+
+      if (isConsecutive) {
         currentStreak++;
       } else {
         currentStreak = 1;

@@ -392,7 +392,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       const currentFirstDateIso = currentFirstDateObj.toISOString();
 
       // Use original full ISO string for comparison (preserves time precision)
-      const actFullIso = isIsoString ? act.start_date : (dateObj ? dateObj.toISOString() : new Date(act.start_date).toISOString());
+      const actFullIso = isIsoString ? act.start_date : dateObj.toISOString();
 
       if (actFullIso < currentFirstDateIso) {
           // Only instantiate Date if we have a new winner

@@ -49,22 +49,25 @@ def verify_frontend():
         # Search for Shortest Activity slide to verify hint
         for i in range(25):
             print(f"Checking slide {i}...", flush=True)
-            page.wait_for_timeout(1000)
 
+            # Ensure page content is loaded and available for other checks
             text_content = page.evaluate("document.body.innerText")
 
-            if "What was this one, btw?" in text_content and not found_shortest:
-                print("Found 'Shortest Activity' slide", flush=True)
-                page.wait_for_timeout(3000) # Wait for hint animation
-                page.screenshot(path="verification/shortest_hint.png")
+            if not found_shortest:
+                try:
+                    # Wait up to 2 seconds for the slide title to appear
+                    expect(page.get_by_text("What was this one, btw?")).to_be_visible(timeout=2000)
+                    print("Found 'Shortest Activity' slide", flush=True)
 
-                # Check for hint text
-                if "Click twice to open!" in page.content():
+                    # Wait up to 4 seconds for the hint to appear (it has a delay)
+                    expect(page.get_by_text("Click twice to open!", exact=False)).to_be_visible(timeout=4000)
                     print("Found 'Click twice' hint!", flush=True)
-                else:
-                    print("Did NOT find 'Click twice' hint", flush=True)
+                    page.screenshot(path="verification/shortest_hint.png")
 
-                found_shortest = True
+                    found_shortest = True
+                except Exception:
+                    # Not found, continue
+                    pass
 
             if found_colour and found_shortest:
                 print("Found all target elements!", flush=True)

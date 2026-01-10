@@ -39,7 +39,8 @@ def verify_setup_modal():
         # After: hostname + Check icon
 
         # We can take a screenshot which is the main goal.
-        page.wait_for_timeout(500)
+        # Wait for the "Check" icon to appear to confirm the copy action.
+        expect(copy_button.locator("svg.text-green-400")).to_be_visible()
 
         # Take a screenshot of the modal with the checkmark (or at least the modal open)
         page.screenshot(path="verification/setup_modal_copied.png")

@@ -11,11 +11,8 @@ def verify_story_viewer():
         page = context.new_page()
 
         try:
-            # Wait for server
-            time.sleep(5)
-
-            # Navigate to app
-            page.goto("http://localhost:5173/StravaReview/")
+            # Navigate to app, waiting for it to be ready. Using a longer timeout is more robust than a fixed sleep.
+            page.goto("http://localhost:5173/StravaReview/", timeout=60000)
 
             # Wait for "Demo Mode" button and click it
             page.get_by_text("Try Demo Mode").click()

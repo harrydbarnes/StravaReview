@@ -80,7 +80,7 @@ def verify_frontend():
                     expect(page.get_by_text("Peak Performance Months")).to_be_visible(timeout=1000)
                     print("Found 'Peak Performance Months' slide", flush=True)
                     # Wait for stagger animation
-                    page.wait_for_timeout(3000)
+                    expect(page.get_by_text("km").first).to_be_visible(timeout=5000)
                     page.screenshot(path="verification/months_slide.png")
                     found_months = True
                 except Exception:

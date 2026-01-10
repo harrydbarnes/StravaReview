@@ -10,6 +10,13 @@ const themes = {
 
 const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
 
+const KEYBOARD_KEYS = {
+    ARROW_RIGHT: 'ArrowRight',
+    ARROW_LEFT: 'ArrowLeft',
+    SPACE: ' ',
+    SPACEBAR: 'Spacebar',
+};
+
 const stopSourceNode = (sourceRef, name) => {
     if (sourceRef.current) {
         try {
@@ -35,8 +42,8 @@ const Controls = ({
     onClose
 }) => {
     const buttonClass = theme === 'white'
-        ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
-        : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
+        ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
+        : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white";
 
     return (
         <div className={clsx("flex gap-2 z-30", className)}>
@@ -315,12 +322,39 @@ const StoryViewer = ({ slides, onClose }) => {
     return () => clearTimeout(timer);
   }, [currentIndex, isPaused, handleNext, slides, hasStarted]);
 
-  const togglePause = () => setIsPaused(!isPaused);
+  const togglePause = useCallback(() => setIsPaused(prev => !prev), []);
 
   const handleStart = () => {
       setHasStarted(true);
       // Removed playEntrySound() call here as it's moved to App.jsx
   };
+
+  // Keyboard Navigation
+  const handleKeyDown = useCallback((e) => {
+    if (!hasStarted) return;
+
+    switch (e.key) {
+      case KEYBOARD_KEYS.ARROW_RIGHT:
+        handleNext();
+        break;
+      case KEYBOARD_KEYS.ARROW_LEFT:
+        handlePrev();
+        break;
+      case KEYBOARD_KEYS.SPACE:
+        e.preventDefault();
+        togglePause();
+        break;
+      default:
+        break;
+    }
+  }, [hasStarted, handleNext, handlePrev, togglePause]);
+
+  // Focus the container when the story starts to enable keyboard navigation
+  useEffect(() => {
+    if (hasStarted && containerRef.current) {
+      containerRef.current.focus({ preventScroll: true });
+    }
+  }, [hasStarted]);
 
   // Touch/Click handlers
   const handleTap = (e) => {
@@ -364,7 +398,9 @@ const StoryViewer = ({ slides, onClose }) => {
         {/* Container for Desktop (Mobile mimics full screen) */}
         <div
             ref={containerRef}
-            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300"
+            tabIndex="-1"
+            onKeyDown={handleKeyDown}
+            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none"
         >
             <AnimatePresence mode="wait">
             {!hasStarted && (
@@ -441,15 +477,17 @@ const StoryViewer = ({ slides, onClose }) => {
         </AnimatePresence>
 
         {/* Progress Bars */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" aria-label="Slides navigation">
           {slides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             const isPast = idx < currentIndex;
             const duration = slide.duration || 6000;
             return (
-              <div
+              <button
                 key={idx}
-                className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all"
+                aria-current={isActive ? 'step' : 'false'}
+                aria-label={`Go to slide ${idx + 1}`}
+                className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all border-none p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
               >
                 <motion.div
@@ -459,7 +497,7 @@ const StoryViewer = ({ slides, onClose }) => {
                   animate={{ width: isPast || isActive ? '100%' : '0%' }}
                   transition={{ duration: isActive ? duration / 1000 : 0, ease: 'linear' }}
                 />
-              </div>
+              </button>
             );
           })}
         </div>

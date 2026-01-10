@@ -1,105 +1,74 @@
 
 from playwright.sync_api import sync_playwright, expect
-import time
+import os
 
 def verify_changes():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={'width': 375, 'height': 667})
+        # Use mobile viewport to verify responsive design if needed, but keeping desktop for clarity
+        context = browser.new_context(viewport={'width': 1280, 'height': 800})
         page = context.new_page()
 
-        print("Navigating to app...")
+        # Navigate to app
         page.goto("http://localhost:5173/StravaReview/")
-        page.wait_for_timeout(2000)
 
-        print("Clicking Demo Mode...")
+        # Click "Try Demo Mode" to load data
         page.get_by_text("Try Demo Mode").click()
 
-        # Wait for start
-        try:
-            page.wait_for_selector("text=Start the Show", timeout=15000)
-            page.get_by_text("Start the Show").click()
-        except:
-            print("Already started or skipped curtain")
+        # Wait for "Ready" state (Curtain) - "LIFT THE CURTAIN ON YOUR YEAR"
+        expect(page.get_by_text("LIFT THE CURTAIN")).to_be_visible(timeout=10000)
 
-        time.sleep(2)
+        # Start the story
+        page.get_by_text("LIFT THE CURTAIN").click()
 
+        # Helper to navigate slides
         def next_slide():
-            # page.mouse.click(350, 300)
-            page.get_by_test_id("click-next").click(force=True)
+            page.keyboard.press("ArrowRight")
+            page.wait_for_timeout(500) # Wait for transition
 
-        # Slide 0: Intro
-        print("Slide 0: Intro")
-        time.sleep(1)
-        next_slide()
+        # We need to find:
+        # 1. Elevation Slide: "The Climb" + Quote
+        # 2. Kudos Slide: "The Social Butterfly" + Integer check
+        # 3. Slowest Slide: "Slow and Steady Wins... a Race"
 
-        # Slide 1: Percent
-        print("Slide 1: Percent")
-        time.sleep(1)
-        next_slide()
+        # Navigate through slides looking for titles
 
-        # Slide 2: Elevation (Big Ben)
-        print("Slide 2: Elevation")
-        expect(page.get_by_text("Big Ben")).to_be_visible(timeout=5000)
-        page.screenshot(path="verification/slide_2_elevation.png")
+        # Depending on random order or fixed order, we might need to search.
+        # But StoryContainer usually has a fixed order if not random.
+        # Let's just click through and screenshot when we find them.
 
-        # Verify text
-        content = page.content()
-        if "Big Ben" in content:
-            print("✅ Big Ben text found")
-        else:
-            print("❌ Big Ben text NOT found")
+        found_elevation = False
+        found_kudos = False
+        found_slowest = False
 
-        next_slide()
+        # Max slides approx 15
+        for i in range(25):
+            content = page.content()
 
-        # Slide 3: Fuel
-        print("Slide 3: Fuel")
-        time.sleep(1)
-        next_slide()
+            if "The Climb" in content and not found_elevation:
+                print("Found Elevation Slide")
+                # Wait for animation
+                page.wait_for_timeout(3000)
+                page.screenshot(path="verification/elevation_slide.png")
+                found_elevation = True
 
-        # Slide 4: Top Sports
-        print("Slide 4: Top Sports")
-        time.sleep(1)
-        next_slide()
+            if "The Social Butterfly" in content and not found_kudos:
+                print("Found Kudos Slide")
+                page.wait_for_timeout(2000)
+                page.screenshot(path="verification/kudos_slide.png")
+                found_kudos = True
 
-        # Slide 5: Pace
-        print("Slide 5: Pace")
-        time.sleep(1)
-        next_slide()
+            if "Slow and Steady Wins... a Race" in content and not found_slowest:
+                print("Found Slowest Slide")
+                page.wait_for_timeout(2000)
+                page.screenshot(path="verification/slowest_slide.png")
+                found_slowest = True
 
-        # Slide 6: Speed (mph)
-        print("Slide 6: Speed")
-        time.sleep(4)
-        page.screenshot(path="verification/slide_6_speed.png")
-        content = page.content()
-        if "mph" in content:
-            print("✅ mph text found")
-        else:
-            print("❌ mph text NOT found")
+            if found_elevation and found_kudos and found_slowest:
+                break
 
-        next_slide()
-
-        # Slide 7: Slowest (Mock has it)
-        print("Slide 7: Slowest")
-        time.sleep(1)
-        next_slide()
-
-        # Slide 8: Shortest (Mock has it)
-        print("Slide 8: Shortest")
-        time.sleep(1)
-        next_slide()
-
-        # Slide 9: Heatmap (Clockwatcher)
-        print("Slide 9: Heatmap")
-        time.sleep(4)
-        page.screenshot(path="verification/slide_9_heatmap.png")
-
-        next_slide()
-
-        # Slide 10: Weekly Pattern
-        print("Slide 10: Weekly Pattern")
-        time.sleep(4)
-        page.screenshot(path="verification/slide_10_weekly.png")
+            next_slide()
+            page.wait_for_timeout(500)
 
         browser.close()
 

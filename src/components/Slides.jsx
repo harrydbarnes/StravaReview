@@ -216,7 +216,7 @@ export const ShortestSlide = ({ data, textColor, showClickHint }) => {
 
 export const ElevationSlide = ({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-20">The Vertical Limit</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-20">The Climb</h2>
 
         <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -246,6 +246,17 @@ export const ElevationSlide = ({ data, textColor }) => (
             className="text-xl font-bold max-w-md"
         >
             That&apos;s equal to stacking Big Ben <span className="text-3xl text-brand-orange block my-2">{data.elevation.bigBenCount} times! 🕰️</span>
+        </motion.div>
+
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: DRAMATIC_DELAY + 0.8 }}
+            className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mt-8"
+        >
+            <p className="text-lg md:text-xl font-medium leading-relaxed">
+                &quot;There&apos;s always gonna be another mountain....&quot;
+            </p>
         </motion.div>
     </SlideContainer>
 );
@@ -533,30 +544,35 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
     );
 };
 
-export const KudosSlide = ({ data, textColor }) => (
-    <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Social Butterfly</h2>
+export const KudosSlide = ({ data, textColor }) => {
+    // Logic to remove decimal if .0
+    const formattedKudosRatio = parseFloat(data.kudosRatio).toString();
 
-        <motion.div
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
-            className="text-[8rem] mb-8"
-        >
-            👍
-        </motion.div>
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">The Social Butterfly</h2>
 
-        <motion.div
-             initial={{ opacity: 0, scale: 0.9 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ delay: DRAMATIC_DELAY }}
-             className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm"
-        >
-            <p className="text-6xl font-black mb-4">{data.kudosRatio}</p>
-            <p className="text-xl font-bold">high-fives for every km you moved!</p>
-        </motion.div>
-    </SlideContainer>
-);
+            <motion.div
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
+                className="text-[8rem] mb-8"
+            >
+                👍
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm"
+            >
+                <p className="text-6xl font-black mb-4">{formattedKudosRatio}</p>
+                <p className="text-xl font-bold">high-fives for every km you moved!</p>
+            </motion.div>
+        </SlideContainer>
+    );
+};
 
 export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
   const handleDoubleClick = React.useCallback(() => {

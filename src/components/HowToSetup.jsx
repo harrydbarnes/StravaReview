@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Copy, Check } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const HowToSetup = ({ isOpen, onClose }) => {
   const [hostname] = useState(window.location.hostname);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(hostname);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.warn('Failed to copy to clipboard:', err);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -66,13 +77,29 @@ const HowToSetup = ({ isOpen, onClose }) => {
                   <ul className="list-disc pl-4 space-y-1 text-gray-400">
                     <li><strong>Application Name:</strong> Wrapped App (or similar - the name should not contain &quot;Strava&quot;)</li>
                     <li><strong>Category:</strong> Visualizer</li>
-                    <li><strong>Authorization Callback Domain:</strong>
-                        <code className="mx-1 px-1 bg-white/10 rounded select-all">{hostname}</code>
+                    <li>
+                        <div className="flex items-center flex-wrap gap-1">
+                            <strong>Authorization Callback Domain:</strong>
+                            <button
+                                onClick={handleCopy}
+                                className="inline-flex items-center gap-2 mx-1 px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded cursor-pointer transition-colors font-mono text-sm group text-white border border-white/5 hover:border-white/20"
+                                aria-label="Copy domain to clipboard"
+                                title="Click to copy domain"
+                                type="button"
+                            >
+                                {hostname}
+                                {copied ? (
+                                    <Check size={12} className="text-green-400" aria-hidden="true" />
+                                ) : (
+                                    <Copy size={12} className="opacity-50 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                                )}
+                            </button>
+                        </div>
                     </li>
                     <li><strong>App Icon:</strong> You will need to upload one on the next page. Any image will do</li>
                   </ul>
                   <p className="text-xs text-gray-500 mt-2">
-                    Note: The &quot;Authorization Callback Domain&quot; must match the domain in your address bar ({hostname}).
+                    Note: The &quot;Authorization Callback Domain&quot; must match the domain in your address bar exactly.
                   </p>
                 </div>
               </div>

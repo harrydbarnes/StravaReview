@@ -274,7 +274,7 @@ export const analyzeData = (allActivities, year = 2025) => {
           dayInt = parseInt(act.start_date.substring(8, 10), 10);
 
           monthIndex = monthInt - 1; // 0-indexed
-          hour = parseInt(act.start_date.substring(11, 13), 10);
+          hour = parseInt(act.start_date.substring(11, 13), 10) || 0;
 
           // Use Integer Math for Day of Week
           dayIndex = getDayOfWeekInt(yearInt, monthInt, dayInt);

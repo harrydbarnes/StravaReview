@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Copy, Check } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -6,12 +6,24 @@ import PropTypes from 'prop-types';
 const HowToSetup = ({ isOpen, onClose }) => {
   const [hostname] = useState(window.location.hostname);
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
 
   const handleCopy = async () => {
+    if (!navigator.clipboard) {
+      console.warn('Clipboard API not available.');
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(hostname);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.warn('Failed to copy to clipboard:', err);
     }

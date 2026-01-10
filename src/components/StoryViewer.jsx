@@ -341,7 +341,6 @@ const StoryViewer = ({ slides, onClose }) => {
         handlePrev();
         break;
       case KEYBOARD_KEYS.SPACE:
-      case KEYBOARD_KEYS.SPACEBAR:
         e.preventDefault();
         togglePause();
         break;

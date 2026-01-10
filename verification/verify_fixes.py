@@ -65,7 +65,7 @@ def verify_frontend():
                     page.screenshot(path="verification/shortest_hint.png")
 
                     found_shortest = True
-                except Exception:
+                except TimeoutError:
                     # Not found, continue
                     pass
 

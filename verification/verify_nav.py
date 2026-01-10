@@ -32,10 +32,10 @@ def verify_story_viewer_navigation():
             # Wait for the curtain to lift (Start button should disappear)
             expect(start_button).to_be_hidden(timeout=5000)
 
-            # Verify we are on Slide 1 (using aria-selected="true")
-            slide_1_tab = page.get_by_role("tab", name="Go to slide 1", exact=True)
-            expect(slide_1_tab).to_be_visible()
-            expect(slide_1_tab).to_have_attribute("aria-selected", "true")
+            # Verify we are on Slide 1 (using aria-current="step")
+            slide_1_btn = page.get_by_role("button", name="Go to slide 1", exact=True)
+            expect(slide_1_btn).to_be_visible()
+            expect(slide_1_btn).to_have_attribute("aria-current", "step")
 
             # 4. Test Spacebar Pause
             print("Pressing Space to PAUSE...")
@@ -46,26 +46,17 @@ def verify_story_viewer_navigation():
             page.wait_for_timeout(6000)
 
             # Verify we are STILL on Slide 1
-            expect(slide_1_tab).to_have_attribute("aria-selected", "true")
+            expect(slide_1_btn).to_have_attribute("aria-current", "step")
             print("Pause confirmed: Still on Slide 1")
 
             # 5. Test Spacebar Resume
             print("Pressing Space to RESUME...")
             page.keyboard.press(" ")
 
-            # It should now advance to Slide 2.
-            # Since we waited 6s (which is > 5s), but we were paused, the timer should resume.
-            # Actually, `setTimeout` in React pauses?
-            # Looking at the code:
-            # useEffect(() => { ... const timer = setTimeout(handleNext, currentDuration); ... }, [currentIndex, isPaused])
-            # When `isPaused` changes to true, the effect cleans up (clearTimeout).
-            # When `isPaused` changes to false, the effect re-runs and sets a NEW timer for `currentDuration`.
-            # So it will wait another full 5000ms.
-
             print("Waiting for advance to Slide 2...")
             # We expect it to advance in ~5s. giving it 7s buffer.
-            slide_2_tab = page.get_by_role("tab", name="Go to slide 2", exact=True)
-            expect(slide_2_tab).to_have_attribute("aria-selected", "true", timeout=7000)
+            slide_2_btn = page.get_by_role("button", name="Go to slide 2", exact=True)
+            expect(slide_2_btn).to_have_attribute("aria-current", "step", timeout=7000)
             print("Resume confirmed: Advanced to Slide 2")
 
             # 6. Test Keyboard Navigation (Right Arrow)
@@ -73,8 +64,8 @@ def verify_story_viewer_navigation():
             page.keyboard.press("ArrowRight")
 
             # Verify we moved to slide 3
-            slide_3_tab = page.get_by_role("tab", name="Go to slide 3", exact=True)
-            expect(slide_3_tab).to_have_attribute("aria-selected", "true", timeout=2000)
+            slide_3_btn = page.get_by_role("button", name="Go to slide 3", exact=True)
+            expect(slide_3_btn).to_have_attribute("aria-current", "step", timeout=2000)
             print("Moved to Slide 3")
 
             # 7. Test Keyboard Navigation (Left Arrow)
@@ -82,7 +73,7 @@ def verify_story_viewer_navigation():
             page.keyboard.press("ArrowLeft")
 
             # Verify we moved back to slide 2
-            expect(slide_2_tab).to_have_attribute("aria-selected", "true", timeout=2000)
+            expect(slide_2_btn).to_have_attribute("aria-current", "step", timeout=2000)
             print("Moved back to Slide 2")
 
             # 8. Take Screenshot

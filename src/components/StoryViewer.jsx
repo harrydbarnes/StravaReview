@@ -14,6 +14,7 @@ const KEYBOARD_KEYS = {
     ARROW_RIGHT: 'ArrowRight',
     ARROW_LEFT: 'ArrowLeft',
     SPACE: ' ',
+    SPACEBAR: 'Spacebar',
 };
 
 const stopSourceNode = (sourceRef, name) => {
@@ -341,6 +342,7 @@ const StoryViewer = ({ slides, onClose }) => {
           handlePrev();
           break;
         case KEYBOARD_KEYS.SPACE:
+        case KEYBOARD_KEYS.SPACEBAR:
           e.preventDefault();
           togglePause();
           break;
@@ -472,7 +474,7 @@ const StoryViewer = ({ slides, onClose }) => {
         </AnimatePresence>
 
         {/* Progress Bars */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" role="tablist" aria-label="Slides navigation">
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" aria-label="Slides navigation">
           {slides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             const isPast = idx < currentIndex;
@@ -480,8 +482,7 @@ const StoryViewer = ({ slides, onClose }) => {
             return (
               <button
                 key={idx}
-                role="tab"
-                aria-selected={isActive}
+                aria-current={isActive ? 'step' : 'false'}
                 aria-label={`Go to slide ${idx + 1}`}
                 className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all border-none p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}

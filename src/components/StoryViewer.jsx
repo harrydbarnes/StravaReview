@@ -10,6 +10,12 @@ const themes = {
 
 const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
 
+const KEYBOARD_KEYS = {
+    ARROW_RIGHT: 'ArrowRight',
+    ARROW_LEFT: 'ArrowLeft',
+    SPACE: ' ',
+};
+
 const stopSourceNode = (sourceRef, name) => {
     if (sourceRef.current) {
         try {
@@ -327,13 +333,19 @@ const StoryViewer = ({ slides, onClose }) => {
     if (!hasStarted) return;
 
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        handleNext();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrev();
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        togglePause();
+      switch (e.key) {
+        case KEYBOARD_KEYS.ARROW_RIGHT:
+          handleNext();
+          break;
+        case KEYBOARD_KEYS.ARROW_LEFT:
+          handlePrev();
+          break;
+        case KEYBOARD_KEYS.SPACE:
+          e.preventDefault();
+          togglePause();
+          break;
+        default:
+          break;
       }
     };
 

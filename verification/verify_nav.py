@@ -1,7 +1,10 @@
 
+import os
 from playwright.sync_api import sync_playwright, expect
 
 def verify_story_viewer_navigation():
+    base_url = os.getenv('BASE_URL', "http://localhost:5173/StravaReview/")
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         # Use mobile viewport to ensure consistent layout
@@ -10,7 +13,8 @@ def verify_story_viewer_navigation():
 
         try:
             # 1. Navigate to the app
-            page.goto("http://localhost:5173/StravaReview/")
+            print(f"Navigating to {base_url}...")
+            page.goto(base_url)
 
             # Wait for app to load
             expect(page.get_by_role("heading", name="STRAVA WRAPPED")).to_be_visible()

@@ -671,7 +671,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     longestStreak: maxStreak,
     spotlightActivity,
     mostLikedActivity,
-    newActivity: newActivity ? { type: newActivity.type, firstDate: new Date(newActivity.firstDate), id: activities.find(a => a.type === newActivity.type)?.id } : null,
+newActivity: newActivity ? { type: newActivity.type, firstDate: new Date(newActivity.firstDate), id: newActivity.firstActivityId } : null,
     topMonthsByDistance,
     monthlyStats,
     topLocation,

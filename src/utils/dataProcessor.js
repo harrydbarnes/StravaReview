@@ -429,8 +429,8 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (currY === prevY) {
           isConsecutive = (currW === prevW + 1);
       } else if (currY === prevY + 1 && currW === 1) {
-           const { week: weeksInPrevYear } = getISOWeekAndYear(new Date(Date.UTC(prevY, 11, 28)));
-           isConsecutive = (prevW === weeksInPrevYear);
+          const { week: weeksInPrevYear } = getISOWeekAndYear(new Date(Date.UTC(prevY, 11, 28)));
+          isConsecutive = (prevW === weeksInPrevYear);
       }
 
       if (isConsecutive) {

@@ -35,8 +35,8 @@ const Controls = ({
     onClose
 }) => {
     const buttonClass = theme === 'white'
-        ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors"
-        : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors";
+        ? "p-2 bg-black/10 text-black rounded-full backdrop-blur-sm text-sm hover:bg-black/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
+        : "p-2 bg-white/20 text-white rounded-full backdrop-blur-sm text-sm hover:bg-white/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white";
 
     return (
         <div className={clsx("flex gap-2 z-30", className)}>
@@ -315,12 +315,31 @@ const StoryViewer = ({ slides, onClose }) => {
     return () => clearTimeout(timer);
   }, [currentIndex, isPaused, handleNext, slides, hasStarted]);
 
-  const togglePause = () => setIsPaused(!isPaused);
+  const togglePause = useCallback(() => setIsPaused(prev => !prev), []);
 
   const handleStart = () => {
       setHasStarted(true);
       // Removed playEntrySound() call here as it's moved to App.jsx
   };
+
+  // Keyboard Navigation
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePause();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hasStarted, handleNext, handlePrev, togglePause]);
 
   // Touch/Click handlers
   const handleTap = (e) => {
@@ -441,15 +460,18 @@ const StoryViewer = ({ slides, onClose }) => {
         </AnimatePresence>
 
         {/* Progress Bars */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" role="tablist" aria-label="Slides navigation">
           {slides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             const isPast = idx < currentIndex;
             const duration = slide.duration || 6000;
             return (
-              <div
+              <button
                 key={idx}
-                className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Go to slide ${idx + 1}`}
+                className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all border-none p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
               >
                 <motion.div
@@ -459,7 +481,7 @@ const StoryViewer = ({ slides, onClose }) => {
                   animate={{ width: isPast || isActive ? '100%' : '0%' }}
                   transition={{ duration: isActive ? duration / 1000 : 0, ease: 'linear' }}
                 />
-              </div>
+              </button>
             );
           })}
         </div>

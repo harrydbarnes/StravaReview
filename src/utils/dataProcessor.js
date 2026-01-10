@@ -358,6 +358,9 @@ export const analyzeData = (allActivities, year = 2025) => {
       // Activity Type Stats
       const type = act.type || 'Unknown';
       if (!activityTypes[type]) {
+          // ⚡ Bolt Optimization: Store firstDate as a string to avoid repeated Date -> String conversions
+          // We prioritize raw strings if available (isIsoString) to avoid Date instantiation entirely
+const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
           activityTypes[type] = {
               count: 0,
               distance: 0,
@@ -367,7 +370,7 @@ export const analyzeData = (allActivities, year = 2025) => {
               minSpeed: Infinity,
               slowestAct: null,
               type: type,
-              firstDate: dateObj || new Date(act.start_date) // Initialize with Date object (lazy create if needed)
+              firstDate: initialDateString
           };
       }
       activityTypes[type].count++;
@@ -386,18 +389,15 @@ export const analyzeData = (allActivities, year = 2025) => {
           }
       }
 
-      // ⚡ Bolt Optimization: Compare full ISO strings first to avoid Date creation/access
+      // ⚡ Bolt Optimization: Direct string comparison avoids .toISOString() calls in hot loop
       // Only update if strictly earlier
-      const currentFirstDateObj = activityTypes[type].firstDate;
-      // Get ISO string for comparison. If we already have dateObj, use toISOString, else use original string if safe
-      const currentFirstDateIso = currentFirstDateObj.toISOString();
+      const currentFirstDateString = activityTypes[type].firstDate;
 
       // Use original full ISO string for comparison (preserves time precision)
       const actFullIso = isIsoString ? act.start_date : dateObj.toISOString();
 
-      if (actFullIso < currentFirstDateIso) {
-          // Only instantiate Date if we have a new winner
-          activityTypes[type].firstDate = dateObj || new Date(act.start_date);
+      if (actFullIso < currentFirstDateString) {
+          activityTypes[type].firstDate = actFullIso;
       }
 
       // Locations Logic
@@ -468,6 +468,7 @@ export const analyzeData = (allActivities, year = 2025) => {
   const topSports = Object.values(activityTypes)
       .map(sport => ({
           ...sport,
+          firstDate: new Date(sport.firstDate), // ⚡ Bolt: Restore Date object for strict API compatibility
           metric: isDistanceSport(sport.type) ? sport.distance : sport.time,
           metricLabel: isDistanceSport(sport.type) ? 'Distance' : 'Time',
           displayValue: isDistanceSport(sport.type)
@@ -670,7 +671,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     longestStreak: maxStreak,
     spotlightActivity,
     mostLikedActivity,
-    newActivity: newActivity ? { type: newActivity.type, firstDate: newActivity.firstDate, id: activities.find(a => a.type === newActivity.type)?.id } : null,
+newActivity: newActivity ? { type: newActivity.type, firstDate: new Date(newActivity.firstDate), id: newActivity.firstActivityId } : null,
     topMonthsByDistance,
     monthlyStats,
     topLocation,

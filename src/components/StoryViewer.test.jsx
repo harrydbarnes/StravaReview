@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import StoryViewer from './StoryViewer';
 
 // Mock Framer Motion
@@ -38,6 +38,7 @@ window.AudioContext = jest.fn(() => mockAudioContext);
 window.webkitAudioContext = jest.fn(() => mockAudioContext);
 
 // Mock fetch for audio
+// eslint-disable-next-line no-undef
 global.fetch = jest.fn(() =>
     Promise.resolve({
         arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),

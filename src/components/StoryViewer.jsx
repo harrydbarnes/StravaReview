@@ -288,7 +288,7 @@ const StoryViewer = ({ slides, onClose }) => {
           stopWebAudioLoop();
           stopWebAudioCheer();
       };
-  }, [stopWebAudioLoop, stopWebAudioCheer]);
+  }, []);
 
   const handleNext = useCallback(() => {
     if (currentIndex < slides.length - 1) {

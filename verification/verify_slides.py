@@ -24,10 +24,10 @@ def verify_frontend():
 
         # Helper for next slide
         def next_slide():
-            # Click the right side of the screen
-            page.mouse.click(350, 400)
+            # Use the dedicated click zone for next slide
+            page.get_by_test_id("click-next").click(force=True)
             # Wait for content to render and animations to start
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(500)
 
         found_climb = False
         found_months = False

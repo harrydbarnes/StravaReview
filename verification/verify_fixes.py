@@ -23,8 +23,10 @@ def verify_frontend():
 
         # Helper for next slide
         def next_slide():
-            page.mouse.click(350, 400)
-            page.wait_for_timeout(1000)
+            # Use the dedicated click zone for next slide
+            page.get_by_test_id("click-next").click(force=True)
+            # Wait for transition to complete (animations usually take ~0.5s)
+            page.wait_for_timeout(500)
 
         found_colour = False
         found_shortest = False

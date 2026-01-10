@@ -360,7 +360,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (!activityTypes[type]) {
           // ⚡ Bolt Optimization: Store firstDate as a string to avoid repeated Date -> String conversions
           // We prioritize raw strings if available (isIsoString) to avoid Date instantiation entirely
-          const initialDateString = isIsoString ? act.start_date : (dateObj ? dateObj.toISOString() : new Date(act.start_date).toISOString());
+const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
           activityTypes[type] = {
               count: 0,
               distance: 0,

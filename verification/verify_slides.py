@@ -53,7 +53,7 @@ def verify_frontend():
             try:
                 # Wait for any of the target texts to appear
                 expect(page.locator("body")).to_contain_text(re.compile(regex_pattern), timeout=2000)
-            except Exception:
+            except TimeoutError:
                 # None of the targets found, move to next slide
                 next_slide()
                 continue

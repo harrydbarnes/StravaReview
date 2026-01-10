@@ -649,28 +649,68 @@ export const LocationSlide = ({ data, textColor }) => {
     );
 };
 
-export const TopMonthsSlide = ({ data, textColor }) => (
-    <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Peak Performance Months</h2>
-        <div className="w-full space-y-4 max-w-md">
-            {data.topMonthsByDistance.map((m, idx) => (
-                <motion.div 
-                    key={m.month}
-                    initial={{ x: -50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: DRAMATIC_DELAY + (idx * STAGGER_DELAY) }}
-                    className="flex items-center justify-between p-4 border-2 border-current rounded-xl"
-                >
-                    <div className="flex items-center gap-4">
-                        <span className="text-2xl font-black">#{idx + 1}</span>
-                        <span className="text-xl font-bold">{m.month}</span>
-                    </div>
-                    <span className="text-lg">{Math.round(m.distance / 1000)} km</span>
-                </motion.div>
-            ))}
+const CalendarIcon = ({ month, rank }) => {
+    const abbr = month.substring(0, 3).toUpperCase();
+
+    return (
+        <div className="relative group">
+            <div className="w-16 h-20 bg-white border-2 border-current rounded-lg flex flex-col overflow-hidden relative shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
+                {/* Header */}
+                <div className="h-1/3 w-full bg-brand-orange border-b-2 border-current flex items-center justify-center z-10">
+                    <span className="text-white font-bold text-xs tracking-wider">{abbr}</span>
+                </div>
+
+                {/* Rings */}
+                <div className="absolute -top-[2px] left-3 w-1.5 h-2.5 bg-white border-2 border-current rounded-full z-20"></div>
+                <div className="absolute -top-[2px] right-3 w-1.5 h-2.5 bg-white border-2 border-current rounded-full z-20"></div>
+
+                {/* Body */}
+                <div className="flex-1 bg-white relative">
+                     {/* Fold */}
+                     <div className="absolute bottom-1 right-1 w-3 h-3 bg-white border-l-2 border-t-2 border-current rounded-tl-sm z-10"></div>
+                </div>
+            </div>
+
+            {/* Rank Badge */}
+            {rank && (
+                <div className="absolute -top-2 -right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center border-2 border-white font-black text-sm z-30 shadow-lg transform rotate-12">
+                    {rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd'}
+                </div>
+            )}
         </div>
-    </SlideContainer>
-);
+    );
+};
+
+export const TopMonthsSlide = ({ data, textColor }) => {
+    const getRank = (monthName) => {
+        const index = data.topMonthsByDistance.findIndex(m => m.month === monthName);
+        return index !== -1 ? index + 1 : null;
+    };
+
+    return (
+        <SlideContainer textColor={textColor}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">Peak Performance Months</h2>
+
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
+                {data.monthlyStats.map((stat, idx) => {
+                    const rank = getRank(stat.month);
+
+                    return (
+                        <motion.div
+                            key={stat.month}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: DRAMATIC_DELAY + (idx * 0.05) }}
+                            className="flex flex-col items-center"
+                        >
+                             <CalendarIcon month={stat.month} rank={rank} />
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </SlideContainer>
+    );
+};
 
 export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);

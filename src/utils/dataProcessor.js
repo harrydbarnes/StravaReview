@@ -160,9 +160,11 @@ const parseIsoDateTimeInts = (str) => {
         return null;
     }
 
+    const parseTwoDigits = (c1, c2) => (c1 - 48) * 10 + (c2 - 48);
+
     const y = (c0 - 48) * 1000 + (c1 - 48) * 100 + (c2 - 48) * 10 + (c3 - 48);
-    const m = (c5 - 48) * 10 + (c6 - 48);
-    const d = (c8 - 48) * 10 + (c9 - 48);
+    const m = parseTwoDigits(c5, c6);
+    const d = parseTwoDigits(c8, c9);
 
     let h = 0;
     let minute = 0;
@@ -173,7 +175,7 @@ const parseIsoDateTimeInts = (str) => {
 
         // If hour chars exist and are valid digits, parse them.
         if (c11 >= 48 && c11 <= 57 && c12 >= 48 && c12 <= 57) {
-             h = (c11 - 48) * 10 + (c12 - 48);
+             h = parseTwoDigits(c11, c12);
         }
     }
     // MM (indices 14-15) if available
@@ -181,7 +183,7 @@ const parseIsoDateTimeInts = (str) => {
         const c14 = str.charCodeAt(14);
         const c15 = str.charCodeAt(15);
         if (c14 >= 48 && c14 <= 57 && c15 >= 48 && c15 <= 57) {
-            minute = (c14 - 48) * 10 + (c15 - 48);
+            minute = parseTwoDigits(c14, c15);
         }
     }
 

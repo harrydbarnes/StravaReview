@@ -709,10 +709,10 @@ const CalendarIcon = ({ month, rank, delay = 0 }) => {
 };
 
 export const TopMonthsSlide = ({ data, textColor }) => {
-    const getRank = (monthName) => {
+    const getRank = React.useCallback((monthName) => {
         const index = data.topMonthsByDistance.findIndex(m => m.month === monthName);
         return index !== -1 ? index + 1 : null;
-    };
+    }, [data.topMonthsByDistance]);
 
     // Calculate delay for each rank to animate in sequence: 3rd -> 2nd -> 1st
     // Grid reveal starts at DRAMATIC_DELAY. Let's say it takes 0.6s (12 * 0.05).

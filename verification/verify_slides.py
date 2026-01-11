@@ -59,7 +59,7 @@ def run(playwright):
 
         # Move to next slide
         # Tap right edge
-        page.mouse.click(350, 300)
+        page.get_by_test_id("click-next").click(force=True)
         time.sleep(1)
 
     print(f"Total hints detected: {hint_count}")

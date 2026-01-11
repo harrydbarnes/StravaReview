@@ -799,13 +799,15 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                 downloadImage(dataUrl);
             }
         } catch (error) {
-            console.error('Error sharing/downloading:', error);
-            setShareError('Failed to generate image. Please try again.');
-            // Fallback if sharing fails mid-way
-            if (dataUrl) {
-                downloadImage(dataUrl);
+            if (error.name !== 'AbortError') {
+                console.error('Error sharing/downloading:', error);
+                setShareError('Failed to generate image. Please try again.');
+                // Fallback if sharing fails mid-way
+                if (dataUrl) {
+                    downloadImage(dataUrl);
+                }
             }
-        } finally {
+        }
             setIsSharing(false);
         }
     };

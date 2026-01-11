@@ -59,7 +59,7 @@ def verify_changes():
                 break
             # Click next (right side of screen)
             # Mobile viewport: width 375. Next is > 2/3 width => > 250
-            page.mouse.click(350, 300)
+            page.get_by_test_id("click-next").click()
             time.sleep(1.5) # wait for animation
 
         if found:

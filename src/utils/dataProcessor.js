@@ -129,20 +129,51 @@ const getISOWeekInt = (y, m, d) => {
 
 // ⚡ Bolt Optimization: Fast integer parsing from ISO string
 // Avoids substring allocations and parseInt overhead
-// Assumes format: YYYY-MM-DD...
-const parseIsoDateInts = (str) => {
-    // YYYY (indices 0-3)
-    const y = (str.charCodeAt(0) - 48) * 1000 +
-              (str.charCodeAt(1) - 48) * 100 +
-              (str.charCodeAt(2) - 48) * 10 +
-              (str.charCodeAt(3) - 48);
-    // MM (indices 5-6)
-    const m = (str.charCodeAt(5) - 48) * 10 +
-              (str.charCodeAt(6) - 48);
-    // DD (indices 8-9)
-    const d = (str.charCodeAt(8) - 48) * 10 +
-              (str.charCodeAt(9) - 48);
-    return { y, m, d };
+// Checks for valid digits to ensure robustness
+const parseIsoDateTimeInts = (str) => {
+    // Helper to validate and return value
+    // Indices for YYYY-MM-DD
+    const c0 = str.charCodeAt(0);
+    const c1 = str.charCodeAt(1);
+    const c2 = str.charCodeAt(2);
+    const c3 = str.charCodeAt(3);
+    const c5 = str.charCodeAt(5);
+    const c6 = str.charCodeAt(6);
+    const c8 = str.charCodeAt(8);
+    const c9 = str.charCodeAt(9);
+
+    // Validate digits (ASCII 48-57)
+    if (
+        c0 < 48 || c0 > 57 ||
+        c1 < 48 || c1 > 57 ||
+        c2 < 48 || c2 > 57 ||
+        c3 < 48 || c3 > 57 ||
+        c5 < 48 || c5 > 57 ||
+        c6 < 48 || c6 > 57 ||
+        c8 < 48 || c8 > 57 ||
+        c9 < 48 || c9 > 57
+    ) {
+        return null;
+    }
+
+    const y = (c0 - 48) * 1000 + (c1 - 48) * 100 + (c2 - 48) * 10 + (c3 - 48);
+    const m = (c5 - 48) * 10 + (c6 - 48);
+    const d = (c8 - 48) * 10 + (c9 - 48);
+
+    let h = 0;
+    // HH (indices 11-12) if available
+    if (str.length >= 13) {
+        const c11 = str.charCodeAt(11);
+        const c12 = str.charCodeAt(12);
+
+        // If hour chars exist, they must be valid digits
+        if (c11 < 48 || c11 > 57 || c12 < 48 || c12 > 57) {
+            return null;
+        }
+        h = (c11 - 48) * 10 + (c12 - 48);
+    }
+
+    return { y, m, d, h };
 };
 
 const getHoursInYear = (year) => {
@@ -286,24 +317,18 @@ export const analyzeData = (allActivities, year = 2025) => {
       let dateInt, monthIndex, hour, dayIndex, yearInt, monthInt, dayInt;
       let dateObj = null; // Lazy init
 
-      if (isIsoString) {
-          // Fast Path: Parse integers directly from ISO string
-          // ⚡ Bolt Optimization: Avoid allocating dateString (substring) completely by using charCodeAt math
-          const { y, m, d } = parseIsoDateInts(act.start_date);
-          yearInt = y;
-          monthInt = m;
-          dayInt = d;
+      // Try fast path first
+      let parsed = isIsoString ? parseIsoDateTimeInts(act.start_date) : null;
+
+      if (parsed) {
+          // Fast Path: Integers parsed successfully
+          yearInt = parsed.y;
+          monthInt = parsed.m;
+          dayInt = parsed.d;
+          hour = parsed.h;
 
           dateInt = (yearInt * 10000) + (monthInt * 100) + dayInt;
-
           monthIndex = monthInt - 1; // 0-indexed
-
-          // Parse hour if available (indices 11-12)
-          if (act.start_date.length >= 13) {
-             hour = (act.start_date.charCodeAt(11) - 48) * 10 + (act.start_date.charCodeAt(12) - 48);
-          } else {
-             hour = 0;
-          }
 
           // Use Integer Math for Day of Week
           dayIndex = getDayOfWeekInt(yearInt, monthInt, dayInt);

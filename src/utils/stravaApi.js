@@ -34,6 +34,20 @@ export const exchangeToken = async (clientId, clientSecret, code) => {
   return response.json();
 };
 
+export const fetchAthlete = async (accessToken) => {
+  const response = await fetch(`${STRAVA_API_BASE}/athlete`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch athlete profile');
+  }
+
+  return response.json();
+};
+
 export const fetchActivities = async (accessToken, year) => {
   let activities = [];
   let page = 1;

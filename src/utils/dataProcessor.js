@@ -18,6 +18,8 @@ export const CALORIES_PIZZA = 285;
 export const CALORIES_DONUT = 250;
 export const OLYMPIC_SPRINT_METERS = 100;
 export const OLYMPIC_POOL_METERS = 50;
+export const OLYMPIC_RUN_LAP_METERS = 400;
+export const OLYMPIC_VELODROME_METERS = 250;
 export const MPH_CONVERSION = 2.23694;
 export const KMH_TO_MPH = 0.621371;
 
@@ -163,6 +165,7 @@ const parseIsoDateTimeInts = (str) => {
     const d = (c8 - 48) * 10 + (c9 - 48);
 
     let h = 0;
+    let minute = 0;
     // HH (indices 11-12) if available
     if (str.length >= 13) {
         const c11 = str.charCodeAt(11);
@@ -170,12 +173,21 @@ const parseIsoDateTimeInts = (str) => {
 
         // If hour chars exist, they must be valid digits
         if (c11 < 48 || c11 > 57 || c12 < 48 || c12 > 57) {
-            return null;
+            // pass
+        } else {
+             h = (c11 - 48) * 10 + (c12 - 48);
         }
-        h = (c11 - 48) * 10 + (c12 - 48);
+    }
+    // MM (indices 14-15) if available
+    if (str.length >= 16) {
+        const c14 = str.charCodeAt(14);
+        const c15 = str.charCodeAt(15);
+        if (c14 >= 48 && c14 <= 57 && c15 >= 48 && c15 <= 57) {
+            minute = (c14 - 48) * 10 + (c15 - 48);
+        }
     }
 
-    return { y, m, d, h };
+    return { y, m, d, h, minute };
 };
 
 const getHoursInYear = (year) => {
@@ -291,6 +303,12 @@ export const analyzeData = (allActivities, year = 2025) => {
   let shortestActivity = null;
   let minDistanceGlobal = Infinity;
 
+  // Earliest/Latest Logic
+  let earliestMinOfDay = 24 * 60; // Minutes from midnight
+  let latestMinOfDay = -1;
+  let earliestActivityTime = null;
+  let latestActivityTime = null;
+
   // ⚡ Bolt Optimization: Use Array for months (0-11) instead of Object with string keys
   // Benchmark: Removes ~12k object lookups per 1k activities
   const months = new Array(12).fill(null).map(() => ({ count: 0, distance: 0, time: 0 }));
@@ -316,7 +334,7 @@ export const analyzeData = (allActivities, year = 2025) => {
                           act.start_date.charAt(4) === '-' &&
                           act.start_date.charAt(7) === '-';
 
-      let dateInt, monthIndex, hour, dayIndex, yearInt, monthInt, dayInt;
+      let dateInt, monthIndex, hour, minute, dayIndex, yearInt, monthInt, dayInt;
       let dateObj = null; // Lazy init
 
       // Try fast path first
@@ -328,6 +346,7 @@ export const analyzeData = (allActivities, year = 2025) => {
           monthInt = parsed.m;
           dayInt = parsed.d;
           hour = parsed.h;
+          minute = parsed.minute;
 
           dateInt = (yearInt * 10000) + (monthInt * 100) + dayInt;
           monthIndex = monthInt - 1; // 0-indexed
@@ -345,6 +364,7 @@ export const analyzeData = (allActivities, year = 2025) => {
           dateInt = (dateObj.getUTCFullYear() * 10000) + ((monthIndex + 1) * 100) + dateObj.getUTCDate();
 
           hour = dateObj.getUTCHours();
+          minute = dateObj.getUTCMinutes();
           dayIndex = dateObj.getUTCDay();
       }
 
@@ -373,6 +393,32 @@ export const analyzeData = (allActivities, year = 2025) => {
       // Map Sun(0) to 6, Mon(1) to 0
       const monSunIndex = (dayIndex + 6) % 7;
       dailyCounts[monSunIndex]++;
+
+      // Earliest/Latest Logic
+      // Filter out activities before 3:00 AM for "Earliest"
+      const currentMinOfDay = (hour * 60) + minute;
+
+      // Earliest (must be >= 3:00 AM, i.e., 180 mins)
+      if (currentMinOfDay >= 180) {
+          if (currentMinOfDay < earliestMinOfDay) {
+              earliestMinOfDay = currentMinOfDay;
+              // Format HH:MM AM/PM
+              const suffix = hour >= 12 ? 'PM' : 'AM';
+              const displayHour = hour % 12 || 12;
+              const displayMin = minute.toString().padStart(2, '0');
+              earliestActivityTime = `${displayHour}:${displayMin} ${suffix}`;
+          }
+      }
+
+      // Latest
+      if (currentMinOfDay > latestMinOfDay) {
+          latestMinOfDay = currentMinOfDay;
+          // Format HH:MM AM/PM
+          const suffix = hour >= 12 ? 'PM' : 'AM';
+          const displayHour = hour % 12 || 12;
+          const displayMin = minute.toString().padStart(2, '0');
+          latestActivityTime = `${displayHour}:${displayMin} ${suffix}`;
+      }
 
       // Speed Stats
       // Strava max_speed is m/s. Convert to mph: * 2.23694
@@ -418,7 +464,7 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (!activityTypes[type]) {
           // ⚡ Bolt Optimization: Store firstDate as a string to avoid repeated Date -> String conversions
           // We prioritize raw strings if available (isIsoString) to avoid Date instantiation entirely
-const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
+          const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
           activityTypes[type] = {
               count: 0,
               distance: 0,
@@ -428,7 +474,8 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
               minSpeed: Infinity,
               slowestAct: null,
               type: type,
-              firstDate: initialDateString
+              firstDate: initialDateString,
+              firstActivityId: act.id // Added: Store ID for New Activity link
           };
       }
       activityTypes[type].count++;
@@ -456,6 +503,7 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
 
       if (actFullIso < currentFirstDateString) {
           activityTypes[type].firstDate = actFullIso;
+          activityTypes[type].firstActivityId = act.id; // Added: Update ID if earlier found
       }
 
       // Locations Logic
@@ -522,9 +570,11 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
       .sort((a, b) => b.metric - a.metric)
       .slice(0, 5);
 
-  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport, restricted to Top 2 Sports)
+  // Post-Processing: Find Slowest Activity (Biggest % Drop within same sport, restricted to Top 1 Sport)
   let maxDiffPercent = -1;
-  topSports.slice(0, 2).forEach(sport => {
+  // Change: Use only top frequency sport (topSports[0]) instead of slice(0, 2)
+  if (topSports.length > 0) {
+      const sport = topSports[0];
       if (sport.maxSpeed > 0 && isFinite(sport.minSpeed)) {
           const diff = ((sport.maxSpeed - sport.minSpeed) / sport.maxSpeed) * 100;
           if (diff > maxDiffPercent) {
@@ -533,7 +583,7 @@ const initialDateString = isIsoString ? act.start_date : dateObj.toISOString();
               minSpeedGlobal = sport.minSpeed; // Update global for display consistency if needed
           }
       }
-  });
+  }
   const speedDiffPercent = maxDiffPercent > 0 ? maxDiffPercent : 0;
 
   // Post-Processing: New Activity
@@ -719,7 +769,13 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     },
     olympics: {
         sprints: Math.floor(runStats.distance / OLYMPIC_SPRINT_METERS),
-        poolLengths: Math.floor(swimStats.distance / OLYMPIC_POOL_METERS)
+        poolLengths: Math.floor(swimStats.distance / OLYMPIC_POOL_METERS),
+        runLaps: Math.floor(runStats.distance / OLYMPIC_RUN_LAP_METERS),
+        rideLaps: Math.floor(rideStats.distance / OLYMPIC_VELODROME_METERS)
+    },
+    clockwatcher: {
+        earliest: earliestActivityTime,
+        latest: latestActivityTime
     },
     funComparisons: {
         song: { title: song.title, count: songCount },
@@ -729,7 +785,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     longestStreak: maxStreak,
     spotlightActivity,
     mostLikedActivity,
-newActivity: newActivity ? { type: newActivity.type, firstDate: new Date(newActivity.firstDate), id: newActivity.firstActivityId } : null,
+    newActivity: newActivity ? { type: newActivity.type, firstDate: new Date(newActivity.firstDate), id: newActivity.firstActivityId } : null,
     topMonthsByDistance,
     monthlyStats,
     topLocation,

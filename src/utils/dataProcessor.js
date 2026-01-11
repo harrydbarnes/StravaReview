@@ -127,6 +127,24 @@ const getISOWeekInt = (y, m, d) => {
     return { year: y, week };
 };
 
+// ⚡ Bolt Optimization: Fast integer parsing from ISO string
+// Avoids substring allocations and parseInt overhead
+// Assumes format: YYYY-MM-DD...
+const parseIsoDateInts = (str) => {
+    // YYYY (indices 0-3)
+    const y = (str.charCodeAt(0) - 48) * 1000 +
+              (str.charCodeAt(1) - 48) * 100 +
+              (str.charCodeAt(2) - 48) * 10 +
+              (str.charCodeAt(3) - 48);
+    // MM (indices 5-6)
+    const m = (str.charCodeAt(5) - 48) * 10 +
+              (str.charCodeAt(6) - 48);
+    // DD (indices 8-9)
+    const d = (str.charCodeAt(8) - 48) * 10 +
+              (str.charCodeAt(9) - 48);
+    return { y, m, d };
+};
+
 const getHoursInYear = (year) => {
     return (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 8784 : 8760;
 };
@@ -270,14 +288,22 @@ export const analyzeData = (allActivities, year = 2025) => {
 
       if (isIsoString) {
           // Fast Path: Parse integers directly from ISO string
-          // ⚡ Bolt Optimization: Avoid allocating dateString (substring) completely
-          yearInt = parseInt(act.start_date.substring(0, 4), 10);
-          monthInt = parseInt(act.start_date.substring(5, 7), 10);
-          dayInt = parseInt(act.start_date.substring(8, 10), 10);
+          // ⚡ Bolt Optimization: Avoid allocating dateString (substring) completely by using charCodeAt math
+          const { y, m, d } = parseIsoDateInts(act.start_date);
+          yearInt = y;
+          monthInt = m;
+          dayInt = d;
+
           dateInt = (yearInt * 10000) + (monthInt * 100) + dayInt;
 
           monthIndex = monthInt - 1; // 0-indexed
-          hour = parseInt(act.start_date.substring(11, 13), 10) || 0;
+
+          // Parse hour if available (indices 11-12)
+          if (act.start_date.length >= 13) {
+             hour = (act.start_date.charCodeAt(11) - 48) * 10 + (act.start_date.charCodeAt(12) - 48);
+          } else {
+             hour = 0;
+          }
 
           // Use Integer Math for Day of Week
           dayIndex = getDayOfWeekInt(yearInt, monthInt, dayInt);

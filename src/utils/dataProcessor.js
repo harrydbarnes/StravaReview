@@ -171,10 +171,8 @@ const parseIsoDateTimeInts = (str) => {
         const c11 = str.charCodeAt(11);
         const c12 = str.charCodeAt(12);
 
-        // If hour chars exist, they must be valid digits
-        if (c11 < 48 || c11 > 57 || c12 < 48 || c12 > 57) {
-            // pass
-        } else {
+        // If hour chars exist and are valid digits, parse them.
+        if (c11 >= 48 && c11 <= 57 && c12 >= 48 && c12 <= 57) {
              h = (c11 - 48) * 10 + (c12 - 48);
         }
     }
@@ -255,6 +253,13 @@ export const generateMockActivities = (year = new Date().getFullYear()) => {
   });
 
   return activities.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+};
+
+const formatTo12Hour = (hour, minute) => {
+    const suffix = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    const displayMin = minute.toString().padStart(2, '0');
+    return `${displayHour}:${displayMin} ${suffix}`;
 };
 
 export const analyzeData = (allActivities, year = 2025) => {
@@ -402,22 +407,14 @@ export const analyzeData = (allActivities, year = 2025) => {
       if (currentMinOfDay >= 180) {
           if (currentMinOfDay < earliestMinOfDay) {
               earliestMinOfDay = currentMinOfDay;
-              // Format HH:MM AM/PM
-              const suffix = hour >= 12 ? 'PM' : 'AM';
-              const displayHour = hour % 12 || 12;
-              const displayMin = minute.toString().padStart(2, '0');
-              earliestActivityTime = `${displayHour}:${displayMin} ${suffix}`;
+              earliestActivityTime = formatTo12Hour(hour, minute);
           }
       }
 
       // Latest
       if (currentMinOfDay > latestMinOfDay) {
           latestMinOfDay = currentMinOfDay;
-          // Format HH:MM AM/PM
-          const suffix = hour >= 12 ? 'PM' : 'AM';
-          const displayHour = hour % 12 || 12;
-          const displayMin = minute.toString().padStart(2, '0');
-          latestActivityTime = `${displayHour}:${displayMin} ${suffix}`;
+          latestActivityTime = formatTo12Hour(hour, minute);
       }
 
       // Speed Stats

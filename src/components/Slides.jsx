@@ -1,7 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
-import * as htmlToImage from 'html-to-image';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
@@ -784,6 +783,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 
         let dataUrl;
         try {
+            const htmlToImage = await import('html-to-image');
             dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'strava-wrapped-summary.png', { type: 'image/png' });
@@ -838,7 +838,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 
             <div className="flex flex-col items-center mt-4 z-50 pointer-events-auto">
                 {shareError && (
-                    <p className="text-red-500 font-bold mb-2 text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                    <p role="alert" className="text-red-500 font-bold mb-2 text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
                         {shareError}
                     </p>
                 )}

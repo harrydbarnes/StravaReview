@@ -46,7 +46,7 @@ def run(playwright):
                 print(f"Hint found on slide {i}!")
                 hint_count += 1
                 if hint_count == 1:
-                     page.screenshot(path="/home/jules/verification/hint_visible.png")
+                     page.screenshot(path=os.path.join("verification", "hint_visible.png"))
             else:
                 print("No hint on this slide.")
         except:

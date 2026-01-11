@@ -79,7 +79,7 @@ def verify_changes():
             if page.get_by_role("button", name="Save & Share").is_visible():
                 found_summary = True
                 break
-            page.mouse.click(350, 300)
+            page.get_by_test_id("click-next").click()
             time.sleep(1.0)
 
         if found_summary:

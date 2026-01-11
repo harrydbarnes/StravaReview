@@ -131,6 +131,8 @@ const getISOWeekInt = (y, m, d) => {
 // Avoids substring allocations and parseInt overhead
 // Checks for valid digits to ensure robustness
 const parseIsoDateTimeInts = (str) => {
+    if (!str || str.length < 10) return null;
+
     // Helper to validate and return value
     // Indices for YYYY-MM-DD
     const c0 = str.charCodeAt(0);

@@ -127,6 +127,57 @@ const getISOWeekInt = (y, m, d) => {
     return { year: y, week };
 };
 
+// ⚡ Bolt Optimization: Fast integer parsing from ISO string
+// Avoids substring allocations and parseInt overhead
+// Checks for valid digits to ensure robustness
+const parseIsoDateTimeInts = (str) => {
+    if (!str || str.length < 10) return null;
+
+    // Helper to validate and return value
+    // Indices for YYYY-MM-DD
+    const c0 = str.charCodeAt(0);
+    const c1 = str.charCodeAt(1);
+    const c2 = str.charCodeAt(2);
+    const c3 = str.charCodeAt(3);
+    const c5 = str.charCodeAt(5);
+    const c6 = str.charCodeAt(6);
+    const c8 = str.charCodeAt(8);
+    const c9 = str.charCodeAt(9);
+
+    // Validate digits (ASCII 48-57)
+    if (
+        c0 < 48 || c0 > 57 ||
+        c1 < 48 || c1 > 57 ||
+        c2 < 48 || c2 > 57 ||
+        c3 < 48 || c3 > 57 ||
+        c5 < 48 || c5 > 57 ||
+        c6 < 48 || c6 > 57 ||
+        c8 < 48 || c8 > 57 ||
+        c9 < 48 || c9 > 57
+    ) {
+        return null;
+    }
+
+    const y = (c0 - 48) * 1000 + (c1 - 48) * 100 + (c2 - 48) * 10 + (c3 - 48);
+    const m = (c5 - 48) * 10 + (c6 - 48);
+    const d = (c8 - 48) * 10 + (c9 - 48);
+
+    let h = 0;
+    // HH (indices 11-12) if available
+    if (str.length >= 13) {
+        const c11 = str.charCodeAt(11);
+        const c12 = str.charCodeAt(12);
+
+        // If hour chars exist, they must be valid digits
+        if (c11 < 48 || c11 > 57 || c12 < 48 || c12 > 57) {
+            return null;
+        }
+        h = (c11 - 48) * 10 + (c12 - 48);
+    }
+
+    return { y, m, d, h };
+};
+
 const getHoursInYear = (year) => {
     return (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) ? 8784 : 8760;
 };
@@ -268,16 +319,18 @@ export const analyzeData = (allActivities, year = 2025) => {
       let dateInt, monthIndex, hour, dayIndex, yearInt, monthInt, dayInt;
       let dateObj = null; // Lazy init
 
-      if (isIsoString) {
-          // Fast Path: Parse integers directly from ISO string
-          // ⚡ Bolt Optimization: Avoid allocating dateString (substring) completely
-          yearInt = parseInt(act.start_date.substring(0, 4), 10);
-          monthInt = parseInt(act.start_date.substring(5, 7), 10);
-          dayInt = parseInt(act.start_date.substring(8, 10), 10);
-          dateInt = (yearInt * 10000) + (monthInt * 100) + dayInt;
+      // Try fast path first
+      let parsed = isIsoString ? parseIsoDateTimeInts(act.start_date) : null;
 
+      if (parsed) {
+          // Fast Path: Integers parsed successfully
+          yearInt = parsed.y;
+          monthInt = parsed.m;
+          dayInt = parsed.d;
+          hour = parsed.h;
+
+          dateInt = (yearInt * 10000) + (monthInt * 100) + dayInt;
           monthIndex = monthInt - 1; // 0-indexed
-          hour = parseInt(act.start_date.substring(11, 13), 10) || 0;
 
           // Use Integer Math for Day of Week
           dayIndex = getDayOfWeekInt(yearInt, monthInt, dayInt);

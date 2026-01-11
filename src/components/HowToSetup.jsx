@@ -55,6 +55,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
               aria-label="Close"
+              title="Close"
             >
               <X size={24} />
             </button>
@@ -104,6 +105,7 @@ const HowToSetup = ({ isOpen, onClose }) => {
                                         copied ? "bg-green-500/20 text-green-400" : "bg-white/10 hover:bg-white/20 text-white"
                                     )}
                                     type="button"
+                                    aria-label="Copy callback domain to clipboard"
                                 >
                                     {copied ? "Copied!" : "Copy"}
                                 </button>

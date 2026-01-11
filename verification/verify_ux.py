@@ -9,12 +9,20 @@ def verify_setup_ux():
         page = context.new_page()
 
         # 1. Navigate to the app (ensure server is running on 5173 or check log)
-        try:
-            page.goto("http://localhost:5173/StravaReview/", timeout=10000)
-        except Exception as e:
-            print(f"Navigation failed: {e}")
-            # Try alternate port if needed, but 5173 is standard Vite
-            page.goto("http://localhost:3000/StravaReview/")
+        navigated = False
+        for port in ("5173", "3000"):
+            try:
+                page.goto(f"http://localhost:{port}/StravaReview/", timeout=5000)
+                print(f"Successfully connected to the app on port {port}")
+                navigated = True
+                break
+            except Exception:
+                print(f"Could not connect to the app on port {port}. Trying next...")
+
+        if not navigated:
+            print("Failed to connect to the application. Please ensure the dev server is running.")
+            browser.close()
+            return
 
         # 2. Verify "Help!" button has aria-haspopup
         help_btn = page.get_by_role("button", name="Help!")

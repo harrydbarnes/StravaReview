@@ -1,118 +1,74 @@
-
-import re
-import sys
 from playwright.sync_api import sync_playwright, expect
+import time
+import os
 
-def verify_frontend():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 375, "height": 800})
-        page = context.new_page()
+def run(playwright):
+    browser = playwright.chromium.launch(headless=True)
+    context = browser.new_context(viewport={"width": 375, "height": 667})
+    page = context.new_page()
 
-        print("Navigating...", flush=True)
-        page.goto("http://localhost:5173/StravaReview/")
+    page.goto("http://localhost:5173/StravaReview/")
+    page.get_by_text("Try Demo Mode").click()
 
-        print("Clicking Demo...", flush=True)
-        page.get_by_text("Try Demo Mode").click()
+    # Wait for start
+    try:
+        page.get_by_text("LIFT THE CURTAIN").wait_for(timeout=10000)
+        # Click the start button overlay
+        # It's likely a button covering the screen or the "Start" button
+        if page.get_by_role("button", name="Start").is_visible():
+             page.get_by_role("button", name="Start").click()
+        else:
+             page.locator("body").click(position={"x": 187, "y": 333})
+    except:
+        pass
 
-        page.wait_for_timeout(3000)
+    print("Story started.")
 
-        print("Starting Story...", flush=True)
-        # Click "Start the Show" button
-        page.get_by_text("Start the Show").click()
-        page.wait_for_timeout(1000)
+    hint_count = 0
 
-        # Helper for next slide
-        def next_slide():
-            # Use the dedicated click zone for next slide
-            page.get_by_test_id("click-next").click(force=True)
-            # Wait for content to render and animations to start
-            page.wait_for_timeout(500)
+    # Iterate through slides slowly
+    # We want to catch the first hint.
+    # We also want to reach the end.
 
-        found_climb = False
-        found_months = False
-        found_social = False
-        found_slowest = False
+    # Max slides is about 15.
+    for i in range(20):
+        print(f"Checking slide {i}...")
 
-        # Iterate through slides
-        for i in range(25):
-            print(f"Checking slide {i}...", flush=True)
+        # Wait for potential hint appearance (DRAMATIC_DELAY is 3s, +1s for hint = 4s)
+        # We don't want to wait 4s for EVERY slide if we are impatient, but for verification we must be sure.
+        # But we can check if text appears.
 
-            # Optimization: Check if any remaining target is visible to avoid long waits
-            patterns = []
-            if not found_climb: patterns.append("The Climb")
-            if not found_months: patterns.append("Peak Performance Months")
-            if not found_social: patterns.append("The Social Butterfly")
-            if not found_slowest: patterns.append("Slow and Steady Wins")
+        try:
+            # Check for any variation of the hint text
+            # "(Click twice to open!)" or "(Click twice to open activity!)"
+            hint = page.locator("text=Click twice to open").first
+            if hint.is_visible(timeout=5000): # Wait up to 5s for hint
+                print(f"Hint found on slide {i}!")
+                hint_count += 1
+                if hint_count == 1:
+                     page.screenshot(path="/home/jules/verification/hint_visible.png")
+            else:
+                print("No hint on this slide.")
+        except:
+             print("No hint (timeout).")
 
-            if not patterns:
-                break
+        # Check if we are at Summary
+        if page.get_by_text("STRAVA").is_visible() and page.get_by_text("WRAPPED").is_visible() and page.get_by_text("Grand Total").is_visible():
+            print("Reached Summary Slide!")
+            break
 
-            regex_pattern = "|".join(patterns)
+        # Move to next slide
+        # Tap right edge
+        page.mouse.click(350, 300)
+        time.sleep(1)
 
-            try:
-                # Wait for any of the target texts to appear
-                expect(page.locator("body")).to_contain_text(re.compile(regex_pattern), timeout=2000)
-            except TimeoutError:
-                # None of the targets found, move to next slide
-                next_slide()
-                continue
+    print(f"Total hints detected: {hint_count}")
 
-            # If we are here, at least one target is present. Check specific slides.
+    # Wait for Summary numbers to count up
+    time.sleep(3)
+    page.screenshot(path="/home/jules/verification/summary_slide.png")
 
-            # Use content() to check for text presence (handles partial rendering/fading)
-            content = page.content()
+    browser.close()
 
-            # 1. The Climb
-            if "The Climb" in content and not found_climb:
-                try:
-                    expect(page.get_by_text("The Climb")).to_be_visible(timeout=1000)
-                    expect(page.get_by_text("There's always gonna be another mountain")).to_be_visible(timeout=1000)
-                    print("Found 'The Climb' slide", flush=True)
-                    page.screenshot(path="verification/climb_slide.png")
-                    found_climb = True
-                except Exception:
-                    pass
-
-            # 2. Peak Performance Months
-            if "Peak Performance Months" in content and not found_months:
-                try:
-                    expect(page.get_by_text("Peak Performance Months")).to_be_visible(timeout=1000)
-                    print("Found 'Peak Performance Months' slide", flush=True)
-                    # Wait for stagger animation
-                    expect(page.get_by_text("km").first).to_be_visible(timeout=5000)
-                    page.screenshot(path="verification/months_slide.png")
-                    found_months = True
-                except Exception:
-                    pass
-
-            # 3. Social Butterfly
-            if "The Social Butterfly" in content and not found_social:
-                try:
-                    expect(page.get_by_text("The Social Butterfly")).to_be_visible(timeout=1000)
-                    print("Found 'Social Butterfly' slide", flush=True)
-                    page.screenshot(path="verification/social_slide.png")
-                    found_social = True
-                except Exception:
-                    pass
-
-            # 4. Slow and Steady
-            if "Slow and Steady Wins" in content and not found_slowest:
-                try:
-                    expect(page.get_by_text("Slow and Steady Wins... a Race")).to_be_visible(timeout=1000)
-                    print("Found 'Slow and Steady' slide", flush=True)
-                    page.screenshot(path="verification/slowest_slide.png")
-                    found_slowest = True
-                except Exception:
-                    pass
-
-            if found_climb and found_months and found_social and found_slowest:
-                print("Found all target slides!", flush=True)
-                break
-
-            next_slide()
-
-        browser.close()
-
-if __name__ == "__main__":
-    verify_frontend()
+with sync_playwright() as playwright:
+    run(playwright)

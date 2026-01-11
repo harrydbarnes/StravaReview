@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
-import { DEFAULT_VIBE } from '../utils/dataProcessor';
+import { DEFAULT_VIBE, OLYMPIC_RUN_LAP_METERS, OLYMPIC_VELODROME_METERS } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 const LARGE_TEXT_LENGTH_THRESHOLD = 8;
@@ -132,44 +132,47 @@ export const PercentSlide = ({ data, textColor }) => (
 );
 
 export const OlympicsSlide = ({ data, textColor }) => {
-    // Logic: Prioritize Swim data if available, else Run. If neither, return null (but structure handles that).
-    // The slide might be rendered even if 0, so we check data.
-    const isSwim = data.olympics.poolLengths > 0;
-    const isRun = data.olympics.sprints > 0;
+    // Collect available stats
+    const stats = [];
+    if (data.olympics.poolLengths > 0) {
+        stats.push({ emoji: "🏊", text: `${data.olympics.poolLengths} Olympic Pool lengths` });
+    }
+    if (data.olympics.runLaps > 0) {
+        stats.push({ emoji: "🏃", text: `${data.olympics.runLaps} laps of Olympic track (${OLYMPIC_RUN_LAP_METERS}m)` });
+    }
+    if (data.olympics.rideLaps > 0) {
+        stats.push({ emoji: "🚴", text: `${data.olympics.rideLaps} laps of Velodrome` });
+    }
 
-    if (!isSwim && !isRun) return null;
+    if (stats.length === 0) return null;
 
-    const emoji = isSwim ? "🏊" : "🏃";
-    const statText = isSwim
-        ? `You swam ${data.olympics.poolLengths} Olympic Pool lengths`
-        : `You ran the 100m Dash ${data.olympics.sprints} times`;
+    // Show up to 3 stats
+    const displayStats = stats.slice(0, 3);
 
     return (
         <SlideContainer textColor={textColor}>
             <h2 className="text-3xl md:text-4xl font-bold mb-8">LA 2028 Calling?</h2>
-            <motion.div
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
-                className="text-8xl mb-6"
-            >
-                {emoji}
-            </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY - 1 }}
-                className="text-2xl font-bold mb-8 max-w-md"
-            >
-                {statText}
-            </motion.div>
+            <div className="flex flex-col gap-6 w-full max-w-lg">
+                {displayStats.map((stat, idx) => (
+                    <motion.div
+                        key={idx}
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: DRAMATIC_DELAY + (idx * 0.8) }}
+                        className="flex items-center gap-6 p-4 bg-white/5 rounded-xl backdrop-blur-sm"
+                    >
+                        <span className="text-5xl">{stat.emoji}</span>
+                        <span className="text-xl font-bold text-left">{stat.text}</span>
+                    </motion.div>
+                ))}
+            </div>
 
             <motion.div
                  initial={{ scale: 0.9, opacity: 0 }}
                  animate={{ scale: 1, opacity: 1 }}
-                 transition={{ delay: DRAMATIC_DELAY + 1 }}
-                 className="bg-current/10 p-6 rounded-xl max-w-md"
+                 transition={{ delay: DRAMATIC_DELAY + 3.0 }}
+                 className="mt-8 bg-current/10 p-6 rounded-xl max-w-md"
             >
                 <p className="font-bold italic">
                     &quot;But you wouldn&apos;t have broken any World Records. Sorry. Try again in 2028. 🥇&quot;
@@ -184,7 +187,7 @@ export const ShortestSlide = ({ data, textColor }) => {
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">What was this one, btw?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8">What Was This One, BTW?</h2>
 
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
@@ -487,6 +490,12 @@ export const HeatmapSlide = ({ data, textColor }) => {
                     You are most active at <span className="text-4xl block my-2">{peakHour}:00</span>
                 </p>
             </motion.div>
+
+            {data.clockwatcher && (data.clockwatcher.earliest || data.clockwatcher.latest) && (
+                <div className="mt-8 flex justify-around w-full max-w-md">
+                    {[                        { type: 'earliest', label: 'Early Bird 🐦', time: data.clockwatcher.earliest, delay: 1.0 },                        { type: 'latest', label: 'Night Owl 🦉', time: data.clockwatcher.latest, delay: 1.5 },                    ].map((stat) => stat.time && (                        <motion.div                            key={stat.type}                            initial={{ y: 20, opacity: 0 }}                            animate={{ y: 0, opacity: 1 }}                            transition={{ delay: DRAMATIC_DELAY + stat.delay }}                        >                            <p className="text-xs uppercase font-bold opacity-60 mb-1">{stat.label}</p>                            <p className="text-xl font-black">{stat.time}</p>                        </motion.div>                    ))}
+                </div>
+            )}
         </SlideContainer>
     );
 };
@@ -832,6 +841,13 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                         <div className="flex items-center justify-center gap-2 opacity-80 mb-4">
                             <span className="text-2xl">{vibeData.icon}</span>
                             <span className="text-lg font-bold uppercase tracking-widest">{data.vibe}</span>
+                        </div>
+                    )}
+
+                    {/* Username Addition */}
+                    {data.athlete && (
+                        <div className="absolute bottom-4 left-0 right-0 opacity-60 text-sm font-bold uppercase tracking-widest">
+                            {data.athlete.username || `${data.athlete.firstname} ${data.athlete.lastname}`.trim()}
                         </div>
                     )}
 

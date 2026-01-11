@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { generateMockActivities, analyzeData } from './utils/dataProcessor';
-import { getAuthUrl, exchangeToken, fetchActivities } from './utils/stravaApi';
+import { getAuthUrl, exchangeToken, fetchActivities, fetchAthlete } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 
@@ -85,6 +85,10 @@ function App() {
             try {
                 const tokenData = await exchangeToken(storedClientId, storedClientSecret, code);
                 
+                // Fetch athlete profile
+                setLoadingStatus('Fetching your profile...');
+                const athlete = await fetchAthlete(tokenData.access_token);
+
                 setLoadingStatus('Fetching your activities (this might take a moment)...');
                 const activities = await fetchActivities(tokenData.access_token, targetYear);
                 
@@ -100,6 +104,9 @@ function App() {
                             result.topLocation.name = cityName;
                         }
                     }
+
+                    // Add athlete profile to data
+                    result.athlete = athlete;
 
                     setData(result);
                     setStarted(true); // Auto start if we have data from redirect
@@ -156,6 +163,15 @@ function App() {
                     result.topLocation.name = cityName;
                 }
             }
+
+            // Mock athlete profile
+            result.athlete = {
+                username: 'DemoUser',
+                firstname: 'Demo',
+                lastname: 'Runner',
+                city: 'San Francisco',
+                country: 'United States'
+            };
 
             setData(result);
             setStarted(true);

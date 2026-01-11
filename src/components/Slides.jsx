@@ -42,8 +42,8 @@ const CountUp = ({ value, label, delay = 0 }) => {
     const length = finalString.length;
 
     // Default size: text-4xl md:text-6xl
-    // If length > 6 (e.g. 1,000.0 or 100,000), reduce size
-    // If length > 8, reduce further
+    // If length > MEDIUM_TEXT_LENGTH_THRESHOLD (e.g. 1,000.0 or 100,000), reduce size
+    // If length > LARGE_TEXT_LENGTH_THRESHOLD, reduce further
     let fontSizeClass = "text-4xl md:text-6xl";
     if (length > LARGE_TEXT_LENGTH_THRESHOLD) {
         fontSizeClass = "text-2xl md:text-4xl";

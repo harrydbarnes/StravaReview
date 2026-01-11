@@ -649,8 +649,11 @@ export const LocationSlide = ({ data, textColor }) => {
     );
 };
 
-const CalendarIcon = ({ month, rank }) => {
+const CalendarIcon = ({ month, rank, delay = 0 }) => {
     const abbr = month.substring(0, 3).toUpperCase();
+
+    // Determine the text to display inside the calendar
+    const rankText = rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : null;
 
     return (
         <div className="relative group">
@@ -665,18 +668,42 @@ const CalendarIcon = ({ month, rank }) => {
                 <div className="absolute -top-[2px] right-3 w-1.5 h-2.5 bg-white border-2 border-current rounded-full z-20"></div>
 
                 {/* Body */}
-                <div className="flex-1 bg-white relative">
+                <div className="flex-1 bg-white relative flex items-center justify-center">
                      {/* Fold */}
                      <div className="absolute bottom-1 right-1 w-3 h-3 bg-white border-l-2 border-t-2 border-current rounded-tl-sm z-10"></div>
+
+                     {/* Rank Text (Handwritten style) */}
+                     {rankText && (
+                        <div className="relative z-0">
+                            <motion.span
+                                initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                                animate={{ opacity: 1, scale: 1, rotate: -5 }}
+                                transition={{ delay: delay, duration: 0.4, type: "spring", bounce: 0.5 }}
+                                className="text-black font-black text-2xl tracking-tighter block transform -rotate-6"
+                                style={{ fontFamily: 'cursive, sans-serif' }} // Fallback to cursive for handwritten feel
+                            >
+                                {rankText}
+                            </motion.span>
+
+                            {/* Circle for 1st place */}
+                            {rank === 1 && (
+                                <svg className="absolute -top-2 -left-3 w-14 h-14 pointer-events-none overflow-visible" viewBox="0 0 100 100">
+                                    <motion.path
+                                        d="M 20,50 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0"
+                                        fill="none"
+                                        stroke="#fc4c02"
+                                        strokeWidth="8"
+                                        strokeLinecap="round"
+                                        initial={{ pathLength: 0, opacity: 0 }}
+                                        animate={{ pathLength: 1, opacity: 0.8 }}
+                                        transition={{ delay: delay + 0.5, duration: 0.6, ease: "easeInOut" }}
+                                    />
+                                </svg>
+                            )}
+                        </div>
+                     )}
                 </div>
             </div>
-
-            {/* Rank Badge */}
-            {rank && (
-                <div className="absolute -top-2 -right-3 w-9 h-9 bg-black text-white rounded-full flex items-center justify-center border-2 border-white font-black text-sm z-30 shadow-lg transform rotate-12">
-                    {rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd'}
-                </div>
-            )}
         </div>
     );
 };
@@ -687,6 +714,11 @@ export const TopMonthsSlide = ({ data, textColor }) => {
         return index !== -1 ? index + 1 : null;
     };
 
+    // Calculate delay for each rank to animate in sequence: 3rd -> 2nd -> 1st
+    // Grid reveal starts at DRAMATIC_DELAY. Let's say it takes 0.6s (12 * 0.05).
+    // So writing starts at DRAMATIC_DELAY + 1.0s
+    const BASE_WRITE_DELAY = DRAMATIC_DELAY + 1.2;
+
     return (
         <SlideContainer textColor={textColor}>
             <h2 className="text-3xl md:text-4xl font-bold mb-8">Peak Performance Months</h2>
@@ -694,6 +726,13 @@ export const TopMonthsSlide = ({ data, textColor }) => {
             <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
                 {data.monthlyStats.map((stat, idx) => {
                     const rank = getRank(stat.month);
+
+                    // Determine delay based on rank (3rd first, then 2nd, then 1st)
+                    // If no rank, no delay passed (doesn't matter)
+                    let writeDelay = 0;
+                    if (rank === 3) writeDelay = BASE_WRITE_DELAY;
+                    if (rank === 2) writeDelay = BASE_WRITE_DELAY + 0.8;
+                    if (rank === 1) writeDelay = BASE_WRITE_DELAY + 1.6;
 
                     return (
                         <motion.div
@@ -703,7 +742,7 @@ export const TopMonthsSlide = ({ data, textColor }) => {
                             transition={{ delay: DRAMATIC_DELAY + (idx * 0.05) }}
                             className="flex flex-col items-center"
                         >
-                             <CalendarIcon month={stat.month} rank={rank} />
+                             <CalendarIcon month={stat.month} rank={rank} delay={writeDelay} />
                         </motion.div>
                     );
                 })}

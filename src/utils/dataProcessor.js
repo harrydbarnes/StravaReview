@@ -161,8 +161,9 @@ const parseIsoDateTimeInts = (str) => {
     }
 
     const parseTwoDigits = (c1, c2) => (c1 - 48) * 10 + (c2 - 48);
+    const parseFourDigits = (c0, c1, c2, c3) => (c0 - 48) * 1000 + (c1 - 48) * 100 + (c2 - 48) * 10 + (c3 - 48);
 
-    const y = (c0 - 48) * 1000 + (c1 - 48) * 100 + (c2 - 48) * 10 + (c3 - 48);
+    const y = parseFourDigits(c0, c1, c2, c3);
     const m = parseTwoDigits(c5, c6);
     const d = parseTwoDigits(c8, c9);
 

@@ -858,7 +858,6 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
             </div>
         </div>
     );
-};
 
 // 1. TOP SPORTS SLIDE
 export const TopSportsSlide = ({ data, textColor }) => (

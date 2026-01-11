@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
+import * as htmlToImage from 'html-to-image';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
@@ -763,10 +764,12 @@ export const TopMonthsSlide = ({ data, textColor }) => {
 
 export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
+    const [isSharing, setIsSharing] = React.useState(false);
     const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
 
     const handleShare = async () => {
-        if (!ref.current) return;
+        if (!ref.current || isSharing) return;
+        setIsSharing(true);
 
         const downloadImage = (url) => {
             const link = document.createElement('a');
@@ -779,7 +782,6 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 
         let dataUrl;
         try {
-            const htmlToImage = await import('html-to-image');
             dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'strava-wrapped-summary.png', { type: 'image/png' });
@@ -796,10 +798,13 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
             }
         } catch (error) {
             console.error('Error sharing/downloading:', error);
+            alert("Failed to generate image. Please check your connection and try again.");
             // Fallback if sharing fails mid-way
             if (dataUrl) {
                 downloadImage(dataUrl);
             }
+        } finally {
+            setIsSharing(false);
         }
     };
 
@@ -831,10 +836,14 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 
             <button 
                 onClick={(e) => { e.stopPropagation(); handleShare(); }}
-                className="mt-4 px-6 py-3 bg-white text-black rounded-full font-bold flex items-center gap-2 shadow-lg z-50 pointer-events-auto hover:bg-gray-100 transition-colors"
+                disabled={isSharing}
+                className={clsx(
+                    "mt-4 px-6 py-3 bg-white text-black rounded-full font-bold flex items-center gap-2 shadow-lg z-50 pointer-events-auto transition-colors",
+                    isSharing ? "opacity-75 cursor-wait" : "hover:bg-gray-100"
+                )}
             >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Save & Share
+                {!isSharing && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>}
+                {isSharing ? "Generating..." : "Save & Share"}
             </button>
         </div>
     );

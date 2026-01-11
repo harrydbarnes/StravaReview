@@ -42,6 +42,16 @@ const StoryContainer = ({ data, onClose, playEntrySound }) => {
       const hasNewActivity = !!data.newActivity;
       const hasSpotlight = !!(data.mostLikedActivity || data.spotlightActivity);
 
+      // Helper to ensure click hint only appears on the first interactive slide
+      let hintShown = false;
+      const shouldShowHint = () => {
+          if (!hintShown) {
+              hintShown = true;
+              return true;
+          }
+          return false;
+      };
+
       return [
         // 1. THE OPENER
         { component: (props) => <IntroSlide data={data} {...props} />, duration: 5000 },
@@ -57,8 +67,8 @@ const StoryContainer = ({ data, onClose, playEntrySound }) => {
 
         // 4. SPEED FREAK (Fast, Slow, Short)
         { component: (props) => <SpeedSlide data={data} {...props} />, duration: 6000 },
-        ...(data.speed.slowestActivity ? [{ component: (props) => <SlowestSlide data={data} {...props} />, duration: 7000 }] : []),
-        ...(data.shortestActivity ? [{ component: (props) => <ShortestSlide data={data} showClickHint={true} {...props} />, duration: 6000 }] : []),
+        ...(data.speed.slowestActivity ? [{ component: (props) => <SlowestSlide data={data} showClickHint={shouldShowHint()} {...props} />, duration: 7000 }] : []),
+        ...(data.shortestActivity ? [{ component: (props) => <ShortestSlide data={data} showClickHint={shouldShowHint()} {...props} />, duration: 6000 }] : []),
 
         // 5. THE SCHEDULE (Heatmaps & Patterns)
         { component: (props) => <HeatmapSlide data={data} {...props} />, duration: 8000 },
@@ -66,7 +76,7 @@ const StoryContainer = ({ data, onClose, playEntrySound }) => {
         { component: (props) => <TopMonthsSlide data={data} {...props} />, duration: getListDuration(data.topMonthsByDistance?.length) },
 
         // 6. HIGHLIGHTS & DISCOVERY
-        ...(hasNewActivity ? [{ component: (props) => <NewActivitySlide data={data} showClickHint={true} {...props} />, duration: 6000 }] : []),
+        ...(hasNewActivity ? [{ component: (props) => <NewActivitySlide data={data} showClickHint={shouldShowHint()} {...props} />, duration: 6000 }] : []),
         { component: (props) => <LocationSlide data={data} {...props} />, duration: 6000 },
 
         // 7. FUN & GAMES
@@ -74,7 +84,7 @@ const StoryContainer = ({ data, onClose, playEntrySound }) => {
         ...( (data.olympics.sprints > 0 || data.olympics.poolLengths > 0) ? [{ component: (props) => <OlympicsSlide data={data} {...props} />, duration: 8000 }] : []),
 
         // 8. SOCIAL & FAVORITES
-        ...(hasSpotlight ? [{ component: (props) => <SpotlightSlide data={data} showClickHint={!hasNewActivity} {...props} />, duration: 7000 }] : []),
+        ...(hasSpotlight ? [{ component: (props) => <SpotlightSlide data={data} showClickHint={shouldShowHint()} {...props} />, duration: 7000 }] : []),
         { component: (props) => <KudosSlide data={data} {...props} />, duration: 6000 },
 
         // 9. THE WRAP UP

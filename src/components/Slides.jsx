@@ -33,6 +33,22 @@ const CountUp = ({ value, label, delay = 0 }) => {
         return controls.stop;
     }, [numericValue, delay, isInt]);
 
+    // Calculate length of the final formatted string to adjust font size
+    const finalString = isInt
+        ? Math.round(numericValue).toLocaleString()
+        : numericValue.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const length = finalString.length;
+
+    // Default size: text-4xl md:text-6xl
+    // If length > 6 (e.g. 1,000.0 or 100,000), reduce size
+    // If length > 8, reduce further
+    let fontSizeClass = "text-4xl md:text-6xl";
+    if (length > 8) {
+        fontSizeClass = "text-2xl md:text-4xl";
+    } else if (length > 6) {
+        fontSizeClass = "text-3xl md:text-5xl";
+    }
+
     return (
         <div className="text-center">
             <motion.div
@@ -40,7 +56,7 @@ const CountUp = ({ value, label, delay = 0 }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: delay, duration: 0.5 }}
             >
-                <p className="text-4xl md:text-6xl font-black">
+                <p className={clsx("font-black", fontSizeClass)}>
                     <span ref={ref}>0</span>
                 </p>
                 <p className="text-sm md:text-base uppercase tracking-widest opacity-75">{label}</p>

@@ -772,7 +772,9 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
             const link = document.createElement('a');
             link.download = 'strava-wrapped-summary.png';
             link.href = url;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         };
 
         let dataUrl;

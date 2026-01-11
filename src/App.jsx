@@ -208,6 +208,8 @@ function App() {
                                             type="button"
                                             onClick={() => setShowHowTo(true)}
                                             className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center gap-1"
+                                            aria-haspopup="dialog"
+                                            title="Get help with setup"
                                         >
                                             <HelpCircle size={14} /> Help!
                                         </button>
@@ -215,6 +217,8 @@ function App() {
                                     <input 
                                         id="client-id"
                                         type="text" 
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                         required
                                         autoComplete="off"
                                         value={clientId}

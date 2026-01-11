@@ -687,11 +687,11 @@ const CalendarIcon = ({ month, rank, delay = 0 }) => {
 
                             {/* Circle for 1st place */}
                             {rank === 1 && (
-                                <svg className="absolute -top-2 -left-3 w-14 h-14 pointer-events-none overflow-visible" viewBox="0 0 100 100">
+                                <svg className="absolute -top-2 -left-3 w-14 h-14 pointer-events-none overflow-visible stroke-brand-orange" viewBox="0 0 100 100">
                                     <motion.path
                                         d="M 20,50 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0"
                                         fill="none"
-                                        stroke="#fc4c02"
+                                        stroke="currentColor"
                                         strokeWidth="8"
                                         strokeLinecap="round"
                                         initial={{ pathLength: 0, opacity: 0 }}

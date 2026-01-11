@@ -763,10 +763,14 @@ export const TopMonthsSlide = ({ data, textColor }) => {
 
 export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
+    const [isSharing, setIsSharing] = React.useState(false);
+    const [shareError, setShareError] = React.useState(null);
     const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
 
     const handleShare = async () => {
-        if (!ref.current) return;
+        if (!ref.current || isSharing) return;
+        setIsSharing(true);
+        setShareError(null);
 
         const downloadImage = (url) => {
             const link = document.createElement('a');
@@ -795,11 +799,16 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                 downloadImage(dataUrl);
             }
         } catch (error) {
-            console.error('Error sharing/downloading:', error);
-            // Fallback if sharing fails mid-way
-            if (dataUrl) {
-                downloadImage(dataUrl);
+            if (error.name !== 'AbortError') {
+                console.error('Error sharing/downloading:', error);
+                setShareError('Failed to generate image. Please try again.');
+                // Fallback if sharing fails mid-way
+                if (dataUrl) {
+                    downloadImage(dataUrl);
+                }
             }
+        }
+            setIsSharing(false);
         }
     };
 
@@ -829,13 +838,24 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                 </div>
             </div>
 
-            <button 
-                onClick={(e) => { e.stopPropagation(); handleShare(); }}
-                className="mt-4 px-6 py-3 bg-white text-black rounded-full font-bold flex items-center gap-2 shadow-lg z-50 pointer-events-auto hover:bg-gray-100 transition-colors"
-            >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Save & Share
-            </button>
+            <div className="flex flex-col items-center mt-4 z-50 pointer-events-auto">
+                {shareError && (
+                    <p role="alert" className="text-red-500 font-bold mb-2 text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                        {shareError}
+                    </p>
+                )}
+                <button
+                    onClick={(e) => { e.stopPropagation(); handleShare(); }}
+                    disabled={isSharing}
+                    className={clsx(
+                        "px-6 py-3 bg-white text-black rounded-full font-bold flex items-center gap-2 shadow-lg transition-colors",
+                        isSharing ? "opacity-75 cursor-wait" : "hover:bg-gray-100"
+                    )}
+                >
+                    {!isSharing && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>}
+                    {isSharing ? "Generating..." : "Save & Share"}
+                </button>
+            </div>
         </div>
     );
 };

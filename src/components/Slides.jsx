@@ -768,9 +768,10 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const handleShare = async () => {
         if (!ref.current) return;
 
+        let dataUrl;
         try {
             const htmlToImage = await import('html-to-image');
-            const dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
+            dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'strava-wrapped-summary.png', { type: 'image/png' });
 
@@ -791,9 +792,12 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
         } catch (error) {
             console.error('Error sharing/downloading:', error);
             // Fallback if sharing fails mid-way
-            const link = document.createElement('a');
-            link.download = 'strava-wrapped-summary.png';
-            link.click();
+            if (dataUrl) {
+                const link = document.createElement('a');
+                link.download = 'strava-wrapped-summary.png';
+                link.href = dataUrl;
+                link.click();
+            }
         }
     };
 
@@ -943,18 +947,20 @@ export const SpotlightSlide = ({ data, textColor }) => {
                     </div>
                 </div>
 
-                <motion.a
-                    href={`https://www.strava.com/activities/${activity.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1 }}
-                    className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
-                >
-                    View on Strava
-                </motion.a>
+                {activity.id && (
+                    <motion.a
+                        href={`https://www.strava.com/activities/${activity.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1 }}
+                        className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                    >
+                        View on Strava
+                    </motion.a>
+                )}
             </motion.div>
         </SlideContainer>
     );

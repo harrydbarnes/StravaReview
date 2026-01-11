@@ -807,8 +807,9 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     downloadImage(dataUrl);
                 }
             }
+        } finally {
+            setIsSharing(false);
         }
-        setIsSharing(false);
     };
 
     return (

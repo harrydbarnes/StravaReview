@@ -66,7 +66,7 @@ def run(playwright):
 
     # Wait for Summary numbers to count up
     page.wait_for_timeout(3000)
-    page.screenshot(path="/home/jules/verification/summary_slide.png")
+    page.screenshot(path=os.path.join("verification", "summary_slide.png"))
 
     browser.close()
 

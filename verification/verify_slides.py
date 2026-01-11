@@ -65,7 +65,7 @@ def run(playwright):
     print(f"Total hints detected: {hint_count}")
 
     # Wait for Summary numbers to count up
-    time.sleep(3)
+    page.wait_for_timeout(3000)
     page.screenshot(path="/home/jules/verification/summary_slide.png")
 
     browser.close()

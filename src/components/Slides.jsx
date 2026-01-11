@@ -768,6 +768,15 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const handleShare = async () => {
         if (!ref.current) return;
 
+        const downloadImage = (url) => {
+            const link = document.createElement('a');
+            link.download = 'strava-wrapped-summary.png';
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
         let dataUrl;
         try {
             const htmlToImage = await import('html-to-image');
@@ -783,20 +792,13 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     files: [file],
                 });
             } else {
-                // Fallback to download
-                const link = document.createElement('a');
-                link.download = 'strava-wrapped-summary.png';
-                link.href = dataUrl;
-                link.click();
+                downloadImage(dataUrl);
             }
         } catch (error) {
             console.error('Error sharing/downloading:', error);
             // Fallback if sharing fails mid-way
             if (dataUrl) {
-                const link = document.createElement('a');
-                link.download = 'strava-wrapped-summary.png';
-                link.href = dataUrl;
-                link.click();
+                downloadImage(dataUrl);
             }
         }
     };

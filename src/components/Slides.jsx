@@ -5,6 +5,8 @@ import { DEFAULT_VIBE } from '../utils/dataProcessor';
 import { useDoubleClick } from '../hooks/useDoubleClick';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
+const LARGE_TEXT_LENGTH_THRESHOLD = 8;
+const MEDIUM_TEXT_LENGTH_THRESHOLD = 6;
 export const DRAMATIC_DELAY = 3;
 export const STAGGER_DELAY = 1.5;
 const INTRO_DELAY = 0.8;
@@ -40,12 +42,12 @@ const CountUp = ({ value, label, delay = 0 }) => {
     const length = finalString.length;
 
     // Default size: text-4xl md:text-6xl
-    // If length > 6 (e.g. 1,000.0 or 100,000), reduce size
-    // If length > 8, reduce further
+    // If length > LARGE_TEXT_LENGTH_THRESHOLD, reduce further
+    // If length > MEDIUM_TEXT_LENGTH_THRESHOLD (e.g. 1,000.0 or 100,000), reduce size
     let fontSizeClass = "text-4xl md:text-6xl";
-    if (length > 8) {
+    if (length > LARGE_TEXT_LENGTH_THRESHOLD) {
         fontSizeClass = "text-2xl md:text-4xl";
-    } else if (length > 6) {
+    } else if (length > MEDIUM_TEXT_LENGTH_THRESHOLD) {
         fontSizeClass = "text-3xl md:text-5xl";
     }
 

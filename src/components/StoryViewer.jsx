@@ -328,6 +328,10 @@ const StoryViewer = ({ slides, onClose }) => {
   const togglePause = useCallback(() => setIsPaused(prev => !prev), []);
 
   const handleStart = () => {
+      // Resume AudioContext if suspended (critical for iOS Safari)
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume().catch(e => console.warn("Audio Context resume failed", e));
+      }
       setHasStarted(true);
       // Removed playEntrySound() call here as it's moved to App.jsx
   };

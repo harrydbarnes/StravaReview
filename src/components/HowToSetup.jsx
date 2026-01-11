@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Copy, Check } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
+import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
 const HowToSetup = ({ isOpen, onClose }) => {
@@ -90,22 +91,23 @@ const HowToSetup = ({ isOpen, onClose }) => {
                     <li><strong>Application Name:</strong> Wrapped App (or similar - the name should not contain &quot;Strava&quot;)</li>
                     <li><strong>Category:</strong> Visualizer</li>
                     <li>
-                        <div className="flex items-center flex-wrap gap-1">
+                        <div className="flex flex-col gap-2 mt-2">
                             <strong>Authorization Callback Domain:</strong>
-                            <button
-                                onClick={handleCopy}
-                                className="inline-flex items-center gap-2 mx-1 px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded cursor-pointer transition-colors font-mono text-sm group text-white border border-white/5 hover:border-white/20"
-                                aria-label="Copy domain to clipboard"
-                                title="Click to copy domain"
-                                type="button"
-                            >
-                                {hostname}
-                                {copied ? (
-                                    <Check size={12} className="text-green-400" aria-hidden="true" />
-                                ) : (
-                                    <Copy size={12} className="opacity-50 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-                                )}
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="px-3 py-2 bg-black/50 rounded-lg font-mono text-sm text-brand-orange border border-white/10 select-all">
+                                    {hostname}
+                                </div>
+                                <button
+                                    onClick={handleCopy}
+                                    className={clsx(
+                                        "px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors",
+                                        copied ? "bg-green-500/20 text-green-400" : "bg-white/10 hover:bg-white/20 text-white"
+                                    )}
+                                    type="button"
+                                >
+                                    {copied ? "Copied!" : "Copy"}
+                                </button>
+                            </div>
                         </div>
                     </li>
                     <li><strong>App Icon:</strong> You will need to upload one on the next page. Any image will do</li>

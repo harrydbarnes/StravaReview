@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import { motion, animate } from 'framer-motion';
 import { DEFAULT_VIBE } from '../utils/dataProcessor';
-import { useDoubleClick } from '../hooks/useDoubleClick';
 
 const MIN_STREAK_FOR_DISPLAY = 5;
 const LARGE_TEXT_LENGTH_THRESHOLD = 8;
@@ -180,15 +179,7 @@ export const OlympicsSlide = ({ data, textColor }) => {
     );
 };
 
-export const ShortestSlide = ({ data, textColor, showClickHint }) => {
-    const handleDoubleClick = React.useCallback(() => {
-        if (data.shortestActivity && data.shortestActivity.id) {
-            window.open(`https://www.strava.com/activities/${data.shortestActivity.id}`, '_blank', 'noopener,noreferrer');
-        }
-    }, [data.shortestActivity]);
-
-    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
-
+export const ShortestSlide = ({ data, textColor }) => {
     if (!data.shortestActivity) return null;
 
     return (
@@ -199,23 +190,25 @@ export const ShortestSlide = ({ data, textColor, showClickHint }) => {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: DRAMATIC_DELAY - 1.5 }}
-                className={clsx("p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5 relative", data.shortestActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
-                onClick={handleClick}
+                className="p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5 relative"
             >
                 <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
                 <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
-
             </motion.div>
 
-            {showClickHint && clickCount < 2 && (
-                <motion.div
+            {data.shortestActivity.id && (
+                <motion.a
+                    href={`https://www.strava.com/activities/${data.shortestActivity.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: DRAMATIC_DELAY + 1 }}
-                    className="text-sm font-bold uppercase tracking-widest opacity-75 mb-8"
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="mb-8 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
                 >
-                    (Click twice to open!)
-                </motion.div>
+                    View on Strava
+                </motion.a>
             )}
 
             <motion.div
@@ -390,15 +383,7 @@ export const SpeedSlide = ({ data, textColor }) => (
     </SlideContainer>
 );
 
-export const SlowestSlide = ({ data, textColor, showClickHint }) => {
-    const handleDoubleClick = React.useCallback(() => {
-        if (data.speed.slowestActivity && data.speed.slowestActivity.id) {
-            window.open(`https://www.strava.com/activities/${data.speed.slowestActivity.id}`, '_blank', 'noopener,noreferrer');
-        }
-    }, [data.speed.slowestActivity]);
-
-    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
-
+export const SlowestSlide = ({ data, textColor }) => {
     if (!data.speed.slowestActivity) return null;
 
     return (
@@ -418,8 +403,7 @@ export const SlowestSlide = ({ data, textColor, showClickHint }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: DRAMATIC_DELAY }}
-                className={clsx("bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md relative", data.speed.slowestActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
-                onClick={handleClick}
+                className="bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md relative"
             >
                 <p className="text-xl font-bold mb-4 line-clamp-2">&quot;{data.speed.slowestActivity.name}&quot;</p>
                 <p className="opacity-90">
@@ -427,15 +411,19 @@ export const SlowestSlide = ({ data, textColor, showClickHint }) => {
                 </p>
                 <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
 
-                {showClickHint && clickCount < 2 && (
-                    <motion.div
+                {data.speed.slowestActivity.id && (
+                    <motion.a
+                        href={`https://www.strava.com/activities/${data.speed.slowestActivity.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1 }}
-                        className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                        className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
                     >
-                        (Click twice to open!)
-                    </motion.div>
+                        View on Strava
+                    </motion.a>
                 )}
             </motion.div>
         </SlideContainer>
@@ -529,7 +517,15 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
 
                          // Determine color based on rank
                          const podiumColors = { 0: 'bg-[#FFD700]', 1: 'bg-[#C0C0C0]', 2: 'bg-[#CD7F32]' };
-                         const barColor = podiumColors[rankMap[idx]] ?? "bg-brand-orange";
+                         const rank = rankMap[idx];
+                         const barColor = podiumColors[rank] ?? "bg-brand-orange";
+
+                         // Fix mobile hover states: Top 3 always visible (rank 0, 1, 2)
+                         // Others show on hover
+                         const isPodium = rank !== undefined; // rank is 0,1,2
+                         const tooltipClass = isPodium
+                             ? "absolute -top-8 left-1/2 -translate-x-1/2 opacity-100 text-xs font-bold bg-black text-white px-2 py-1 rounded"
+                             : "absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded";
 
                          return (
                              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
@@ -539,7 +535,7 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
                                     transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
                                     className={clsx("w-full rounded-t-lg relative group", barColor)}
                                  >
-                                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded">
+                                     <div className={tooltipClass}>
                                          {val}
                                      </div>
                                  </motion.div>
@@ -592,14 +588,7 @@ export const KudosSlide = ({ data, textColor }) => {
     );
 };
 
-export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
-  const handleDoubleClick = React.useCallback(() => {
-      if (!data.newActivity.id) return;
-      window.open(`https://www.strava.com/activities/${data.newActivity.id}`, '_blank', 'noopener,noreferrer');
-  }, [data.newActivity.id]);
-
-  const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
-
+export const NewActivitySlide = ({ data, textColor }) => {
   return (
       <SlideContainer textColor={textColor}>
           <h2 className="text-3xl md:text-4xl font-bold mb-8">You Tried Something New</h2>
@@ -607,22 +596,25 @@ export const NewActivitySlide = ({ data, textColor, showClickHint }) => {
             initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
             animate={{ rotate: 0, scale: 1, opacity: 1 }}
             transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
-            className={clsx("p-8 border-4 border-current rounded-3xl relative", data.newActivity.id && "cursor-pointer hover:scale-105 transition-transform")}
-            onClick={handleClick}
+            className="p-8 border-4 border-current rounded-3xl relative"
           >
               <div className="text-5xl md:text-7xl mb-4">🆕</div>
               <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
               <p className="mt-2 opacity-80">Tried on {new Date(data.newActivity.firstDate).toLocaleDateString()}</p>
 
-              {showClickHint && clickCount < 2 && (
-                  <motion.div
+              {data.newActivity.id && (
+                  <motion.a
+                      href={`https://www.strava.com/activities/${data.newActivity.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: DRAMATIC_DELAY + 1 }}
-                      className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
+                      className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
                   >
-                      (Click twice to open activity!)
-                  </motion.div>
+                      View on Strava
+                  </motion.a>
               )}
           </motion.div>
       </SlideContainer>
@@ -773,13 +765,35 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
     const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
 
-    const handleDownload = async () => {
-        if (ref.current) {
-             const dataUrl = await import('html-to-image').then(mod => mod.toPng(ref.current, { cacheBust: true, pixelRatio: 2 }));
-             const link = document.createElement('a');
-             link.download = 'strava-wrapped-summary.png';
-             link.href = dataUrl;
-             link.click();
+    const handleShare = async () => {
+        if (!ref.current) return;
+
+        try {
+            const htmlToImage = await import('html-to-image');
+            const dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], 'strava-wrapped-summary.png', { type: 'image/png' });
+
+            // Check if native sharing is supported
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'My Strava Wrapped',
+                    text: 'Check out my year in sport!',
+                    files: [file],
+                });
+            } else {
+                // Fallback to download
+                const link = document.createElement('a');
+                link.download = 'strava-wrapped-summary.png';
+                link.href = dataUrl;
+                link.click();
+            }
+        } catch (error) {
+            console.error('Error sharing/downloading:', error);
+            // Fallback if sharing fails mid-way
+            const link = document.createElement('a');
+            link.download = 'strava-wrapped-summary.png';
+            link.click();
         }
     };
 
@@ -810,7 +824,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
             </div>
 
             <button 
-                onClick={(e) => { e.stopPropagation(); handleDownload(); }} 
+                onClick={(e) => { e.stopPropagation(); handleShare(); }}
                 className="mt-4 px-6 py-3 bg-white text-black rounded-full font-bold flex items-center gap-2 shadow-lg z-50 pointer-events-auto hover:bg-gray-100 transition-colors"
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -886,17 +900,9 @@ export const FunStatsSlide = ({ data, textColor }) => (
 );
 
 // 3. SPOTLIGHT / KUDOS SLIDE
-export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
+export const SpotlightSlide = ({ data, textColor }) => {
     // Fallback if no kudos data
     const activity = data.mostLikedActivity || data.spotlightActivity;
-
-    const handleDoubleClick = React.useCallback(() => {
-        if (activity) {
-            window.open(`https://www.strava.com/activities/${activity.id}`, '_blank', 'noopener,noreferrer');
-        }
-    }, [activity]);
-
-    const { clickCount, handleClick } = useDoubleClick(handleDoubleClick);
 
     if (!activity) return null;
 
@@ -918,8 +924,7 @@ export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="p-8 border-4 border-current rounded-3xl max-w-md w-full hover:scale-105 transition-transform cursor-pointer relative"
-                onClick={handleClick}
+                className="p-8 border-4 border-current rounded-3xl max-w-md w-full relative"
             >
                 <div className="flex justify-between items-start mb-6">
                     <span className="text-5xl">👍</span>
@@ -938,16 +943,18 @@ export const SpotlightSlide = ({ data, textColor, showClickHint }) => {
                     </div>
                 </div>
 
-                {showClickHint && clickCount < 2 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 }}
-                        className="absolute -bottom-12 left-0 right-0 text-sm font-bold uppercase tracking-widest opacity-75"
-                    >
-                        (Click twice to open activity!)
-                    </motion.div>
-                )}
+                <motion.a
+                    href={`https://www.strava.com/activities/${activity.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1 }}
+                    className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                >
+                    View on Strava
+                </motion.a>
             </motion.div>
         </SlideContainer>
     );

@@ -58,7 +58,7 @@ def verify_progress_bars():
                     const rect = element.getBoundingClientRect();
                     return rect.width > 0;
                 }""",
-                arg=active_bar.element_handle()
+                arg=active_bar
             )
 
             screenshot_path = "verification/progress_bars.png"

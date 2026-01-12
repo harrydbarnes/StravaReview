@@ -774,7 +774,11 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
     const [isSharing, setIsSharing] = React.useState(false);
     const [shareError, setShareError] = React.useState(null);
-    const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
+
+    // Support array or string for backward compatibility
+    const vibeArray = Array.isArray(data.vibe) ? data.vibe : [data.vibe];
+    const mainVibe = vibeArray[0];
+    const vibeData = traits ? (traits[mainVibe] || traits[DEFAULT_VIBE]) : null;
 
     const handleShare = async () => {
         if (!ref.current || isSharing) return;
@@ -838,9 +842,21 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
                     </div>
 
                     {vibeData && (
-                        <div className="flex items-center justify-center gap-2 opacity-80 mb-4">
-                            <span className="text-2xl">{vibeData.icon}</span>
-                            <span className="text-lg font-bold uppercase tracking-widest">{data.vibe}</span>
+                        <div className="flex flex-col items-center gap-2 opacity-80 mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-2xl">{vibeData.icon}</span>
+                                <span className="text-lg font-bold uppercase tracking-widest">{mainVibe}</span>
+                            </div>
+                            {/* Show extra icons if they exist */}
+                            {vibeArray.length > 1 && (
+                                <div className="flex gap-3 mt-1 p-2 bg-white/10 rounded-full">
+                                    {vibeArray.slice(1).map(v => (
+                                        <span key={v} title={v} className="text-lg">
+                                            {traits[v]?.icon}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -1005,53 +1021,110 @@ export const SpotlightSlide = ({ data, textColor }) => {
     );
 };
 
+// Helper Component for the Vibe Cards
+const SingleVibeCard = ({ vibeKey, traits, delay, size = "medium" }) => {
+    const trait = traits[vibeKey] || traits[DEFAULT_VIBE];
+
+    // Size variants
+    const sizes = {
+        large: { icon: "text-9xl", title: "text-5xl md:text-6xl" },
+        medium: { icon: "text-7xl", title: "text-3xl md:text-4xl" },
+        small: { icon: "text-5xl", title: "text-xl md:text-2xl" }
+    };
+    const s = sizes[size];
+
+    return (
+        <div className="flex flex-col items-center">
+            <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", delay: delay }}
+                className={`mb-2 ${s.icon} drop-shadow-2xl`}
+            >
+                {trait.icon}
+            </motion.div>
+            <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: delay + 0.2 }}
+                className={`font-black uppercase tracking-tight leading-none mb-2 ${s.title}`}
+            >
+                {vibeKey}
+            </motion.h3>
+            {size !== "small" && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: delay + 0.4 }}
+                    className="bg-white/10 backdrop-blur-md p-4 rounded-xl max-w-xs mt-2"
+                >
+                    <p className="text-sm md:text-base font-medium leading-relaxed">
+                        "{trait.description}"
+                    </p>
+                </motion.div>
+            )}
+        </div>
+    );
+};
+
 // 4. VIBE SLIDE (Replaces Old Personality Slide)
 export const VibeSlide = ({ data, textColor, traits }) => {
-    const vibeData = traits ? (traits[data.vibe] || traits[DEFAULT_VIBE]) : null;
+    // Ensure array
+    const vibes = Array.isArray(data.vibe) ? data.vibe : [data.vibe];
+    const count = vibes.length;
+
+    // Dynamic Title: "Vibe Check" (1) vs "Vibe Stack" (>1)
+    const titleText = count > 1 ? "Vibe Stack" : "Vibe Check";
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="mt-8 md:mt-12 mb-2 text-xl font-bold uppercase tracking-[0.2em] opacity-60">{data.year} Vibe Check</h2>
+            <h2 className="mt-4 md:mt-8 mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
+                {data.year} {titleText}
+            </h2>
 
-            <motion.div
-                initial={{ scale: 0, rotate: -45, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 10, delay: DRAMATIC_DELAY }}
-                className="mb-2 text-[8rem] md:text-[10rem] drop-shadow-2xl"
-            >
-                {vibeData.icon}
-            </motion.div>
+            <div className="w-full flex-1 flex flex-col justify-center items-center pb-12">
 
-            <motion.h1
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY + 0.5, type: "spring" }}
-                className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight text-center leading-none"
-            >
-                {data.vibe}
-            </motion.h1>
+                {/* 1. SINGLE VIBE */}
+                {count === 1 && (
+                    <SingleVibeCard vibeKey={vibes[0]} traits={traits} delay={DRAMATIC_DELAY} size="large" />
+                )}
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: DRAMATIC_DELAY + 0.8 }}
-                className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mb-4"
-            >
-                <p className="text-lg md:text-xl font-medium leading-relaxed">
-                    &quot;{vibeData.description}&quot;
-                </p>
-            </motion.div>
+                {/* 2. DUO STACK */}
+                {count === 2 && (
+                    <div className="flex flex-col gap-8 w-full max-w-md items-center">
+                         <SingleVibeCard vibeKey={vibes[0]} traits={traits} delay={DRAMATIC_DELAY} size="medium" />
+                         <motion.div
+                            initial={{ width: 0 }} animate={{ width: "100%" }}
+                            transition={{ delay: DRAMATIC_DELAY + 0.5 }}
+                            className="h-0.5 bg-white/30 w-1/2"
+                         />
+                         <SingleVibeCard vibeKey={vibes[1]} traits={traits} delay={DRAMATIC_DELAY + 0.8} size="medium" />
+                    </div>
+                )}
 
-            {data.longestStreak > MIN_STREAK_FOR_DISPLAY && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 0.75, y: 0 }}
-                    transition={{ delay: DRAMATIC_DELAY + 1.5 }}
-                    className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest"
-                >
-                    <span>🔥 {data.longestStreak} Week Streak</span>
-                </motion.div>
-            )}
+                {/* 3. TRIO TREE */}
+                {count === 3 && (
+                    <div className="flex flex-col items-center gap-4 w-full h-full justify-center">
+                        {/* Top: Methodology */}
+                        <div className="mb-2">
+                             <SingleVibeCard vibeKey={vibes[0]} traits={traits} delay={DRAMATIC_DELAY} size="medium" />
+                        </div>
+
+                        {/* Line */}
+                        <motion.div
+                            initial={{ height: 0 }} animate={{ height: 40 }}
+                            transition={{ delay: DRAMATIC_DELAY + 0.5 }}
+                            className="w-0.5 bg-white/30"
+                        />
+
+                        {/* Bottom: Chronotype & Status */}
+                        <div className="flex justify-center gap-8 w-full px-4">
+                            <SingleVibeCard vibeKey={vibes[1]} traits={traits} delay={DRAMATIC_DELAY + 0.8} size="small" />
+                            <SingleVibeCard vibeKey={vibes[2]} traits={traits} delay={DRAMATIC_DELAY + 1.0} size="small" />
+                        </div>
+                    </div>
+                )}
+            </div>
         </SlideContainer>
     );
 };

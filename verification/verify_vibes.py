@@ -28,9 +28,9 @@ def run(playwright):
         if start_btn.is_visible():
             start_btn.click()
         else:
-            # Fallback to coordinate click if button text differs or hidden
-            print("Button not found by text, trying coordinates...")
-            page.mouse.click(187, 333)
+            # Fallback to clicking the center of the screen
+            print("Button not found by text, trying to click center of screen...")
+            page.mouse.click(page.viewport_size["width"] / 2, page.viewport_size["height"] / 2)
 
     except Exception as e:
         print(f"Start curtain interaction failed: {e}")

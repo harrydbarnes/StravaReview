@@ -7,9 +7,10 @@ import ProgressBars from './ProgressBars';
 const themes = {
   black: { bg: 'bg-black', text: 'text-white', accent: 'text-white' },
   white: { bg: 'bg-white', text: 'text-black', accent: 'text-black' },
+  orange: { bg: 'bg-brand-orange', text: 'text-white', accent: 'text-white' },
 };
 
-const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
+const textColors = ['text-white', 'text-black', 'text-orange-500'];
 
 const KEYBOARD_KEYS = {
     ARROW_RIGHT: 'ArrowRight',
@@ -62,9 +63,17 @@ const Controls = React.memo(({
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    const newTheme = theme === 'black' ? 'white' : 'black';
+                    const themeOrder = ['black', 'white', 'orange'];
+                    const currentIdx = themeOrder.indexOf(theme);
+                    const newTheme = themeOrder[(currentIdx + 1) % themeOrder.length];
                     setTheme(newTheme);
-                    setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
+
+                    // Reset textColor to a safe default
+                    if (newTheme === 'white') {
+                        setTextColor('text-black');
+                    } else {
+                        setTextColor('text-white');
+                    }
                 }}
                 className={buttonClass}
                 aria-label="Toggle theme"
@@ -79,6 +88,7 @@ const Controls = React.memo(({
                     const invalidColorForTheme = {
                         black: 'text-black',
                         white: 'text-white',
+                        orange: 'text-orange-500',
                     };
                     const availableColors = textColors.filter(c => c !== invalidColorForTheme[theme]);
 

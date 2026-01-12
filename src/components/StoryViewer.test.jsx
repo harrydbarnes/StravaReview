@@ -47,8 +47,8 @@ global.fetch = jest.fn(() =>
 
 describe('StoryViewer', () => {
     const mockSlides = [
-        { component: () => <div>Slide 1</div>, duration: 1000 },
-        { component: () => <div>Slide 2</div>, duration: 1000 },
+        { id: '1', component: () => <div>Slide 1</div>, duration: 1000 },
+        { id: '2', component: () => <div>Slide 2</div>, duration: 1000 },
     ];
 
     const mockOnClose = jest.fn();

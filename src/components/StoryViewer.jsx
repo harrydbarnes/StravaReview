@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import ProgressBars from './ProgressBars';
 
 const themes = {
-  black: { bg: 'bg-black', backdrop: 'bg-zinc-900', text: 'text-white', accent: 'text-white' },
-  white: { bg: 'bg-white', backdrop: 'bg-gray-200', text: 'text-black', accent: 'text-black' },
-  orange: { bg: 'bg-brand-orange', backdrop: 'bg-orange-800', text: 'text-white', accent: 'text-white' },
+  black: { bg: 'bg-black', backdrop: 'bg-zinc-900', text: 'text-white', accent: 'text-white', invalidTextColor: 'text-black' },
+  white: { bg: 'bg-white', backdrop: 'bg-gray-200', text: 'text-black', accent: 'text-black', invalidTextColor: 'text-white' },
+  orange: { bg: 'bg-brand-orange', backdrop: 'bg-orange-800', text: 'text-white', accent: 'text-white', invalidTextColor: 'text-orange-500' },
 };
 
 const textColors = ['text-white', 'text-black', 'text-orange-500'];
@@ -79,12 +79,7 @@ const Controls = React.memo(({
                 onClick={(e) => {
                     e.stopPropagation();
                     // Filter colors based on current theme to avoid invisible text
-                    const invalidColorForTheme = {
-                        black: 'text-black',
-                        white: 'text-white',
-                        orange: 'text-orange-500',
-                    };
-                    const availableColors = textColors.filter(c => c !== invalidColorForTheme[theme]);
+                    const availableColors = textColors.filter(c => c !== themes[theme].invalidTextColor);
 
                     // Find current index in the filtered list or default to 0
                     const currentFilteredIndex = availableColors.indexOf(textColor);
@@ -412,7 +407,7 @@ const StoryViewer = ({ slides, onClose }) => {
             ref={containerRef}
             tabIndex="-1"
             onKeyDown={handleKeyDown}
-            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none"
+            className={clsx("relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none", themes[theme].bg)}
         >
             <AnimatePresence mode="wait">
             {!hasStarted && (
@@ -542,7 +537,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
         {/* Slide Content */}
         <div 
-            className={clsx("flex-1 relative cursor-pointer select-none touch-manipulation", themes[theme].bg, themes[theme].text)}
+            className={clsx("flex-1 relative cursor-pointer select-none touch-manipulation", themes[theme].text)}
             onClick={handleTap}
         >
           {hasStarted && (

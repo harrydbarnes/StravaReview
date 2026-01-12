@@ -5,11 +5,12 @@ import clsx from 'clsx';
 import ProgressBars from './ProgressBars';
 
 const themes = {
-  black: { bg: 'bg-black', text: 'text-white', accent: 'text-white' },
-  white: { bg: 'bg-white', text: 'text-black', accent: 'text-black' },
+  black: { bg: 'bg-black', backdrop: 'bg-zinc-900', text: 'text-white', accent: 'text-white', invalidTextColor: 'text-black' },
+  white: { bg: 'bg-white', backdrop: 'bg-gray-200', text: 'text-black', accent: 'text-black', invalidTextColor: 'text-white' },
+  orange: { bg: 'bg-brand-orange', backdrop: 'bg-orange-800', text: 'text-white', accent: 'text-white', invalidTextColor: 'text-orange-500' },
 };
 
-const textColors = ['text-white', 'text-black', 'text-red-500', 'text-blue-500', 'text-orange-500'];
+const textColors = [...new Set(Object.values(themes).flatMap(theme => [theme.text, theme.invalidTextColor]))];
 
 const KEYBOARD_KEYS = {
     ARROW_RIGHT: 'ArrowRight',
@@ -62,9 +63,11 @@ const Controls = React.memo(({
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    const newTheme = theme === 'black' ? 'white' : 'black';
+                    const themeKeys = Object.keys(themes);
+                    const currentIdx = themeKeys.indexOf(theme);
+                    const newTheme = themeKeys[(currentIdx + 1) % themeKeys.length];
                     setTheme(newTheme);
-                    setTextColor(newTheme === 'black' ? 'text-white' : 'text-black');
+                    setTextColor(themes[newTheme].text);
                 }}
                 className={buttonClass}
                 aria-label="Toggle theme"
@@ -76,11 +79,7 @@ const Controls = React.memo(({
                 onClick={(e) => {
                     e.stopPropagation();
                     // Filter colors based on current theme to avoid invisible text
-                    const invalidColorForTheme = {
-                        black: 'text-black',
-                        white: 'text-white',
-                    };
-                    const availableColors = textColors.filter(c => c !== invalidColorForTheme[theme]);
+                    const availableColors = textColors.filter(c => c !== themes[theme].invalidTextColor);
 
                     // Find current index in the filtered list or default to 0
                     const currentFilteredIndex = availableColors.indexOf(textColor);
@@ -386,7 +385,7 @@ const StoryViewer = ({ slides, onClose }) => {
   if (!SlideComponent) return null;
 
   return (
-    <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].bg)}>
+    <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].backdrop)}>
       
       {/* Wrapper for Desktop Layout */}
       <div className="relative w-full h-full md:w-[400px] md:h-[80vh] flex flex-col">
@@ -408,7 +407,7 @@ const StoryViewer = ({ slides, onClose }) => {
             ref={containerRef}
             tabIndex="-1"
             onKeyDown={handleKeyDown}
-            className="relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none"
+            className={clsx("relative w-full h-full md:rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300 focus:outline-none", themes[theme].bg)}
         >
             <AnimatePresence mode="wait">
             {!hasStarted && (
@@ -538,7 +537,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
         {/* Slide Content */}
         <div 
-            className={clsx("flex-1 relative cursor-pointer select-none touch-manipulation", themes[theme].bg, themes[theme].text)}
+            className={clsx("flex-1 relative cursor-pointer select-none touch-manipulation", themes[theme].text)}
             onClick={handleTap}
         >
           {hasStarted && (

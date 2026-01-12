@@ -81,8 +81,8 @@ def run(playwright):
             # Try clicking anyway if locator failed?
             try:
                 page.get_by_test_id("click-next").click(force=True)
-            except Exception:
-                pass
+            except Exception as click_err:
+                print(f"  Also failed to click next: {click_err}")
 
     if not found_vibe:
         print("Failed to locate Vibe Slide.")

@@ -4,7 +4,10 @@ from playwright.sync_api import sync_playwright, expect
 
 def verify_progress_bars():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # Check if HEADLESS env var is set to false (string) to run headed
+        is_headless = os.getenv('HEADLESS', 'true').lower() == 'true'
+        browser = p.chromium.launch(headless=is_headless)
+
         # Use a mobile-like viewport to ensure we test responsive behavior if needed,
         # but desktop is fine for checking progress bar presence.
         context = browser.new_context(viewport={"width": 1280, "height": 720})
@@ -43,8 +46,21 @@ def verify_progress_bars():
             assert count > 0, "No progress bars found"
 
             # 5. Take Screenshot
-            # Wait a moment for animations
-            time.sleep(2)
+            # Wait for the first progress bar (active) to have non-zero width
+            # The progress bar is a div inside the button.
+            active_bar = bars.nth(0).locator('div')
+
+            # Wait function to check if width style is not 0% or computed width > 0
+            # We can check bounding box width
+            print("Waiting for animation to start...")
+            page.wait_for_function(
+                """(element) => {
+                    const rect = element.getBoundingClientRect();
+                    return rect.width > 0;
+                }""",
+                arg=active_bar.element_handle()
+            )
+
             screenshot_path = "verification/progress_bars.png"
             page.screenshot(path=screenshot_path)
             print(f"Screenshot saved to {screenshot_path}")

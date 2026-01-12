@@ -3,13 +3,15 @@ import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
+const DEFAULT_SLIDE_DURATION_MS = 6000;
+
 const ProgressBars = memo(({ slides, currentIndex, progressColorClass, onJump }) => {
     return (
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" aria-label="Slides navigation">
             {slides.map((slide, idx) => {
                 const isActive = idx === currentIndex;
                 const isPast = idx < currentIndex;
-                const duration = slide.duration || 6000;
+                const duration = slide.duration || DEFAULT_SLIDE_DURATION_MS;
 
                 return (
                     <button

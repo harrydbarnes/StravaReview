@@ -15,7 +15,7 @@ const ProgressBars = memo(({ slides, currentIndex, progressColorClass, onJump })
 
                 return (
                     <button
-                        key={idx}
+                        key={slide.id || idx}
                         aria-current={isActive ? 'step' : 'false'}
                         aria-label={`Go to slide ${idx + 1}`}
                         className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all border-none p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
@@ -25,7 +25,7 @@ const ProgressBars = memo(({ slides, currentIndex, progressColorClass, onJump })
                         }}
                     >
                         <motion.div
-                            key={`${idx}-${isActive}`}
+                            key={`${slide.id || idx}-${isActive}`}
                             className={clsx("h-full", progressColorClass)}
                             initial={{ width: isPast ? '100%' : '0%' }}
                             animate={{ width: isPast || isActive ? '100%' : '0%' }}

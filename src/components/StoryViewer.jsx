@@ -10,7 +10,7 @@ const themes = {
   orange: { bg: 'bg-brand-orange', backdrop: 'bg-orange-800', text: 'text-white', accent: 'text-white', invalidTextColor: 'text-orange-500' },
 };
 
-const textColors = ['text-white', 'text-black', 'text-orange-500'];
+const textColors = [...new Set(Object.values(themes).flatMap(theme => [theme.text, theme.invalidTextColor]))];
 
 const KEYBOARD_KEYS = {
     ARROW_RIGHT: 'ArrowRight',

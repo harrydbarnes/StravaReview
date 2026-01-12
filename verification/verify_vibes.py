@@ -15,8 +15,8 @@ def run(playwright):
     # Click Demo Mode
     try:
         page.get_by_text("Try Demo Mode").click(timeout=5000)
-    except:
-        print("Demo mode button not found, maybe already loaded or different text")
+    except Exception as e:
+        print(f"Demo mode button not found, maybe already loaded or different text: {e}")
 
     # Wait for curtain/start
     try:
@@ -41,8 +41,8 @@ def run(playwright):
     try:
         page.wait_for_selector('[data-testid="click-next"]', timeout=5000)
         print("Controls visible, story active.")
-    except:
-        print("Controls NOT visible. Start failed.")
+    except Exception as e:
+        print(f"Controls NOT visible. Start failed: {e}")
         # Attempt recovery?
         page.screenshot(path="verification/failed_start.png")
         return
@@ -68,14 +68,20 @@ def run(playwright):
 
             # Next slide
             page.get_by_test_id("click-next").click(force=True)
-            page.wait_for_timeout(800)
+
+            # Instead of fixed wait, wait for some content change or just a short safety buffer
+            # Since we don't know the next slide content, we can wait for the transition to likely complete
+            # or try to catch the click.
+            # Ideally we'd wait for the slide index to update, but we don't have access to React state here.
+            # Using a slightly shorter wait as we just want to spam next until we find our slide.
+            page.wait_for_timeout(500)
 
         except Exception as e:
             print(f"Error checking slide {i}: {e}")
             # Try clicking anyway if locator failed?
             try:
                 page.get_by_test_id("click-next").click(force=True)
-            except:
+            except Exception:
                 pass
 
     if not found_vibe:
@@ -90,8 +96,8 @@ def run(playwright):
                 break
             try:
                 page.get_by_test_id("click-next").click(force=True)
-                page.wait_for_timeout(800)
-            except:
+                page.wait_for_timeout(500)
+            except Exception:
                 pass
 
     if page.locator("text=Grand Total").is_visible():

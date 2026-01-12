@@ -973,7 +973,7 @@ export const SpotlightSlide = ({ data, textColor }) => {
                 className="absolute top-16 right-10"
             >
                 <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">
-                    🏆 Fan Favorite
+                    🏆 Fan Favourite
                 </div>
             </motion.div>
 

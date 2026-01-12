@@ -64,6 +64,8 @@ const VIBE_THRESHOLD_NIGHT_RATIO = 0.3;
 const VIBE_THRESHOLD_LUNCH_RATIO = 0.2;
 const VIBE_THRESHOLD_WEEKEND_RATIO = 0.6;
 const VIBE_THRESHOLD_VARIETY_COUNT = 4;
+const VIBE_THRESHOLD_ELEVATION = 8848;
+const VIBE_THRESHOLD_KUDOS_RATIO = 1.0;
 
 // Helper to determine if a sport is Distance or Time based
 const isDistanceSport = (type) => ['Run', 'Ride', 'Swim', 'Hike', 'Walk', 'Kayaking'].includes(type);
@@ -808,26 +810,26 @@ const determineVibeStack = (stats) => {
 
     // SLOT 1: METHODOLOGY (Your "Class")
     let methodology = DEFAULT_VIBE;
-    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * 0.3) {
+    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * VIBE_THRESHOLD_YOGA_RATIO) {
         methodology = "Soft Life Era";
-    } else if (Object.keys(activityTypes).length > 4) {
+    } else if (Object.keys(activityTypes).length > VIBE_THRESHOLD_VARIETY_COUNT) {
         methodology = "Side Quest Pro";
     }
 
     // SLOT 2: CHRONOTYPE (Your "Time Zone")
     let chronotype = null;
-    if (weekendRatio > 0.6) chronotype = "Weekend Warrior";
-    else if (morningRatio > 0.4) chronotype = "Early Bird";
-    else if (nightRatio > 0.3) chronotype = "Night Owl";
-    else if (lunchRatio > 0.2) chronotype = "Lunch Breaker";
+    if (weekendRatio > VIBE_THRESHOLD_WEEKEND_RATIO) chronotype = "Weekend Warrior";
+    else if (morningRatio > VIBE_THRESHOLD_MORNING_RATIO) chronotype = "Early Bird";
+    else if (nightRatio > VIBE_THRESHOLD_NIGHT_RATIO) chronotype = "Night Owl";
+    else if (lunchRatio > VIBE_THRESHOLD_LUNCH_RATIO) chronotype = "Lunch Breaker";
 
     // SLOT 3: STATUS (Your "Feat")
     let status = null;
-    if (streak > 20) {
+    if (streak > VIBE_THRESHOLD_STREAK) {
         status = "Main Character Energy";
-    } else if (elevation > 8848) {
+    } else if (elevation > VIBE_THRESHOLD_ELEVATION) {
         status = "Mountain Goat";
-    } else if (parseFloat(kudosRatio) > 1.0) {
+    } else if (parseFloat(kudosRatio) > VIBE_THRESHOLD_KUDOS_RATIO) {
         status = "Fan Favourite";
     }
 

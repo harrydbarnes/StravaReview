@@ -488,7 +488,7 @@ const StoryViewer = ({ slides, onClose }) => {
         <ProgressBars
             slides={slides}
             currentIndex={currentIndex}
-            textColor={textColor}
+            progressColorClass={textColor.replace('text-', 'bg-')}
             onJump={setCurrentIndex}
         />
 

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
-const ProgressBars = memo(({ slides, currentIndex, textColor, onJump }) => {
+const ProgressBars = memo(({ slides, currentIndex, progressColorClass, onJump }) => {
     return (
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" aria-label="Slides navigation">
             {slides.map((slide, idx) => {
@@ -24,7 +24,7 @@ const ProgressBars = memo(({ slides, currentIndex, textColor, onJump }) => {
                     >
                         <motion.div
                             key={`${idx}-${isActive}`}
-                            className={clsx("h-full", textColor.replace('text-', 'bg-'))}
+                            className={clsx("h-full", progressColorClass)}
                             initial={{ width: isPast ? '100%' : '0%' }}
                             animate={{ width: isPast || isActive ? '100%' : '0%' }}
                             transition={{ duration: isActive ? duration / 1000 : 0, ease: 'linear' }}
@@ -39,9 +39,11 @@ const ProgressBars = memo(({ slides, currentIndex, textColor, onJump }) => {
 ProgressBars.displayName = 'ProgressBars';
 
 ProgressBars.propTypes = {
-    slides: PropTypes.array.isRequired,
+    slides: PropTypes.arrayOf(PropTypes.shape({
+        duration: PropTypes.number
+    })).isRequired,
     currentIndex: PropTypes.number.isRequired,
-    textColor: PropTypes.string.isRequired,
+    progressColorClass: PropTypes.string.isRequired,
     onJump: PropTypes.func.isRequired
 };
 

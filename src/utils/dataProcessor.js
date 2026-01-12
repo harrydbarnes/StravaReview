@@ -64,6 +64,8 @@ const VIBE_THRESHOLD_NIGHT_RATIO = 0.3;
 const VIBE_THRESHOLD_LUNCH_RATIO = 0.2;
 const VIBE_THRESHOLD_WEEKEND_RATIO = 0.6;
 const VIBE_THRESHOLD_VARIETY_COUNT = 4;
+const VIBE_THRESHOLD_ELEVATION = 8848;
+const VIBE_THRESHOLD_KUDOS_RATIO = 1.0;
 
 // Helper to determine if a sport is Distance or Time based
 const isDistanceSport = (type) => ['Run', 'Ride', 'Swim', 'Hike', 'Walk', 'Kayaking'].includes(type);
@@ -720,15 +722,20 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRideSpeed = `${speedVal.toFixed(1)} mph`;
   }
 
-  // Vibe Check
-  const vibe = determineVibe({
+  // 1. Calculate Ratio first
+  const calculatedKudosRatio = totalDistance > 0 ? (totalKudos / (totalDistance / 1000)).toFixed(1) : 0;
+
+  // 2. Pass new params to the Stack function
+  const vibe = determineVibeStack({
       activityTypes,
       totalActivities,
       morningCount,
       nightCount,
       lunchCount,
       weekendCount,
-      streak: maxStreak
+      streak: maxStreak,
+      elevation: totalElevation, // Ensure totalElevation is available here
+      kudosRatio: calculatedKudosRatio
   });
 
   return {
@@ -748,7 +755,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
         pizza: Math.floor(totalCalories / CALORIES_PIZZA),
         donuts: Math.floor(totalCalories / CALORIES_DONUT)
     },
-    kudosRatio: totalDistance > 0 ? (totalKudos / (totalDistance / 1000)).toFixed(1) : 0,
+    kudosRatio: calculatedKudosRatio,
     speed: {
         max: Math.round(maxSpeedGlobal),
         min: isFinite(minSpeedGlobal) ? minSpeedGlobal.toFixed(1) : 0,
@@ -789,42 +796,45 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     topMonthsByDistance,
     monthlyStats,
     topLocation,
-    vibe
+    vibe // This is now an Array ["Side Quest Pro", "Night Owl"]
   };
 };
 
-const determineVibe = (stats) => {
-    const { activityTypes, totalActivities, morningCount, nightCount, lunchCount, weekendCount, streak } = stats;
+const determineVibeStack = (stats) => {
+    const { activityTypes, totalActivities, morningCount, nightCount, lunchCount, weekendCount, streak, elevation, kudosRatio } = stats;
 
-    // Ratios
     const morningRatio = morningCount / totalActivities;
     const nightRatio = nightCount / totalActivities;
     const lunchRatio = lunchCount / totalActivities;
     const weekendRatio = weekendCount / totalActivities;
 
-    // Logic
-    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * VIBE_THRESHOLD_YOGA_RATIO)
-        return "Soft Life Era";
+    // SLOT 1: METHODOLOGY (Your "Class")
+    let methodology = DEFAULT_VIBE;
+    if (activityTypes['Yoga'] && activityTypes['Yoga'].count > totalActivities * VIBE_THRESHOLD_YOGA_RATIO) {
+        methodology = "Soft Life Era";
+    } else if (Object.keys(activityTypes).length > VIBE_THRESHOLD_VARIETY_COUNT) {
+        methodology = "Side Quest Pro";
+    }
 
-    if (streak > VIBE_THRESHOLD_STREAK)
-        return "Main Character Energy";
+    // SLOT 2: CHRONOTYPE (Your "Time Zone")
+    let chronotype = null;
+    if (weekendRatio > VIBE_THRESHOLD_WEEKEND_RATIO) chronotype = "Weekend Warrior";
+    else if (morningRatio > VIBE_THRESHOLD_MORNING_RATIO) chronotype = "Early Bird";
+    else if (nightRatio > VIBE_THRESHOLD_NIGHT_RATIO) chronotype = "Night Owl";
+    else if (lunchRatio > VIBE_THRESHOLD_LUNCH_RATIO) chronotype = "Lunch Breaker";
 
-    if (morningRatio > VIBE_THRESHOLD_MORNING_RATIO)
-        return "Early Bird"; // Renamed from Sunrise CEO
+    // SLOT 3: STATUS (Your "Feat")
+    let status = null;
+    if (streak > VIBE_THRESHOLD_STREAK) {
+        status = "Main Character Energy";
+    } else if (elevation > VIBE_THRESHOLD_ELEVATION) {
+        status = "Mountain Goat";
+    } else if (parseFloat(kudosRatio) > VIBE_THRESHOLD_KUDOS_RATIO) {
+        status = "Fan Favourite";
+    }
 
-    if (nightRatio > VIBE_THRESHOLD_NIGHT_RATIO)
-        return "Night Owl"; // Renamed from After Hours
-
-    if (lunchRatio > VIBE_THRESHOLD_LUNCH_RATIO)
-        return "Lunch Breaker"; // Restored
-
-    if (weekendRatio > VIBE_THRESHOLD_WEEKEND_RATIO)
-        return "Weekend Warrior";
-
-    if (Object.keys(activityTypes).length > VIBE_THRESHOLD_VARIETY_COUNT)
-        return "Side Quest Pro";
-
-    return DEFAULT_VIBE;
+    // Return unique vibes only (filters out nulls and duplicates)
+    return [...new Set([methodology, chronotype, status].filter(Boolean))];
 };
 
 export const vibeTraits = {
@@ -834,6 +844,11 @@ export const vibeTraits = {
     "Night Owl": { description: "The city hits different at night. You own the darkness.", icon: "🌙" },
     "Lunch Breaker": { description: "Maximizing every minute. You turned downtime into go-time.", icon: "🥪" },
     "Side Quest Pro": { description: "Why specialize? You're collecting XP in every category possible.", icon: "🎮" },
-    [DEFAULT_VIBE]: { description: "No labels, just movement. You kept it moving all year long.", icon: "👟" },
-    "Weekend Warrior": { description: "Living for the weekend adventures.", icon: "🗓️" }
+    "Weekend Warrior": { description: "Living for the weekend adventures.", icon: "🗓️" },
+
+    // NEW TRAITS
+    "Mountain Goat": { description: "You eat elevation for breakfast. You climbed the equivalent of Mount Everest.", icon: "🐐" },
+    "Fan Favourite": { description: "The crowd loves you. Your activities get the people going.", icon: "🤩" },
+
+    [DEFAULT_VIBE]: { description: "No labels, just movement. You kept it moving all year long.", icon: "👟" }
 };

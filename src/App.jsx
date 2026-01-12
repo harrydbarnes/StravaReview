@@ -92,7 +92,7 @@ function App() {
                 setLoadingStatus('Fetching your activities (this might take a moment)...');
                 const activities = await fetchActivities(tokenData.access_token, targetYear);
                 
-                setLoadingStatus('Analyzing your year...');
+                setLoadingStatus('Analysing your year...');
                 const result = analyzeData(activities, targetYear);
                 
                 if (result) {

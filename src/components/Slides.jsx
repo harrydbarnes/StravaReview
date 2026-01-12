@@ -74,35 +74,36 @@ export const SlideContainer = ({ children, textColor, className }) => (
   </div>
 );
 
-export const IntroSlide = ({ data, textColor }) => (
-  <SlideContainer textColor={textColor}>
-    <motion.h1 
-      initial={{ y: 20, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }} 
-      className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"
-    >
-      Your Year <br/> in Activity
-    </motion.h1>
-    <motion.p 
+export const IntroSlide = React.memo(({ data, textColor }) => (
+    <SlideContainer textColor={textColor}>
+        <motion.h1
         initial={{ y: 20, opacity: 0 }} 
         animate={{ y: 0, opacity: 1 }} 
-        transition={{ delay: INTRO_DELAY }}
-        className="text-xl font-bold"
-    >
-        {data.year}
-    </motion.p>
-    <motion.div 
-        initial={{ scale: 0 }} 
-        animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-        transition={{ delay: INTRO_DELAY + 0.4 }}
-        className="mt-8 text-6xl md:text-8xl"
-    >
-        🔥
-    </motion.div>
-  </SlideContainer>
-);
+        className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"
+        >
+        Your Year <br/> in Activity
+        </motion.h1>
+        <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: INTRO_DELAY }}
+            className="text-xl font-bold"
+        >
+            {data.year}
+        </motion.p>
+        <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+            transition={{ delay: INTRO_DELAY + 0.4 }}
+            className="mt-8 text-6xl md:text-8xl"
+        >
+            🔥
+        </motion.div>
+    </SlideContainer>
+));
+IntroSlide.displayName = 'IntroSlide';
 
-export const PercentSlide = ({ data, textColor }) => (
+export const PercentSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Life in Motion</h2>
         <motion.div
@@ -129,9 +130,10 @@ export const PercentSlide = ({ data, textColor }) => (
             </p>
         </motion.div>
     </SlideContainer>
-);
+));
+PercentSlide.displayName = 'PercentSlide';
 
-export const OlympicsSlide = ({ data, textColor }) => {
+export const OlympicsSlide = React.memo(({ data, textColor }) => {
     // Collect available stats
     const stats = [];
     if (data.olympics.poolLengths > 0) {
@@ -180,9 +182,10 @@ export const OlympicsSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+OlympicsSlide.displayName = 'OlympicsSlide';
 
-export const ShortestSlide = ({ data, textColor }) => {
+export const ShortestSlide = React.memo(({ data, textColor }) => {
     if (!data.shortestActivity) return null;
 
     return (
@@ -226,9 +229,10 @@ export const ShortestSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+ShortestSlide.displayName = 'ShortestSlide';
 
-export const ElevationSlide = ({ data, textColor }) => (
+export const ElevationSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-20">The Climb</h2>
 
@@ -273,9 +277,10 @@ export const ElevationSlide = ({ data, textColor }) => (
             </p>
         </motion.div>
     </SlideContainer>
-);
+));
+ElevationSlide.displayName = 'ElevationSlide';
 
-export const FuelSlide = ({ data, textColor }) => (
+export const FuelSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">The Fuel Tank</h2>
 
@@ -307,9 +312,10 @@ export const FuelSlide = ({ data, textColor }) => (
             </motion.p>
         </div>
     </SlideContainer>
-);
+));
+FuelSlide.displayName = 'FuelSlide';
 
-export const PaceSlide = ({ data, textColor }) => (
+export const PaceSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-12">The Consistent Cruiser</h2>
 
@@ -349,9 +355,10 @@ export const PaceSlide = ({ data, textColor }) => (
             )}
         </div>
     </SlideContainer>
-);
+));
+PaceSlide.displayName = 'PaceSlide';
 
-export const SpeedSlide = ({ data, textColor }) => (
+export const SpeedSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">The Need for Speed</h2>
 
@@ -384,9 +391,10 @@ export const SpeedSlide = ({ data, textColor }) => (
                 : `A T-Rex (${T_REX_SPEED_MPH}mph) might catch you. Run faster next year!`}
         </motion.p>
     </SlideContainer>
-);
+));
+SpeedSlide.displayName = 'SpeedSlide';
 
-export const SlowestSlide = ({ data, textColor }) => {
+export const SlowestSlide = React.memo(({ data, textColor }) => {
     if (!data.speed.slowestActivity) return null;
 
     return (
@@ -431,9 +439,10 @@ export const SlowestSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+SlowestSlide.displayName = 'SlowestSlide';
 
-export const HeatmapSlide = ({ data, textColor }) => {
+export const HeatmapSlide = React.memo(({ data, textColor }) => {
     // Trim leading/trailing zeros
     const hourly = data.charts.hourly;
     const firstActive = hourly.findIndex(v => v > 0);
@@ -498,9 +507,10 @@ export const HeatmapSlide = ({ data, textColor }) => {
             )}
         </SlideContainer>
     );
-};
+});
+HeatmapSlide.displayName = 'HeatmapSlide';
 
-export const WeeklyPatternSlide = ({ data, textColor }) => {
+export const WeeklyPatternSlide = React.memo(({ data, textColor }) => {
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const maxVal = Math.max(...data.charts.daily);
 
@@ -565,9 +575,10 @@ export const WeeklyPatternSlide = ({ data, textColor }) => {
             </motion.p>
         </SlideContainer>
     );
-};
+});
+WeeklyPatternSlide.displayName = 'WeeklyPatternSlide';
 
-export const KudosSlide = ({ data, textColor }) => {
+export const KudosSlide = React.memo(({ data, textColor }) => {
     // Logic to remove decimal if .0
     const formattedKudosRatio = parseFloat(data.kudosRatio).toString();
 
@@ -595,9 +606,10 @@ export const KudosSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+KudosSlide.displayName = 'KudosSlide';
 
-export const NewActivitySlide = ({ data, textColor }) => {
+export const NewActivitySlide = React.memo(({ data, textColor }) => {
   return (
       <SlideContainer textColor={textColor}>
           <h2 className="text-3xl md:text-4xl font-bold mb-8">You Tried Something New</h2>
@@ -628,9 +640,10 @@ export const NewActivitySlide = ({ data, textColor }) => {
           </motion.div>
       </SlideContainer>
   );
-};
+});
+NewActivitySlide.displayName = 'NewActivitySlide';
 
-export const LocationSlide = ({ data, textColor }) => {
+export const LocationSlide = React.memo(({ data, textColor }) => {
     // Dynamic sizing based on length
     const nameLength = data.topLocation.name.length;
     let textSizeClass = "text-4xl md:text-6xl"; // Default (Short)
@@ -666,7 +679,8 @@ export const LocationSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+LocationSlide.displayName = 'LocationSlide';
 
 const CalendarIcon = ({ month, rank, delay = 0 }) => {
     const abbr = month.substring(0, 3).toUpperCase();
@@ -727,7 +741,7 @@ const CalendarIcon = ({ month, rank, delay = 0 }) => {
     );
 };
 
-export const TopMonthsSlide = ({ data, textColor }) => {
+export const TopMonthsSlide = React.memo(({ data, textColor }) => {
     const getRank = React.useCallback((monthName) => {
         const index = data.topMonthsByDistance.findIndex(m => m.month === monthName);
         return index !== -1 ? index + 1 : null;
@@ -768,9 +782,10 @@ export const TopMonthsSlide = ({ data, textColor }) => {
             </div>
         </SlideContainer>
     );
-};
+});
+TopMonthsSlide.displayName = 'TopMonthsSlide';
 
-export const SummarySlide = ({ data, theme, textColor, traits }) => {
+export const SummarySlide = React.memo(({ data, theme, textColor, traits }) => {
     const ref = React.useRef(null);
     const [isSharing, setIsSharing] = React.useState(false);
     const [shareError, setShareError] = React.useState(null);
@@ -890,10 +905,11 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
             </div>
         </div>
     );
-};
+});
+SummarySlide.displayName = 'SummarySlide';
 
 // 1. TOP SPORTS SLIDE
-export const TopSportsSlide = ({ data, textColor }) => (
+export const TopSportsSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Your Top Sports</h2>
         <div className="w-full max-w-md space-y-4">
@@ -917,10 +933,11 @@ export const TopSportsSlide = ({ data, textColor }) => (
             ))}
         </div>
     </SlideContainer>
-);
+));
+TopSportsSlide.displayName = 'TopSportsSlide';
 
 // 2. FUN STATS (Time Comparison) SLIDE
-export const FunStatsSlide = ({ data, textColor }) => (
+export const FunStatsSlide = React.memo(({ data, textColor }) => (
     <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Time Well Spent</h2>
 
@@ -955,10 +972,11 @@ export const FunStatsSlide = ({ data, textColor }) => (
             </motion.div>
         </div>
     </SlideContainer>
-);
+));
+FunStatsSlide.displayName = 'FunStatsSlide';
 
 // 3. SPOTLIGHT / KUDOS SLIDE
-export const SpotlightSlide = ({ data, textColor }) => {
+export const SpotlightSlide = React.memo(({ data, textColor }) => {
     // Fallback if no kudos data
     const activity = data.mostLikedActivity || data.spotlightActivity;
 
@@ -1019,7 +1037,8 @@ export const SpotlightSlide = ({ data, textColor }) => {
             </motion.div>
         </SlideContainer>
     );
-};
+});
+SpotlightSlide.displayName = 'SpotlightSlide';
 
 // Helper Component for the Vibe Cards
 const SingleVibeCard = ({ vibeKey, traits, delay, size = "medium" }) => {
@@ -1059,7 +1078,7 @@ const SingleVibeCard = ({ vibeKey, traits, delay, size = "medium" }) => {
                     className="bg-white/10 backdrop-blur-md p-4 rounded-xl max-w-xs mt-2"
                 >
                     <p className="text-sm md:text-base font-medium leading-relaxed">
-                        "{trait.description}"
+                        &quot;{trait.description}&quot;
                     </p>
                 </motion.div>
             )}
@@ -1068,7 +1087,7 @@ const SingleVibeCard = ({ vibeKey, traits, delay, size = "medium" }) => {
 };
 
 // 4. VIBE SLIDE (Replaces Old Personality Slide)
-export const VibeSlide = ({ data, textColor, traits }) => {
+export const VibeSlide = React.memo(({ data, textColor, traits }) => {
     // Ensure array
     const vibes = Array.isArray(data.vibe) ? data.vibe : [data.vibe];
     const count = vibes.length;
@@ -1127,4 +1146,5 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             </div>
         </SlideContainer>
     );
-};
+});
+VibeSlide.displayName = 'VibeSlide';

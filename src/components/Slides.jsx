@@ -159,7 +159,7 @@ export const OlympicsSlide = ({ data, textColor }) => {
                         key={idx}
                         initial={{ x: -50, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: DRAMATIC_DELAY + (idx * 0.8) }}
+                        transition={{ delay: DRAMATIC_DELAY + (idx * 0.4) }}
                         className="flex items-center gap-6 p-4 bg-white/5 rounded-xl backdrop-blur-sm"
                     >
                         <span className="text-5xl">{stat.emoji}</span>
@@ -171,7 +171,7 @@ export const OlympicsSlide = ({ data, textColor }) => {
             <motion.div
                  initial={{ scale: 0.9, opacity: 0 }}
                  animate={{ scale: 1, opacity: 1 }}
-                 transition={{ delay: DRAMATIC_DELAY + 3.0 }}
+                 transition={{ delay: DRAMATIC_DELAY + 2.0 }}
                  className="mt-8 bg-current/10 p-6 rounded-xl max-w-md"
             >
                 <p className="font-bold italic">
@@ -645,7 +645,7 @@ export const LocationSlide = ({ data, textColor }) => {
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favorite Playground</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favourite Playground</h2>
             <motion.div
                 className="text-8xl md:text-9xl mb-4"
                 initial={{ scale: 0, rotate: -180, opacity: 0 }}
@@ -846,7 +846,7 @@ export const SummarySlide = ({ data, theme, textColor, traits }) => {
 
                     {/* Username Addition */}
                     {data.athlete && (
-                        <div className="absolute bottom-4 left-0 right-0 opacity-60 text-sm font-bold uppercase tracking-widest">
+                        <div className="absolute bottom-12 left-0 right-0 opacity-60 text-sm font-bold uppercase tracking-widest">
                             {data.athlete.username || `${data.athlete.firstname} ${data.athlete.lastname}`.trim()}
                         </div>
                     )}
@@ -966,6 +966,7 @@ export const SpotlightSlide = ({ data, textColor }) => {
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
                 className="p-8 border-4 border-current rounded-3xl max-w-md w-full relative"
             >
                 <div className="flex justify-between items-start mb-6">
@@ -1042,9 +1043,14 @@ export const VibeSlide = ({ data, textColor, traits }) => {
             </motion.div>
 
             {data.longestStreak > MIN_STREAK_FOR_DISPLAY && (
-                <div className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest opacity-75">
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 0.75, y: 0 }}
+                    transition={{ delay: DRAMATIC_DELAY + 1.5 }}
+                    className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest"
+                >
                     <span>🔥 {data.longestStreak} Week Streak</span>
-                </div>
+                </motion.div>
             )}
         </SlideContainer>
     );

@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import ProgressBars from './ProgressBars';
 
 const themes = {
-  black: { bg: 'bg-black', text: 'text-white', accent: 'text-white' },
-  white: { bg: 'bg-white', text: 'text-black', accent: 'text-black' },
-  orange: { bg: 'bg-brand-orange', text: 'text-white', accent: 'text-white' },
+  black: { bg: 'bg-black', backdrop: 'bg-zinc-900', text: 'text-white', accent: 'text-white' },
+  white: { bg: 'bg-white', backdrop: 'bg-gray-200', text: 'text-black', accent: 'text-black' },
+  orange: { bg: 'bg-brand-orange', backdrop: 'bg-orange-800', text: 'text-white', accent: 'text-white' },
 };
 
 const textColors = ['text-white', 'text-black', 'text-orange-500'];
@@ -63,17 +63,11 @@ const Controls = React.memo(({
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    const themeOrder = ['black', 'white', 'orange'];
-                    const currentIdx = themeOrder.indexOf(theme);
-                    const newTheme = themeOrder[(currentIdx + 1) % themeOrder.length];
+                    const themeKeys = Object.keys(themes);
+                    const currentIdx = themeKeys.indexOf(theme);
+                    const newTheme = themeKeys[(currentIdx + 1) % themeKeys.length];
                     setTheme(newTheme);
-
-                    // Reset textColor to a safe default
-                    if (newTheme === 'white') {
-                        setTextColor('text-black');
-                    } else {
-                        setTextColor('text-white');
-                    }
+                    setTextColor(themes[newTheme].text);
                 }}
                 className={buttonClass}
                 aria-label="Toggle theme"
@@ -396,7 +390,7 @@ const StoryViewer = ({ slides, onClose }) => {
   if (!SlideComponent) return null;
 
   return (
-    <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].bg)}>
+    <div className={clsx("fixed inset-0 z-50 flex items-center justify-center", themes[theme].backdrop)}>
       
       {/* Wrapper for Desktop Layout */}
       <div className="relative w-full h-full md:w-[400px] md:h-[80vh] flex flex-col">

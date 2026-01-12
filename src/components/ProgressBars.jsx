@@ -1,0 +1,48 @@
+import React, { memo } from 'react';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+
+const ProgressBars = memo(({ slides, currentIndex, textColor, onJump }) => {
+    return (
+        <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2" aria-label="Slides navigation">
+            {slides.map((slide, idx) => {
+                const isActive = idx === currentIndex;
+                const isPast = idx < currentIndex;
+                const duration = slide.duration || 6000;
+
+                return (
+                    <button
+                        key={idx}
+                        aria-current={isActive ? 'step' : 'false'}
+                        aria-label={`Go to slide ${idx + 1}`}
+                        className="h-2 flex-1 bg-gray-500/50 rounded-full overflow-hidden cursor-pointer hover:h-3 transition-all border-none p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onJump(idx);
+                        }}
+                    >
+                        <motion.div
+                            key={`${idx}-${isActive}`}
+                            className={clsx("h-full", textColor.replace('text-', 'bg-'))}
+                            initial={{ width: isPast ? '100%' : '0%' }}
+                            animate={{ width: isPast || isActive ? '100%' : '0%' }}
+                            transition={{ duration: isActive ? duration / 1000 : 0, ease: 'linear' }}
+                        />
+                    </button>
+                );
+            })}
+        </div>
+    );
+});
+
+ProgressBars.displayName = 'ProgressBars';
+
+ProgressBars.propTypes = {
+    slides: PropTypes.array.isRequired,
+    currentIndex: PropTypes.number.isRequired,
+    textColor: PropTypes.string.isRequired,
+    onJump: PropTypes.func.isRequired
+};
+
+export default ProgressBars;

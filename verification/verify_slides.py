@@ -26,7 +26,7 @@ def run():
         # Helper to click next
         def click_next():
             # Use a robust selector instead of coordinates to avoid brittle tests.
-            page.get_by_test_id("click-next").click()
+            page.get_by_test_id("click-next").click(force=True)
             time.sleep(1) # Wait for transition
 
         # Iterate and capture

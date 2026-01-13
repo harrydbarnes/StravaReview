@@ -84,7 +84,7 @@ const HeaderClass = "text-3xl md:text-4xl font-bold mb-8";
 export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   return (
     <SlideContainer textColor={textColor}>
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-12 w-full items-center">
             <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -117,7 +117,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -206,7 +206,7 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>What Was This One, BTW?</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -303,7 +303,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Fuel Tank</h2>
 
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
             <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -341,7 +341,7 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Consistent Cruiser</h2>
 
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
             <div className="flex flex-col gap-8 w-full max-w-md">
                 {data.averagePace.run && (
                     <motion.div
@@ -490,7 +490,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Clockwatcher</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <div className="flex flex-col w-full max-w-md">
                     <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
                         {displayData.map((val, idx) => {
@@ -571,7 +571,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>The Weekly Grind</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <div className="w-full max-w-md relative h-64 mb-8">
                      <div className="flex items-end h-full w-full px-4 gap-1">
                          {data.charts.daily.map((val, idx) => {
@@ -632,7 +632,7 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>The Social Butterfly</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <motion.div
                     initial={{ scale: 0, rotate: -45 }}
                     animate={{ scale: 1, rotate: 0 }}
@@ -660,7 +660,7 @@ export const NewActivitySlide = React.memo(function NewActivitySlide({ data, tex
   return (
       <SlideContainer textColor={textColor}>
           <h2 className={HeaderClass}>You Tried Something New</h2>
-          <div className="flex-1 flex flex-col justify-center w-full items-center pb-24">
+          <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center pb-24">
               <motion.div
                 initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
                 animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -707,7 +707,7 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
     return (
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Your Favourite Playground</h2>
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <motion.div
                     className="text-8xl md:text-9xl mb-4"
                     initial={{ scale: 0, rotate: -180, opacity: 0 }}
@@ -805,7 +805,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Peak Performance Months</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
                     {data.monthlyStats.map((stat, idx) => {
                         const rank = getRank(stat.month);
@@ -910,13 +910,19 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
 
                     {vibeArray.length > 0 && traits && (
                         <div className="flex flex-col items-center gap-2 opacity-80 mb-4 w-full">
-                            {vibeArray.map(vibe => {
+                            {vibeArray.map((vibe, idx) => {
                                 const trait = traits[vibe] || traits[DEFAULT_VIBE];
                                 return (
-                                    <div key={vibe} className="flex items-center justify-center gap-2 w-full">
+                                    <motion.div
+                                        key={vibe}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 4.5 + (idx * 0.5) }}
+                                        className="flex items-center justify-center gap-2 w-full"
+                                    >
                                         <span className="text-2xl shrink-0">{trait.icon}</span>
                                         <span className="text-lg font-bold uppercase tracking-widest text-wrap">{vibe}</span>
-                                    </div>
+                                    </motion.div>
                                 );
                             })}
                         </div>
@@ -924,9 +930,19 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
 
                     {/* Username Addition */}
                     {data.athlete && (
-                        <div className="mt-4 opacity-60 text-sm font-bold uppercase tracking-widest">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 2, rotate: 10 }}
+                            animate={{ opacity: 0.6, scale: 1, rotate: -2 }}
+                            transition={{
+                                delay: 4.5 + (vibeArray.length * 0.5) + 0.5,
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 12
+                            }}
+                            className="mt-4 text-sm font-bold uppercase tracking-widest border-2 border-current px-4 py-1 rounded-md"
+                        >
                             {data.athlete.username || `${data.athlete.firstname} ${data.athlete.lastname}`.trim()}
-                        </div>
+                        </motion.div>
                     )}
 
                 </div>
@@ -991,7 +1007,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
             <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -1049,7 +1065,7 @@ export const SpotlightSlide = React.memo(function SpotlightSlide({ data, textCol
 
             <h2 className={HeaderClass}>The Crowd Went Wild</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center">
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}

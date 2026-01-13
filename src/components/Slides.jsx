@@ -363,7 +363,7 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
 
 export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
     return (
-    <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">The Need for Speed</h2>
 
         <motion.div

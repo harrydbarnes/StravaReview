@@ -66,8 +66,12 @@ const CountUp = ({ value, label, delay = 0 }) => {
     );
 };
 
-export const SlideContainer = ({ children, textColor, className }) => (
-  <div className={clsx("w-full h-full flex flex-col px-6 pt-[calc(5rem+env(safe-area-inset-top))] pb-safe items-center justify-start text-center md:pt-24", className)}>
+export const SlideContainer = ({ children, textColor, className, smallPadding = false }) => (
+  <div className={clsx(
+      "w-full h-full flex flex-col px-6 pb-safe items-center justify-start text-center",
+      smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32",
+      className
+  )}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
         {children}
     </div>
@@ -656,7 +660,7 @@ export const NewActivitySlide = React.memo(function NewActivitySlide({ data, tex
   return (
       <SlideContainer textColor={textColor}>
           <h2 className={HeaderClass}>You Tried Something New</h2>
-          <div className="flex-1 flex flex-col justify-center w-full items-center">
+          <div className="flex-1 flex flex-col justify-center w-full items-center pb-24">
               <motion.div
                 initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
                 animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -675,7 +679,7 @@ export const NewActivitySlide = React.memo(function NewActivitySlide({ data, tex
                           onClick={(e) => e.stopPropagation()}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: DRAMATIC_DELAY + 1 }}
+                          transition={{ delay: DRAMATIC_DELAY + 0.2 }}
                           className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
                       >
                           View on Strava
@@ -1144,7 +1148,7 @@ export const VibeSlide = React.memo(function VibeSlide({ data, textColor, traits
     const titleText = count > 1 ? "Vibe Stack" : "Vibe Check";
 
     return (
-        <SlideContainer textColor={textColor} className="">
+        <SlideContainer textColor={textColor} smallPadding>
             <h2 className="mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
                 {data.year} {titleText}
             </h2>

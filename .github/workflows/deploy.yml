@@ -33,6 +33,8 @@ jobs:
       - name: Install dependencies
         # Added --legacy-peer-deps to fix React 19 conflict
         run: npm ci --legacy-peer-deps
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
         
       - name: Build
         run: npm run build

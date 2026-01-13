@@ -25,11 +25,12 @@ def test_orange_theme_details(page):
 
     # 1. Verify PercentSlide (Life in Motion)
     print("Searching for Life in Motion")
-    for _ in range(15):
-        if page.get_by_role("heading", name="Life in Motion").is_visible():
+    for _ in range(25):
+        try:
+            expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible(timeout=600)
             break
-        next_slide()
-        page.wait_for_timeout(500) # Small dwell to allow slide transition logic to fire
+        except:
+            next_slide()
     expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible()
 
     text_el = page.get_by_text("of your year spent moving")
@@ -41,11 +42,12 @@ def test_orange_theme_details(page):
 
     # 2. Verify ElevationSlide (The Climb)
     print("Searching for The Climb")
-    for _ in range(15):
-        if page.get_by_role("heading", name="The Climb").is_visible():
+    for _ in range(25):
+        try:
+            expect(page.get_by_role("heading", name="The Climb")).to_be_visible(timeout=600)
             break
-        next_slide()
-        page.wait_for_timeout(500)
+        except:
+            next_slide()
     expect(page.get_by_role("heading", name="The Climb")).to_be_visible()
 
     times_el = page.locator("text=times! 🕰️")
@@ -54,11 +56,12 @@ def test_orange_theme_details(page):
 
     # 3. Verify HeatmapSlide (Clockwatcher)
     print("Searching for Clockwatcher")
-    for _ in range(15):
-        if page.get_by_role("heading", name="Clockwatcher").is_visible():
+    for _ in range(25):
+        try:
+            expect(page.get_by_role("heading", name="Clockwatcher")).to_be_visible(timeout=600)
             break
-        next_slide()
-        page.wait_for_timeout(500)
+        except:
+            next_slide()
     expect(page.get_by_role("heading", name="Clockwatcher")).to_be_visible()
 
     peak_time_el = page.locator("p:has-text('You are most active at') span")
@@ -68,11 +71,12 @@ def test_orange_theme_details(page):
 
     # 4. Verify WeeklyPatternSlide (The Weekly Grind)
     print("Searching for The Weekly Grind")
-    for _ in range(15):
-        if page.get_by_role("heading", name="The Weekly Grind").is_visible():
+    for _ in range(25):
+        try:
+            expect(page.get_by_role("heading", name="The Weekly Grind")).to_be_visible(timeout=600)
             break
-        next_slide()
-        page.wait_for_timeout(500)
+        except:
+            next_slide()
     expect(page.get_by_role("heading", name="The Weekly Grind")).to_be_visible()
 
     # Check non-podium day text color (Black)
@@ -98,11 +102,12 @@ def test_orange_theme_details(page):
 
     # 5. Verify FunStatsSlide (Time Well Spent)
     print("Searching for Time Well Spent")
-    for _ in range(15):
-        if page.get_by_role("heading", name="Time Well Spent").is_visible():
+    for _ in range(25):
+        try:
+            expect(page.get_by_role("heading", name="Time Well Spent")).to_be_visible(timeout=600)
             break
-        next_slide()
-        page.wait_for_timeout(500)
+        except:
+            next_slide()
     expect(page.get_by_role("heading", name="Time Well Spent")).to_be_visible()
 
     container = page.locator("div", has_text="That's like listening to")

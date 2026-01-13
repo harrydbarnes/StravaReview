@@ -826,7 +826,11 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
         let dataUrl;
         try {
             const htmlToImage = await import('html-to-image');
-            dataUrl = await htmlToImage.toPng(ref.current, { cacheBust: true, pixelRatio: 2 });
+            dataUrl = await htmlToImage.toPng(ref.current, {
+                cacheBust: true,
+                pixelRatio: 2,
+                useCORS: true
+            });
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], 'strava-wrapped-summary.png', { type: 'image/png' });
 

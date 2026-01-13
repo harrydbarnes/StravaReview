@@ -45,7 +45,7 @@ def verify_viewport(playwright, viewport, name):
         print(f"Error in {name}: {e}")
         try:
             page.screenshot(path=f"/app/verification/error_{name}.png")
-        except:
+        except Exception:
             pass
         raise e
     finally:

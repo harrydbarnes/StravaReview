@@ -505,7 +505,20 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, textColor }
 
             {data.clockwatcher && (data.clockwatcher.earliest || data.clockwatcher.latest) && (
                 <div className="mt-8 flex justify-around w-full max-w-md">
-                    {[                        { type: 'earliest', label: 'Early Bird 🐦', time: data.clockwatcher.earliest, delay: 1.0 },                        { type: 'latest', label: 'Night Owl 🦉', time: data.clockwatcher.latest, delay: 1.5 },                    ].map((stat) => stat.time && (                        <motion.div                            key={stat.type}                            initial={{ y: 20, opacity: 0 }}                            animate={{ y: 0, opacity: 1 }}                            transition={{ delay: DRAMATIC_DELAY + stat.delay }}                        >                            <p className="text-xs uppercase font-bold opacity-60 mb-1">{stat.label}</p>                            <p className="text-xl font-black">{stat.time}</p>                        </motion.div>                    ))}
+                    {[
+                        { type: 'earliest', label: 'Earliest', time: data.clockwatcher.earliest, delay: 1.0 },
+                        { type: 'latest', label: 'Latest', time: data.clockwatcher.latest, delay: 1.5 },
+                    ].map((stat) => stat.time && (
+                        <motion.div
+                            key={stat.type}
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: DRAMATIC_DELAY + stat.delay }}
+                        >
+                            <p className="text-xs uppercase font-bold opacity-60 mb-1">{stat.label}</p>
+                            <p className="text-xl font-black">{stat.time}</p>
+                        </motion.div>
+                    ))}
                 </div>
             )}
         </SlideContainer>

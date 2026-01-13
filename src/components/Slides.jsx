@@ -106,7 +106,7 @@ export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
 
 export const PercentSlide = React.memo(function PercentSlide({ data, textColor }) {
     return (
-    <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Life in Motion</h2>
         <motion.div
             initial={{ scale: 0.5, opacity: 0 }}

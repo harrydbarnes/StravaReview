@@ -66,8 +66,12 @@ const CountUp = ({ value, label, delay = 0 }) => {
     );
 };
 
-export const SlideContainer = ({ children, textColor, className }) => (
-  <div className={clsx("w-full h-full flex flex-col px-6 pt-[calc(6rem+env(safe-area-inset-top))] pb-safe items-center justify-start text-center md:pt-32", className)}>
+export const SlideContainer = ({ children, textColor, className, smallPadding = false }) => (
+  <div className={clsx(
+      "w-full h-full flex flex-col px-6 pb-safe items-center justify-start text-center",
+      smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32",
+      className
+  )}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
         {children}
     </div>
@@ -1144,7 +1148,7 @@ export const VibeSlide = React.memo(function VibeSlide({ data, textColor, traits
     const titleText = count > 1 ? "Vibe Stack" : "Vibe Check";
 
     return (
-        <SlideContainer textColor={textColor} className="!pt-[calc(5rem+env(safe-area-inset-top))] !md:pt-24">
+        <SlideContainer textColor={textColor} smallPadding>
             <h2 className="mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
                 {data.year} {titleText}
             </h2>

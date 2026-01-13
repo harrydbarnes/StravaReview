@@ -1,74 +1,66 @@
 from playwright.sync_api import sync_playwright, expect
 import time
-import os
 
-def run(playwright):
-    browser = playwright.chromium.launch(headless=True)
-    context = browser.new_context(viewport={"width": 375, "height": 667})
-    page = context.new_page()
+def run():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(viewport={'width': 375, 'height': 812}) # Mobile viewport
+        page = context.new_page()
 
-    page.goto("http://localhost:5173/StravaReview/")
-    page.get_by_text("Try Demo Mode").click()
+        print("Navigating to app...")
+        page.goto("http://localhost:5173/StravaReview/")
 
-    # Wait for start
-    try:
-        page.get_by_text("LIFT THE CURTAIN").wait_for(timeout=10000)
-        # Click the start button overlay
-        # It's likely a button covering the screen or the "Start" button
-        if page.get_by_role("button", name="Start").is_visible():
-             page.get_by_role("button", name="Start").click()
-        else:
-             page.locator("body").click(position={"x": 187, "y": 333})
-    except:
-        pass
+        # Click Demo Mode
+        print("Clicking Demo Mode...")
+        page.get_by_role("button", name="Try Demo Mode").click()
 
-    print("Story started.")
+        # Wait for curtain
+        print("Waiting for curtain...")
+        page.wait_for_selector("text=LIFT THE CURTAIN", timeout=10000)
+        page.get_by_role("button", name="Start the Show").click()
 
-    hint_count = 0
+        # Wait for first slide
+        print("Waiting for first slide...")
+        page.wait_for_selector("text=Your Year", timeout=10000)
 
-    # Iterate through slides slowly
-    # We want to catch the first hint.
-    # We also want to reach the end.
+        # Helper to click next
+        def click_next():
+            # The click area is the right 75% of the screen.
+            # Since overlays are pointer-events-none, we click by coordinate or target the container.
+            # Mobile viewport 375x812. Click right side.
+            page.mouse.click(300, 400)
+            time.sleep(1) # Wait for transition
 
-    # Max slides is about 15.
-    for i in range(20):
-        print(f"Checking slide {i}...")
+        # Iterate and capture
+        slides_to_capture = {
+            "IntroSlide": "Your Year",
+            "NewActivitySlide": "You Tried Something New",
+            "VibeSlide": "Vibe " # catch Vibe Check or Vibe Stack
+        }
 
-        # Wait for potential hint appearance (DRAMATIC_DELAY is 3s, +1s for hint = 4s)
-        # We don't want to wait 4s for EVERY slide if we are impatient, but for verification we must be sure.
-        # But we can check if text appears.
+        captured = set()
+        max_slides = 20
 
-        try:
-            # Check for any variation of the hint text
-            # "(Click twice to open!)" or "(Click twice to open activity!)"
-            hint = page.locator("text=Click twice to open").first
-            if hint.is_visible(timeout=5000): # Wait up to 5s for hint
-                print(f"Hint found on slide {i}!")
-                hint_count += 1
-                if hint_count == 1:
-                     page.screenshot(path=os.path.join("verification", "hint_visible.png"))
-            else:
-                print("No hint on this slide.")
-        except:
-             print("No hint (timeout).")
+        for i in range(max_slides):
+            # Check current slide content
+            content = page.content()
 
-        # Check if we are at Summary
-        if page.get_by_text("STRAVA").is_visible() and page.get_by_text("WRAPPED").is_visible() and page.get_by_text("Grand Total").is_visible():
-            print("Reached Summary Slide!")
-            break
+            for name, text in slides_to_capture.items():
+                if name not in captured and text in content:
+                    # Wait for animation to settle roughly
+                    time.sleep(2)
+                    print(f"Capturing {name}...")
+                    page.screenshot(path=f"/home/jules/verification/{name}.png")
+                    captured.add(name)
 
-        # Move to next slide
-        # Tap right edge
-        page.get_by_test_id("click-next").click(force=True)
-        page.wait_for_timeout(1000)
+            if len(captured) == len(slides_to_capture):
+                break
 
-    print(f"Total hints detected: {hint_count}")
+            print(f"Clicking next ({i})...")
+            click_next()
 
-    # Wait for Summary numbers to count up
-    page.wait_for_timeout(3000)
-    page.screenshot(path=os.path.join("verification", "summary_slide.png"))
+        print("Done.")
+        browser.close()
 
-    browser.close()
-
-with sync_playwright() as playwright:
-    run(playwright)
+if __name__ == "__main__":
+    run()

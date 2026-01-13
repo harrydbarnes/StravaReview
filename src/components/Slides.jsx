@@ -283,7 +283,7 @@ export const ElevationSlide = React.memo(function ElevationSlide({ data, textCol
 
 export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
     return (
-    <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">The Fuel Tank</h2>
 
         <motion.div

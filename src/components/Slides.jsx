@@ -1106,8 +1106,8 @@ export const VibeSlide = React.memo(function VibeSlide({ data, textColor, traits
     const titleText = count > 1 ? "Vibe Stack" : "Vibe Check";
 
     return (
-        <SlideContainer textColor={textColor} className="pt-20 md:pt-6">
-            <h2 className="md:mt-8 mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
+        <SlideContainer textColor={textColor} className="pt-20 md:pt-14">
+            <h2 className="mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
                 {data.year} {titleText}
             </h2>
 

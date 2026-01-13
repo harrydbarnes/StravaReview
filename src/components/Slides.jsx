@@ -234,7 +234,7 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
 
 export const ElevationSlide = React.memo(function ElevationSlide({ data, textColor }) {
     return (
-    <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-20">The Climb</h2>
 
         <motion.div

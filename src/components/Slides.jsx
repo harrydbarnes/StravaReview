@@ -853,7 +853,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
             <div className={clsx("flex-1 w-full flex flex-col items-center justify-center", textColor)}>
                 <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl relative", theme.bg, textColor)}>
                     <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter">
-                        STRAVA <br/> <span className={theme.bg === 'bg-brand-orange' ? "text-[#4D9078]" : "text-brand-orange"}>WRAPPED</span>
+                        STRAVA <br/> <span className={theme.bg === 'bg-brand-orange' ? "text-[#7A03FC]" : "text-brand-orange"}>WRAPPED</span>
                     </h1>
                     <h2 className="text-2xl md:text-3xl font-bold mb-6 uppercase opacity-80">{data.year} Grand Total</h2>
 

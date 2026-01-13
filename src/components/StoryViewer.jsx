@@ -373,9 +373,9 @@ const StoryViewer = ({ slides, onClose }) => {
     const x = e.clientX - rect.left;
     const width = rect.width;
 
-    if (x < width / 3) handlePrev();
-    else if (x > 2 * width / 3) handleNext();
-    else togglePause();
+    if (x < width * 0.25) handlePrev();
+    else handleNext();
+    // Note: Pause is best handled by long-press, but simple tap is fine for now.
   };
 
   const CurrentSlideData = slides[currentIndex];

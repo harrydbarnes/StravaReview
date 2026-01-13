@@ -226,121 +226,119 @@ function App() {
       }
   };
 
-  if (!started) {
-      return (
-          <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-              {/* Background accent */}
-              <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none" />
-              
-              <div className="z-10 w-full max-w-md flex flex-col items-center text-center">
-                <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
-                    STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
-                </h1>
-                
-                <p className="text-gray-400 mb-8 text-lg">
-                    See your {targetYear} year in review. <br/> Connect your account to get started.
-                </p>
-
-                {error && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm text-left">
-                        <AlertCircle size={20} />
-                        {error}
-                    </div>
-                )}
-
-                {loading ? (
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-8 h-8 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
-                        <p className="text-sm font-medium animate-pulse">{loadingStatus}</p>
-                    </div>
-                ) : (
-                    <div className="w-full space-y-4">
-                        {needsCreds && (
-                            <div className="p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowHowTo(true)}
-                                            className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center gap-1"
-                                            aria-haspopup="dialog"
-                                            title="Get help with setup"
-                                        >
-                                            <HelpCircle size={14} /> Help!
-                                        </button>
-                                    </div>
-                                    <input 
-                                        id="client-id"
-                                        type="text" 
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        required
-                                        autoComplete="off"
-                                        value={clientId}
-                                        onChange={(e) => setClientId(e.target.value)}
-                                        placeholder="e.g., 12345"
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-orange transition-colors"
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <label htmlFor="client-secret" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client Secret</label>
-                                    <input 
-                                        id="client-secret"
-                                        type="password" 
-                                        required
-                                        autoComplete="off"
-                                        value={clientSecret}
-                                        onChange={(e) => setClientSecret(e.target.value)}
-                                        placeholder="e.g., a1b2c3..."
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-orange transition-colors"
-                                    />
-                                </div>
-                                <p className="text-xs text-gray-500">
-                                    Your credentials are stored locally and sent only to Strava.
-                                </p>
-                            </div>
-                        )}
-
-                        <button 
-                            onClick={handleConnect}
-                            className="w-full px-8 py-4 bg-brand-orange text-white text-xl font-bold rounded-xl hover:bg-brand-orange/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-brand-orange/20"
-                        >
-                            Connect with Strava
-                        </button>
-                        
-                        <button 
-                            onClick={handleDemo}
-                            className="w-full px-4 py-2 text-sm text-gray-500 hover:text-white transition-colors"
-                        >
-                            Try Demo Mode
-                        </button>
-                    </div>
-                )}
-              </div>
-              <Suspense fallback={null}>
-                  <HowToSetup isOpen={showHowTo} onClose={() => setShowHowTo(false)} />
-              </Suspense>
-          </div>
-      );
-  }
-
   // Reuse the loading spinner for Suspense fallback
   const LoadingFallback = () => (
-    <div className="h-screen w-full bg-black flex flex-col items-center justify-center gap-4">
+    <div className="h-full w-full bg-black flex flex-col items-center justify-center gap-4">
         <div className="w-8 h-8 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
         <p className="text-white text-sm font-medium animate-pulse">Loading experience...</p>
     </div>
   );
 
   return (
-    <div className="h-screen w-full bg-black overflow-hidden">
+    <div className="h-[100dvh] w-full bg-black overflow-hidden overscroll-none touch-none text-white relative">
+      {!started ? (
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Background accent */}
+            <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none" />
+
+            <div className="z-10 w-full max-w-md flex flex-col items-center text-center">
+            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
+                STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
+            </h1>
+
+            <p className="text-gray-400 mb-8 text-lg">
+                See your {targetYear} year in review. <br/> Connect your account to get started.
+            </p>
+
+            {error && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm text-left">
+                    <AlertCircle size={20} />
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-brand-orange border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm font-medium animate-pulse">{loadingStatus}</p>
+                </div>
+            ) : (
+                <div className="w-full space-y-4">
+                    {needsCreds && (
+                        <div className="p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm space-y-4 text-left">
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label htmlFor="client-id" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client ID</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHowTo(true)}
+                                        className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center gap-1"
+                                        aria-haspopup="dialog"
+                                        title="Get help with setup"
+                                    >
+                                        <HelpCircle size={14} /> Help!
+                                    </button>
+                                </div>
+                                <input
+                                    id="client-id"
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    required
+                                    autoComplete="off"
+                                    value={clientId}
+                                    onChange={(e) => setClientId(e.target.value)}
+                                    placeholder="e.g., 12345"
+                                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-orange transition-colors"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label htmlFor="client-secret" className="text-xs uppercase font-bold text-gray-500 tracking-wider">Client Secret</label>
+                                <input
+                                    id="client-secret"
+                                    type="password"
+                                    required
+                                    autoComplete="off"
+                                    value={clientSecret}
+                                    onChange={(e) => setClientSecret(e.target.value)}
+                                    placeholder="e.g., a1b2c3..."
+                                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-orange transition-colors"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                Your credentials are stored locally and sent only to Strava.
+                            </p>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={handleConnect}
+                        className="w-full px-8 py-4 bg-brand-orange text-white text-xl font-bold rounded-xl hover:bg-brand-orange/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-brand-orange/20"
+                    >
+                        Connect with Strava
+                    </button>
+
+                    <button
+                        onClick={handleDemo}
+                        className="w-full px-4 py-2 text-sm text-gray-500 hover:text-white transition-colors"
+                    >
+                        Try Demo Mode
+                    </button>
+                </div>
+            )}
+            </div>
+            <Suspense fallback={null}>
+                <HowToSetup isOpen={showHowTo} onClose={() => setShowHowTo(false)} />
+            </Suspense>
+        </div>
+      ) : (
         <Suspense fallback={<LoadingFallback />}>
             <StoryContainer
                 data={data}
                 onClose={() => setStarted(false)}
             />
         </Suspense>
+      )}
     </div>
   );
 }

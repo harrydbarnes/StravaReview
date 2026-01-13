@@ -74,6 +74,9 @@ export const SlideContainer = ({ children, textColor, className }) => (
   </div>
 );
 
+// Consistent Header Class
+const HeaderClass = "text-3xl md:text-4xl font-bold mb-8";
+
 export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   return (
     <SlideContainer textColor={textColor}>
@@ -104,20 +107,20 @@ export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   );
 });
 
-export const PercentSlide = React.memo(function PercentSlide({ data, textColor }) {
+export const PercentSlide = React.memo(function PercentSlide({ data, theme, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Life in Motion</h2>
+        <h2 className={HeaderClass}>Life in Motion</h2>
         <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: DRAMATIC_DELAY - 2 }}
             className="mb-8"
         >
-            <p className="text-6xl md:text-8xl font-black text-brand-orange mb-2">
+            <p className={clsx("text-6xl md:text-8xl font-black mb-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>
                 {data.percentTimeMoving.toFixed(1)}%
             </p>
-            <p className="text-xl font-bold">of your year spent moving</p>
+            <p className={clsx("text-xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>of your year spent moving</p>
         </motion.div>
 
         <motion.div
@@ -155,7 +158,7 @@ export const OlympicsSlide = React.memo(function OlympicsSlide({ data, textColor
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">LA 2028 Calling?</h2>
+            <h2 className={HeaderClass}>LA 2028 Calling?</h2>
 
             <div className="flex flex-col gap-6 w-full max-w-lg">
                 {displayStats.map((stat, idx) => (
@@ -191,7 +194,7 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">What Was This One, BTW?</h2>
+            <h2 className={HeaderClass}>What Was This One, BTW?</h2>
 
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
@@ -232,10 +235,10 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
     );
 });
 
-export const ElevationSlide = React.memo(function ElevationSlide({ data, textColor }) {
+export const ElevationSlide = React.memo(function ElevationSlide({ data, theme, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-20">The Climb</h2>
+        <h2 className={HeaderClass}>The Climb</h2>
 
         <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -264,7 +267,7 @@ export const ElevationSlide = React.memo(function ElevationSlide({ data, textCol
             transition={{ delay: DRAMATIC_DELAY }}
             className="text-xl font-bold max-w-md"
         >
-            That&apos;s equal to stacking Big Ben <span className="text-3xl text-brand-orange block my-2">{data.elevation.bigBenCount} times! 🕰️</span>
+            That&apos;s equal to stacking Big Ben <span className={clsx("text-3xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.elevation.bigBenCount} times! 🕰️</span>
         </motion.div>
 
         <motion.div
@@ -284,7 +287,7 @@ export const ElevationSlide = React.memo(function ElevationSlide({ data, textCol
 export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Fuel Tank</h2>
+        <h2 className={HeaderClass}>The Fuel Tank</h2>
 
         <motion.div
             initial={{ scale: 0, rotate: -180 }}
@@ -320,7 +323,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
 export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-12">The Consistent Cruiser</h2>
+        <h2 className={HeaderClass}>The Consistent Cruiser</h2>
 
         <div className="flex flex-col gap-8 w-full max-w-md">
             {data.averagePace.run && (
@@ -364,7 +367,7 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
 export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">The Need for Speed</h2>
+        <h2 className={HeaderClass}>The Need for Speed</h2>
 
         <motion.div
             animate={{ x: [-10, 10, -10] }}
@@ -403,7 +406,7 @@ export const SlowestSlide = React.memo(function SlowestSlide({ data, textColor }
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Slow and Steady Wins... a Race</h2>
+            <h2 className={HeaderClass}>Slow and Steady Wins... a Race</h2>
 
             <motion.div
                 initial={{ x: -100, opacity: 0 }}
@@ -445,7 +448,7 @@ export const SlowestSlide = React.memo(function SlowestSlide({ data, textColor }
     );
 });
 
-export const HeatmapSlide = React.memo(function HeatmapSlide({ data, textColor }) {
+export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, textColor }) {
     // Trim leading/trailing zeros
     const hourly = data.charts.hourly;
     const firstActive = hourly.findIndex(v => v > 0);
@@ -463,7 +466,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, textColor }
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Clockwatcher</h2>
+            <h2 className={HeaderClass}>Clockwatcher</h2>
 
             <div className="flex flex-col w-full max-w-md">
                 <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
@@ -499,7 +502,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, textColor }
                 className="mt-6"
             >
                 <p className="text-2xl font-bold">
-                    You are most active at <span className="text-4xl block my-2">{peakHour}:00</span>
+                    You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-[#FFD700]" : "")}>{peakHour}:00</span>
                 </p>
             </motion.div>
 
@@ -525,7 +528,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, textColor }
     );
 });
 
-export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data, textColor }) {
+export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data, theme, textColor }) {
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     const maxVal = Math.max(...data.charts.daily);
 
@@ -542,7 +545,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-12">The Weekly Grind</h2>
+            <h2 className={HeaderClass}>The Weekly Grind</h2>
 
             <div className="w-full max-w-md relative h-64 mb-8">
                  <div className="flex items-end h-full w-full px-4 gap-1">
@@ -561,6 +564,9 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
                              ? "absolute -top-8 left-1/2 -translate-x-1/2 opacity-100 text-xs font-bold bg-black text-white px-2 py-1 rounded"
                              : "absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded";
 
+                         // Text color handling for non-podium days in Orange theme
+                         const dayTextColorClass = (!isPodium && theme.bg === 'bg-brand-orange') ? "text-black" : "opacity-70";
+
                          return (
                              <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
                                  <motion.div
@@ -573,7 +579,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
                                          {val}
                                      </div>
                                  </motion.div>
-                                 <span className="font-bold opacity-70">{days[idx]}</span>
+                                 <span className={clsx("font-bold", dayTextColorClass)}>{days[idx]}</span>
                              </div>
                          );
                      })}
@@ -598,7 +604,7 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">The Social Butterfly</h2>
+            <h2 className={HeaderClass}>The Social Butterfly</h2>
 
             <motion.div
                 initial={{ scale: 0, rotate: -45 }}
@@ -625,7 +631,7 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
 export const NewActivitySlide = React.memo(function NewActivitySlide({ data, textColor }) {
   return (
       <SlideContainer textColor={textColor}>
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">You Tried Something New</h2>
+          <h2 className={HeaderClass}>You Tried Something New</h2>
           <motion.div
             initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
             animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -670,7 +676,7 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Favourite Playground</h2>
+            <h2 className={HeaderClass}>Your Favourite Playground</h2>
             <motion.div
                 className="text-8xl md:text-9xl mb-4"
                 initial={{ scale: 0, rotate: -180, opacity: 0 }}
@@ -765,7 +771,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Peak Performance Months</h2>
+            <h2 className={HeaderClass}>Peak Performance Months</h2>
 
             <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
                 {data.monthlyStats.map((stat, idx) => {
@@ -865,13 +871,13 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
                     </div>
 
                     {vibeArray.length > 0 && traits && (
-                        <div className="flex flex-col items-center gap-1 opacity-80 mb-4">
+                        <div className="flex flex-col items-center gap-2 opacity-80 mb-4 w-full">
                             {vibeArray.map(vibe => {
                                 const trait = traits[vibe] || traits[DEFAULT_VIBE];
                                 return (
-                                    <div key={vibe} className="flex items-center gap-2">
-                                        <span className="text-2xl">{trait.icon}</span>
-                                        <span className="text-lg font-bold uppercase tracking-widest">{vibe}</span>
+                                    <div key={vibe} className="flex items-center justify-center gap-2 w-full">
+                                        <span className="text-2xl shrink-0">{trait.icon}</span>
+                                        <span className="text-lg font-bold uppercase tracking-widest truncate">{vibe}</span>
                                     </div>
                                 );
                             })}
@@ -914,7 +920,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
 export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Your Top Sports</h2>
+        <h2 className={HeaderClass}>Your Top Sports</h2>
         <div className="w-full max-w-md space-y-4">
             {data.topSports.map((sport, idx) => (
                 <motion.div
@@ -940,10 +946,10 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
 });
 
 // 2. FUN STATS (Time Comparison) SLIDE
-export const FunStatsSlide = React.memo(function FunStatsSlide({ data, textColor }) {
+export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, textColor }) {
     return (
       <SlideContainer textColor={textColor}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Time Well Spent</h2>
+        <h2 className={HeaderClass}>Time Well Spent</h2>
 
         <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
             <motion.div
@@ -958,7 +964,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, textColor
                     <p className="text-lg font-medium">
                         That&apos;s like listening to <br/>
                         <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
-                        <span className="text-4xl font-bold text-brand-orange">{data.funComparisons.song.count}</span> times! 💃
+                        <span className={clsx("text-4xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.funComparisons.song.count}</span> times! 💃
                     </p>
                 </div>
             </motion.div>
@@ -999,7 +1005,7 @@ export const SpotlightSlide = React.memo(function SpotlightSlide({ data, textCol
                 </div>
             </motion.div>
 
-            <h2 className="text-3xl font-bold mb-8 opacity-80">The Crowd Went Wild</h2>
+            <h2 className={HeaderClass}>The Crowd Went Wild</h2>
 
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
@@ -1073,18 +1079,17 @@ const SingleVibeCard = ({ vibeKey, traits, delay, size = "medium" }) => {
             >
                 {vibeKey}
             </motion.h3>
-            {size !== "small" && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: delay + 0.4 }}
-                    className="bg-white/10 backdrop-blur-md p-4 rounded-xl max-w-xs mt-2"
-                >
-                    <p className="text-sm md:text-base font-medium leading-relaxed">
-                        &quot;{trait.description}&quot;
-                    </p>
-                </motion.div>
-            )}
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: delay + 0.4 }}
+                className="bg-white/10 backdrop-blur-md p-4 rounded-xl max-w-xs mt-2"
+            >
+                <p className="text-sm md:text-base font-medium leading-relaxed">
+                    &quot;{trait.description}&quot;
+                </p>
+            </motion.div>
         </div>
     );
 };

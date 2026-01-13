@@ -1,0 +1,29 @@
+Verified PercentSlide text color
+Verified ElevationSlide text color
+Test failed: Locator expected to have CSS 'rgb(255, 215, 0)'
+Actual value: <element(s) not found>
+Call log:
+  - Expect "to_have_css" with timeout 5000ms
+  - waiting for locator("p:has-text('You are most active at') span")
+
+Traceback (most recent call last):
+  File "/app/verification/verify_orange_details.py", line 134, in <module>
+    raise e
+  File "/app/verification/verify_orange_details.py", line 130, in <module>
+    test_orange_theme_details(page)
+  File "/app/verification/verify_orange_details.py", line 60, in test_orange_theme_details
+    expect(peak_time_el).to_have_css("color", "rgb(255, 215, 0)")
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 19607, in to_have_css
+    self._sync(
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 404, in to_have_css
+    await self._expect_impl(
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 83, in _expect_impl
+    raise AssertionError(
+AssertionError: Locator expected to have CSS 'rgb(255, 215, 0)'
+Actual value: <element(s) not found>
+Call log:
+  - Expect "to_have_css" with timeout 5000ms
+  - waiting for locator("p:has-text('You are most active at') span")

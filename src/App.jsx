@@ -42,9 +42,30 @@ function App() {
     };
   }, []);
 
+  const fadeOutEntrySound = () => {
+    const audio = entryAudioRef.current;
+    if (audio) {
+        const fadeDuration = 1000; // 1 second
+        const interval = 50; // Update every 50ms
+        const steps = fadeDuration / interval;
+        const volStep = audio.volume / steps;
+
+        const fadeInterval = setInterval(() => {
+            if (audio.volume > volStep) {
+                audio.volume -= volStep;
+            } else {
+                audio.volume = 0;
+                audio.pause();
+                clearInterval(fadeInterval);
+            }
+        }, interval);
+    }
+  };
+
   const playEntrySound = () => {
     if (entryAudioRef.current) {
         try {
+            entryAudioRef.current.volume = 0.5;
             entryAudioRef.current.currentTime = 0;
             entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
         } catch(e) {
@@ -109,6 +130,7 @@ function App() {
                     result.athlete = athlete;
 
                     setData(result);
+                    fadeOutEntrySound();
                     setStarted(true); // Auto start if we have data from redirect
                 } else {
                     setError(`No activities found for ${targetYear}. Go record some activities!`);
@@ -174,6 +196,7 @@ function App() {
             };
 
             setData(result);
+            fadeOutEntrySound();
             setStarted(true);
         } else {
             setError("Failed to generate demo data.");

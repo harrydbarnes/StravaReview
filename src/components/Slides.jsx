@@ -907,7 +907,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
 // 1. TOP SPORTS SLIDE
 export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textColor }) {
     return (
-    <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor}>
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Your Top Sports</h2>
         <div className="w-full max-w-md space-y-4">
             {data.topSports.map((sport, idx) => (

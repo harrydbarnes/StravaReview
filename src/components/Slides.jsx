@@ -802,8 +802,6 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
 
     // Support array or string for backward compatibility
     const vibeArray = Array.isArray(data.vibe) ? data.vibe : [data.vibe];
-    const mainVibe = vibeArray[0];
-    const vibeData = traits ? (traits[mainVibe] || traits[DEFAULT_VIBE]) : null;
 
     const handleShare = async () => {
         if (!ref.current || isSharing) return;
@@ -854,40 +852,35 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
         <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-between text-center")}>
             <div className={clsx("flex-1 w-full flex flex-col items-center justify-center", textColor)}>
                 <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl relative", theme.bg, textColor)}>
-                    <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
-                        STRAVA <br/> <span className="text-brand-orange">WRAPPED</span>
+                    <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter">
+                        STRAVA <br/> <span className={theme.bg === 'bg-brand-orange' ? "text-brand-purple" : "text-brand-orange"}>WRAPPED</span>
                     </h1>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-8 uppercase opacity-80">{data.year} Grand Total</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-6 uppercase opacity-80">{data.year} Grand Total</h2>
 
-                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg mb-4">
+                    <div className="grid grid-cols-2 gap-6 w-full max-w-lg mb-4">
                         <CountUp value={data.totalActivities} label="Activities" delay={0.5} />
                         <CountUp value={data.totalHours} label="Hours" delay={1.0} />
                         <CountUp value={data.totalDistance} label="Km" delay={1.5} />
                         <CountUp value={data.totalCalories} label="Cals" delay={2.0} />
                     </div>
 
-                    {vibeData && (
-                        <div className="flex flex-col items-center gap-2 opacity-80 mb-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-2xl">{vibeData.icon}</span>
-                                <span className="text-lg font-bold uppercase tracking-widest">{mainVibe}</span>
-                            </div>
-                            {/* Show extra icons if they exist */}
-                            {vibeArray.length > 1 && (
-                                <div className="flex gap-3 mt-1 p-2 bg-white/10 rounded-full">
-                                    {vibeArray.slice(1).map(v => (
-                                        <span key={v} title={v} className="text-lg">
-                                            {traits[v]?.icon}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
+                    {vibeArray.length > 0 && traits && (
+                        <div className="flex flex-col items-center gap-1 opacity-80 mb-4">
+                            {vibeArray.map(vibe => {
+                                const trait = traits[vibe] || traits[DEFAULT_VIBE];
+                                return (
+                                    <div key={vibe} className="flex items-center gap-2">
+                                        <span className="text-2xl">{trait.icon}</span>
+                                        <span className="text-lg font-bold uppercase tracking-widest">{vibe}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 
                     {/* Username Addition */}
                     {data.athlete && (
-                        <div className="absolute bottom-12 left-0 right-0 opacity-60 text-sm font-bold uppercase tracking-widest">
+                        <div className="mt-4 opacity-60 text-sm font-bold uppercase tracking-widest">
                             {data.athlete.username || `${data.athlete.firstname} ${data.athlete.lastname}`.trim()}
                         </div>
                     )}

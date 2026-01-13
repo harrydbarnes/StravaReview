@@ -67,8 +67,8 @@ const CountUp = ({ value, label, delay = 0 }) => {
 };
 
 export const SlideContainer = ({ children, textColor, className }) => (
-  <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-center text-center", className)}>
-    <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-center relative")}>
+  <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-start text-center pt-8 md:pt-12", className)}>
+    <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
         {children}
     </div>
   </div>
@@ -80,29 +80,31 @@ const HeaderClass = "text-3xl md:text-4xl font-bold mb-8";
 export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   return (
     <SlideContainer textColor={textColor}>
-        <motion.h1
-        initial={{ y: 20, opacity: 0 }} 
-        animate={{ y: 0, opacity: 1 }} 
-        className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"
-        >
-        Your Year <br/> in Activity
-        </motion.h1>
-        <motion.p
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: INTRO_DELAY }}
-            className="text-xl font-bold"
-        >
-            {data.year}
-        </motion.p>
-        <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-            transition={{ delay: INTRO_DELAY + 0.4 }}
-            className="mt-8 text-6xl md:text-8xl"
-        >
-            🔥
-        </motion.div>
+            className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"
+            >
+            Your Year <br/> in Activity
+            </motion.h1>
+            <motion.p
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: INTRO_DELAY }}
+                className="text-xl font-bold"
+            >
+                {data.year}
+            </motion.p>
+            <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                transition={{ delay: INTRO_DELAY + 0.4 }}
+                className="mt-8 text-6xl md:text-8xl"
+            >
+                🔥
+            </motion.div>
+        </div>
     </SlideContainer>
   );
 });
@@ -111,29 +113,31 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY - 2 }}
-            className="mb-8"
-        >
-            <p className={clsx("text-6xl md:text-8xl font-black mb-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>
-                {data.percentTimeMoving.toFixed(1)}%
-            </p>
-            <p className={clsx("text-xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>of your year spent moving</p>
-        </motion.div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY - 2 }}
+                className="mb-8"
+            >
+                <p className={clsx("text-6xl md:text-8xl font-black mb-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>
+                    {data.percentTimeMoving.toFixed(1)}%
+                </p>
+                <p className={clsx("text-xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>of your year spent moving</p>
+            </motion.div>
 
-        <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY }}
-            className="max-w-md bg-white/10 p-6 rounded-xl backdrop-blur-sm"
-        >
-            <p className="mb-4 text-lg">For comparison, you spent about <span className="font-bold">29%</span> of your year sleeping.</p>
-            <p className="text-xl font-bold italic opacity-90">
-                &quot;You were definitely awake for the fun parts.&quot;
-            </p>
-        </motion.div>
+            <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="max-w-md bg-white/10 p-6 rounded-xl backdrop-blur-sm"
+            >
+                <p className="mb-4 text-lg">For comparison, you spent about <span className="font-bold">29%</span> of your year sleeping.</p>
+                <p className="text-xl font-bold italic opacity-90">
+                    &quot;You were definitely awake for the fun parts.&quot;
+                </p>
+            </motion.div>
+        </div>
     </SlideContainer>
     );
 });
@@ -160,31 +164,33 @@ export const OlympicsSlide = React.memo(function OlympicsSlide({ data, textColor
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>LA 2028 Calling?</h2>
 
-            <div className="flex flex-col gap-6 w-full max-w-lg">
-                {displayStats.map((stat, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: DRAMATIC_DELAY + (idx * 0.4) }}
-                        className="flex items-center gap-6 p-4 bg-white/5 rounded-xl backdrop-blur-sm"
-                    >
-                        <span className="text-5xl">{stat.emoji}</span>
-                        <span className="text-xl font-bold text-left">{stat.text}</span>
-                    </motion.div>
-                ))}
-            </div>
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <div className="flex flex-col gap-6 w-full max-w-lg">
+                    {displayStats.map((stat, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ x: -50, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: DRAMATIC_DELAY + (idx * 0.4) }}
+                            className="flex items-center gap-6 p-4 bg-white/5 rounded-xl backdrop-blur-sm"
+                        >
+                            <span className="text-5xl">{stat.emoji}</span>
+                            <span className="text-xl font-bold text-left">{stat.text}</span>
+                        </motion.div>
+                    ))}
+                </div>
 
-            <motion.div
-                 initial={{ scale: 0.9, opacity: 0 }}
-                 animate={{ scale: 1, opacity: 1 }}
-                 transition={{ delay: DRAMATIC_DELAY + 2.0 }}
-                 className="mt-8 bg-current/10 p-6 rounded-xl max-w-md"
-            >
-                <p className="font-bold italic">
-                    &quot;But you wouldn&apos;t have broken any World Records. Sorry. Try again in 2028. 🥇&quot;
-                </p>
-            </motion.div>
+                <motion.div
+                     initial={{ scale: 0.9, opacity: 0 }}
+                     animate={{ scale: 1, opacity: 1 }}
+                     transition={{ delay: DRAMATIC_DELAY + 2.0 }}
+                     className="mt-8 bg-current/10 p-6 rounded-xl max-w-md"
+                >
+                    <p className="font-bold italic">
+                        &quot;But you wouldn&apos;t have broken any World Records. Sorry. Try again in 2028. 🥇&quot;
+                    </p>
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -196,41 +202,43 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>What Was This One, BTW?</h2>
 
-            <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY - 1.5 }}
-                className="p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5 relative"
-            >
-                <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
-                <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
-            </motion.div>
-
-            {data.shortestActivity.id && (
-                <motion.a
-                    href={`https://www.strava.com/activities/${data.shortestActivity.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: DRAMATIC_DELAY }}
-                    className="mb-8 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY - 1.5 }}
+                    className="p-8 border-4 border-current rounded-full w-64 h-64 flex flex-col items-center justify-center mb-8 bg-white/5 relative"
                 >
-                    View on Strava
-                </motion.a>
-            )}
+                    <p className="text-4xl font-black">{data.shortestActivity.distanceKm} km</p>
+                    <p className="text-sm font-bold uppercase mt-2 max-w-[150px] truncate">{data.shortestActivity.type}</p>
+                </motion.div>
 
-            <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-            >
-                <p className="text-xl font-bold mb-2">
-                     &quot;{data.shortestActivity.name}&quot;
-                </p>
-                <p className="opacity-80 italic">Short, sweet, and complete. Every step counts!</p>
-            </motion.div>
+                {data.shortestActivity.id && (
+                    <motion.a
+                        href={`https://www.strava.com/activities/${data.shortestActivity.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: DRAMATIC_DELAY }}
+                        className="mb-8 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                    >
+                        View on Strava
+                    </motion.a>
+                )}
+
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                >
+                    <p className="text-xl font-bold mb-2">
+                         &quot;{data.shortestActivity.name}&quot;
+                    </p>
+                    <p className="opacity-80 italic">Short, sweet, and complete. Every step counts!</p>
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -240,46 +248,48 @@ export const ElevationSlide = React.memo(function ElevationSlide({ data, theme, 
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Climb</h2>
 
-        <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="flex items-end justify-center gap-1 mb-8"
-        >
-            <div className="w-8 h-16 bg-current opacity-20 rounded-t-lg"></div>
-            <div className="w-12 h-24 bg-current opacity-40 rounded-t-lg"></div>
-            <div className="w-16 h-40 bg-current opacity-60 rounded-t-lg"></div>
-            <div className="w-20 h-64 bg-current rounded-t-lg relative flex flex-col items-center justify-end">
-                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 2 }}
-                    className="absolute -top-16 left-1/2 -translate-x-1/2 font-black text-2xl whitespace-nowrap z-10"
-                 >
-                     {data.elevation.total}m
-                 </motion.div>
-            </div>
-        </motion.div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="flex items-end justify-center gap-1 mb-8"
+            >
+                <div className="w-8 h-16 bg-current opacity-20 rounded-t-lg"></div>
+                <div className="w-12 h-24 bg-current opacity-40 rounded-t-lg"></div>
+                <div className="w-16 h-40 bg-current opacity-60 rounded-t-lg"></div>
+                <div className="w-20 h-64 bg-current rounded-t-lg relative flex flex-col items-center justify-end">
+                     <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 2 }}
+                        className="absolute -top-16 left-1/2 -translate-x-1/2 font-black text-2xl whitespace-nowrap z-10"
+                     >
+                         {data.elevation.total}m
+                     </motion.div>
+                </div>
+            </motion.div>
 
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY }}
-            className="text-xl font-bold max-w-md"
-        >
-            That&apos;s equal to stacking Big Ben <span className={clsx("text-3xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.elevation.bigBenCount} times! 🕰️</span>
-        </motion.div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="text-xl font-bold max-w-md"
+            >
+                That&apos;s equal to stacking Big Ben <span className={clsx("text-3xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.elevation.bigBenCount} times! 🕰️</span>
+            </motion.div>
 
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: DRAMATIC_DELAY + 0.8 }}
-            className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mt-8"
-        >
-            <p className="text-lg md:text-xl font-medium leading-relaxed">
-                &quot;There&apos;s always gonna be another mountain....&quot;
-            </p>
-        </motion.div>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: DRAMATIC_DELAY + 0.8 }}
+                className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mt-8"
+            >
+                <p className="text-lg md:text-xl font-medium leading-relaxed">
+                    &quot;There&apos;s always gonna be another mountain....&quot;
+                </p>
+            </motion.div>
+        </div>
     </SlideContainer>
     );
 });
@@ -289,32 +299,34 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Fuel Tank</h2>
 
-        <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", duration: 1.5, delay: 0.5 }}
-            className="text-[8rem] mb-8"
-        >
-            🍕
-        </motion.div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", duration: 1.5, delay: 0.5 }}
+                className="text-[8rem] mb-8"
+            >
+                🍕
+            </motion.div>
 
-        <div className="flex flex-col gap-4 text-xl font-bold">
-            <motion.p
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-            >
-                Burned <span className="text-3xl font-black">{data.totalCalories.toLocaleString()}</span> Calories
-            </motion.p>
-             <motion.p
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY + 1 }}
-                className="opacity-90"
-            >
-                You earned <span className="text-2xl font-black text-brand-orange">{data.food.pizza}</span> Slices of Pizza! <br/>
-                <span className="text-sm font-normal opacity-70">(Zero guilt attached)</span>
-            </motion.p>
+            <div className="flex flex-col gap-4 text-xl font-bold">
+                <motion.p
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                >
+                    Burned <span className="text-3xl font-black">{data.totalCalories.toLocaleString()}</span> Calories
+                </motion.p>
+                 <motion.p
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY + 1 }}
+                    className="opacity-90"
+                >
+                    You earned <span className="text-2xl font-black text-brand-orange">{data.food.pizza}</span> Slices of Pizza! <br/>
+                    <span className="text-sm font-normal opacity-70">(Zero guilt attached)</span>
+                </motion.p>
+            </div>
         </div>
     </SlideContainer>
     );
@@ -325,40 +337,42 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Consistent Cruiser</h2>
 
-        <div className="flex flex-col gap-8 w-full max-w-md">
-            {data.averagePace.run && (
-                <motion.div
-                    initial={{ x: -50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: DRAMATIC_DELAY - 1.5 }}
-                    className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
-                >
-                    <div className="text-left">
-                        <p className="text-sm font-bold uppercase opacity-70">Avg Run Pace</p>
-                        <p className="text-4xl font-black">{data.averagePace.run}</p>
-                    </div>
-                    <span className="text-4xl">🏃</span>
-                </motion.div>
-            )}
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex flex-col gap-8 w-full max-w-md">
+                {data.averagePace.run && (
+                    <motion.div
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: DRAMATIC_DELAY - 1.5 }}
+                        className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
+                    >
+                        <div className="text-left">
+                            <p className="text-sm font-bold uppercase opacity-70">Avg Run Pace</p>
+                            <p className="text-4xl font-black">{data.averagePace.run}</p>
+                        </div>
+                        <span className="text-4xl">🏃</span>
+                    </motion.div>
+                )}
 
-             {data.averagePace.ride && (
-                <motion.div
-                    initial={{ x: 50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: DRAMATIC_DELAY - 0.5 }}
-                    className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
-                >
-                    <div className="text-left">
-                        <p className="text-sm font-bold uppercase opacity-70">Avg Ride Speed</p>
-                        <p className="text-4xl font-black">{data.averagePace.ride}</p>
-                    </div>
-                    <span className="text-4xl">🚴</span>
-                </motion.div>
-            )}
+                 {data.averagePace.ride && (
+                    <motion.div
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: DRAMATIC_DELAY - 0.5 }}
+                        className="flex items-center justify-between p-6 border-2 border-current rounded-xl"
+                    >
+                        <div className="text-left">
+                            <p className="text-sm font-bold uppercase opacity-70">Avg Ride Speed</p>
+                            <p className="text-4xl font-black">{data.averagePace.ride}</p>
+                        </div>
+                        <span className="text-4xl">🚴</span>
+                    </motion.div>
+                )}
 
-            {!data.averagePace.run && !data.averagePace.ride && (
-                 <p className="text-xl">Just cruising at your own speed.</p>
-            )}
+                {!data.averagePace.run && !data.averagePace.ride && (
+                     <p className="text-xl">Just cruising at your own speed.</p>
+                )}
+            </div>
         </div>
     </SlideContainer>
     );
@@ -369,34 +383,36 @@ export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Need for Speed</h2>
 
-        <motion.div
-            animate={{ x: [-10, 10, -10] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-            className="text-8xl mb-8"
-        >
-            🦖
-        </motion.div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <motion.div
+                animate={{ x: [-10, 10, -10] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                className="text-8xl mb-8"
+            >
+                🦖
+            </motion.div>
 
-        <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY - 1 }}
-            className="mb-8"
-        >
-            <p className="text-sm uppercase font-bold opacity-70 mb-2">Top Speed Reached</p>
-            <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">mph</span></p>
-        </motion.div>
+            <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY - 1 }}
+                className="mb-8"
+            >
+                <p className="text-sm uppercase font-bold opacity-70 mb-2">Top Speed Reached</p>
+                <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">mph</span></p>
+            </motion.div>
 
-        <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY }}
-            className="text-lg max-w-sm"
-        >
-            {data.speed.max > T_REX_SPEED_MPH
-                ? `Faster than a T-Rex (${T_REX_SPEED_MPH}mph). You'd survive Jurassic Park!`
-                : `A T-Rex (${T_REX_SPEED_MPH}mph) might catch you. Run faster next year!`}
-        </motion.p>
+            <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY }}
+                className="text-lg max-w-sm"
+            >
+                {data.speed.max > T_REX_SPEED_MPH
+                    ? `Faster than a T-Rex (${T_REX_SPEED_MPH}mph). You'd survive Jurassic Park!`
+                    : `A T-Rex (${T_REX_SPEED_MPH}mph) might catch you. Run faster next year!`}
+            </motion.p>
+        </div>
     </SlideContainer>
     );
 });
@@ -408,42 +424,44 @@ export const SlowestSlide = React.memo(function SlowestSlide({ data, textColor }
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Slow and Steady Wins... a Race</h2>
 
-            <motion.div
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 3, ease: "linear" }}
-                className="text-8xl mb-8"
-            >
-                🐌
-            </motion.div>
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <motion.div
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 3, ease: "linear" }}
+                    className="text-8xl mb-8"
+                >
+                    🐌
+                </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-                className="bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md relative"
-            >
-                <p className="text-xl font-bold mb-4 line-clamp-2">&quot;{data.speed.slowestActivity.name}&quot;</p>
-                <p className="opacity-90">
-                    Was <span className="font-black text-brand-orange">{data.speed.diffPercent}%</span> slower than your fastest.
-                </p>
-                <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="bg-white/10 p-6 rounded-xl backdrop-blur-sm max-w-md relative"
+                >
+                    <p className="text-xl font-bold mb-4 line-clamp-2">&quot;{data.speed.slowestActivity.name}&quot;</p>
+                    <p className="opacity-90">
+                        Was <span className="font-black text-brand-orange">{data.speed.diffPercent}%</span> slower than your fastest.
+                    </p>
+                    <p className="mt-4 text-sm font-bold uppercase tracking-widest opacity-60">Taking in the scenery?</p>
 
-                {data.speed.slowestActivity.id && (
-                    <motion.a
-                        href={`https://www.strava.com/activities/${data.speed.slowestActivity.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 }}
-                        className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
-                    >
-                        View on Strava
-                    </motion.a>
-                )}
-            </motion.div>
+                    {data.speed.slowestActivity.id && (
+                        <motion.a
+                            href={`https://www.strava.com/activities/${data.speed.slowestActivity.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                        >
+                            View on Strava
+                        </motion.a>
+                    )}
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -468,62 +486,64 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Clockwatcher</h2>
 
-            <div className="flex flex-col w-full max-w-md">
-                <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
-                    {displayData.map((val, idx) => {
-                        const actualHour = startIdx + idx;
-                        return (
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <div className="flex flex-col w-full max-w-md">
+                    <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
+                        {displayData.map((val, idx) => {
+                            const actualHour = startIdx + idx;
+                            return (
+                                <motion.div
+                                    key={actualHour}
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${maxVal > 0 ? (val / maxVal) * 100 : 0}%` }}
+                                    transition={{ delay: idx * 0.05 + 0.5 }}
+                                    className={clsx("flex-1 rounded-t-sm min-h-[4px]", actualHour === peakHour ? (theme.bg === 'bg-brand-orange' ? "bg-brand-gold" : "bg-brand-orange") : "bg-current opacity-50")}
+                                />
+                            );
+                        })}
+                    </div>
+
+                    {/* X-Axis Legend */}
+                    <div className="flex justify-between text-xs font-bold opacity-60 px-1">
+                        <span>{startIdx}:00</span>
+                        {/* Show midpoint if range is wide enough */}
+                        {endIdx - startIdx > 6 && (
+                            <span>{Math.floor((startIdx + endIdx) / 2)}:00</span>
+                        )}
+                        <span>{endIdx}:00</span>
+                    </div>
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="mt-6"
+                >
+                    <p className="text-2xl font-bold">
+                        You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>{peakHour}:00</span>
+                    </p>
+                </motion.div>
+
+                {data.clockwatcher && (data.clockwatcher.earliest || data.clockwatcher.latest) && (
+                    <div className="mt-8 flex justify-around w-full max-w-md">
+                        {[
+                            { type: 'earliest', label: 'Earliest', time: data.clockwatcher.earliest, delay: 1.0 },
+                            { type: 'latest', label: 'Latest', time: data.clockwatcher.latest, delay: 1.5 },
+                        ].map((stat) => stat.time && (
                             <motion.div
-                                key={actualHour}
-                                initial={{ height: 0 }}
-                                animate={{ height: `${maxVal > 0 ? (val / maxVal) * 100 : 0}%` }}
-                                transition={{ delay: idx * 0.05 + 0.5 }}
-                                className={clsx("flex-1 rounded-t-sm min-h-[4px]", actualHour === peakHour ? "bg-brand-orange" : "bg-current opacity-50")}
-                            />
-                        );
-                    })}
-                </div>
-
-                {/* X-Axis Legend */}
-                <div className="flex justify-between text-xs font-bold opacity-60 px-1">
-                    <span>{startIdx}:00</span>
-                    {/* Show midpoint if range is wide enough */}
-                    {endIdx - startIdx > 6 && (
-                        <span>{Math.floor((startIdx + endIdx) / 2)}:00</span>
-                    )}
-                    <span>{endIdx}:00</span>
-                </div>
+                                key={stat.type}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: DRAMATIC_DELAY + stat.delay }}
+                            >
+                                <p className="text-xs uppercase font-bold opacity-60 mb-1">{stat.label}</p>
+                                <p className="text-xl font-black">{stat.time}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
-
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-                className="mt-6"
-            >
-                <p className="text-2xl font-bold">
-                    You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-brand-gold" : "")}>{peakHour}:00</span>
-                </p>
-            </motion.div>
-
-            {data.clockwatcher && (data.clockwatcher.earliest || data.clockwatcher.latest) && (
-                <div className="mt-8 flex justify-around w-full max-w-md">
-                    {[
-                        { type: 'earliest', label: 'Earliest', time: data.clockwatcher.earliest, delay: 1.0 },
-                        { type: 'latest', label: 'Latest', time: data.clockwatcher.latest, delay: 1.5 },
-                    ].map((stat) => stat.time && (
-                        <motion.div
-                            key={stat.type}
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: DRAMATIC_DELAY + stat.delay }}
-                        >
-                            <p className="text-xs uppercase font-bold opacity-60 mb-1">{stat.label}</p>
-                            <p className="text-xl font-black">{stat.time}</p>
-                        </motion.div>
-                    ))}
-                </div>
-            )}
         </SlideContainer>
     );
 });
@@ -547,53 +567,55 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>The Weekly Grind</h2>
 
-            <div className="w-full max-w-md relative h-64 mb-8">
-                 <div className="flex items-end h-full w-full px-4 gap-1">
-                     {data.charts.daily.map((val, idx) => {
-                         const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <div className="w-full max-w-md relative h-64 mb-8">
+                     <div className="flex items-end h-full w-full px-4 gap-1">
+                         {data.charts.daily.map((val, idx) => {
+                             const heightPercent = maxVal > 0 ? (val / maxVal) * 80 : 0;
 
-                         // Determine color based on rank
-                         const podiumColors = { 0: 'bg-[#FFD700]', 1: 'bg-[#C0C0C0]', 2: 'bg-[#CD7F32]' };
-                         const rank = rankMap[idx];
-                         const barColor = podiumColors[rank] ?? "bg-brand-orange";
+                             // Determine color based on rank
+                             const podiumColors = { 0: 'bg-[#FFD700]', 1: 'bg-[#C0C0C0]', 2: 'bg-[#CD7F32]' };
+                             const rank = rankMap[idx];
+                             const barColor = podiumColors[rank] ?? (theme.bg === 'bg-brand-orange' ? "bg-black" : "bg-brand-orange");
 
-                         // Fix mobile hover states: Top 3 always visible (rank 0, 1, 2)
-                         // Others show on hover
-                         const isPodium = rank !== undefined; // rank is 0,1,2
-                         const tooltipClass = isPodium
-                             ? "absolute -top-8 left-1/2 -translate-x-1/2 opacity-100 text-xs font-bold bg-black text-white px-2 py-1 rounded"
-                             : "absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded";
+                             // Fix mobile hover states: Top 3 always visible (rank 0, 1, 2)
+                             // Others show on hover
+                             const isPodium = rank !== undefined; // rank is 0,1,2
+                             const tooltipClass = isPodium
+                                 ? "absolute -top-8 left-1/2 -translate-x-1/2 opacity-100 text-xs font-bold bg-black text-white px-2 py-1 rounded"
+                                 : "absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold bg-black text-white px-2 py-1 rounded";
 
-                         // Text color handling for non-podium days in Orange theme
-                         const dayTextColorClass = (!isPodium && theme.bg === 'bg-brand-orange') ? "text-black" : "opacity-70";
+                             // Text color handling for non-podium days
+                             const dayTextColorClass = (!isPodium) ? "opacity-70" : "";
 
-                         return (
-                             <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
-                                 <motion.div
-                                    initial={{ height: 0 }}
-                                    animate={{ height: `${heightPercent}%` }}
-                                    transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
-                                    className={clsx("w-full rounded-t-lg relative group", barColor)}
-                                 >
-                                     <div className={tooltipClass}>
-                                         {val}
-                                     </div>
-                                 </motion.div>
-                                 <span className={clsx("font-bold", dayTextColorClass)}>{days[idx]}</span>
-                             </div>
-                         );
-                     })}
-                 </div>
+                             return (
+                                 <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end flex-1">
+                                     <motion.div
+                                        initial={{ height: 0 }}
+                                        animate={{ height: `${heightPercent}%` }}
+                                        transition={{ delay: idx * 0.1 + 0.5, type: 'spring' }}
+                                        className={clsx("w-full rounded-t-lg relative group", barColor)}
+                                     >
+                                         <div className={tooltipClass}>
+                                             {val}
+                                         </div>
+                                     </motion.div>
+                                     <span className={clsx("font-bold", dayTextColorClass)}>{days[idx]}</span>
+                                 </div>
+                             );
+                         })}
+                     </div>
+                </div>
+
+                <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="text-xl font-bold opacity-90"
+                >
+                    Your week in motion.
+                </motion.p>
             </div>
-
-            <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-                className="text-xl font-bold opacity-90"
-            >
-                Your week in motion.
-            </motion.p>
         </SlideContainer>
     );
 });
@@ -606,24 +628,26 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>The Social Butterfly</h2>
 
-            <motion.div
-                initial={{ scale: 0, rotate: -45 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
-                className="text-[8rem] mb-8"
-            >
-                👍
-            </motion.div>
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <motion.div
+                    initial={{ scale: 0, rotate: -45 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", bounce: 0.6, delay: 0.5 }}
+                    className="text-[8rem] mb-8"
+                >
+                    👍
+                </motion.div>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-                className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm"
-            >
-                <p className="text-6xl font-black mb-4">{formattedKudosRatio}</p>
-                <p className="text-xl font-bold">high-fives for every km you moved!</p>
-            </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="bg-white/10 p-8 rounded-2xl backdrop-blur-sm"
+                >
+                    <p className="text-6xl font-black mb-4">{formattedKudosRatio}</p>
+                    <p className="text-xl font-bold">high-fives for every km you moved!</p>
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -632,31 +656,33 @@ export const NewActivitySlide = React.memo(function NewActivitySlide({ data, tex
   return (
       <SlideContainer textColor={textColor}>
           <h2 className={HeaderClass}>You Tried Something New</h2>
-          <motion.div
-            initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
-            animate={{ rotate: 0, scale: 1, opacity: 1 }}
-            transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
-            className="p-8 border-4 border-current rounded-3xl relative"
-          >
-              <div className="text-5xl md:text-7xl mb-4">🆕</div>
-              <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
-              <p className="mt-2 opacity-80">Tried on {new Date(data.newActivity.firstDate).toLocaleDateString()}</p>
+          <div className="flex-1 flex flex-col justify-center w-full items-center">
+              <motion.div
+                initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                transition={{ delay: DRAMATIC_DELAY, duration: 0.5 }}
+                className="p-8 border-4 border-current rounded-3xl relative"
+              >
+                  <div className="text-5xl md:text-7xl mb-4">🆕</div>
+                  <div className="text-2xl md:text-4xl font-black uppercase">{data.newActivity.type}</div>
+                  <p className="mt-2 opacity-80">Tried on {new Date(data.newActivity.firstDate).toLocaleDateString()}</p>
 
-              {data.newActivity.id && (
-                  <motion.a
-                      href={`https://www.strava.com/activities/${data.newActivity.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: DRAMATIC_DELAY + 1 }}
-                      className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
-                  >
-                      View on Strava
-                  </motion.a>
-              )}
-          </motion.div>
+                  {data.newActivity.id && (
+                      <motion.a
+                          href={`https://www.strava.com/activities/${data.newActivity.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: DRAMATIC_DELAY + 1 }}
+                          className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                      >
+                          View on Strava
+                      </motion.a>
+                  )}
+              </motion.div>
+          </div>
       </SlideContainer>
   );
 });
@@ -677,24 +703,26 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
     return (
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Your Favourite Playground</h2>
-            <motion.div
-                className="text-8xl md:text-9xl mb-4"
-                initial={{ scale: 0, rotate: -180, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{ type: "spring", bounce: 0.5, duration: 1.5, delay: DRAMATIC_DELAY }}
-            >
-                📍
-            </motion.div>
-            <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: DRAMATIC_DELAY + 0.5, type: "spring" }}
-            >
-                <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
-                    {data.topLocation.name}
-                </h3>
-                <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
-            </motion.div>
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <motion.div
+                    className="text-8xl md:text-9xl mb-4"
+                    initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                    transition={{ type: "spring", bounce: 0.5, duration: 1.5, delay: DRAMATIC_DELAY }}
+                >
+                    📍
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: DRAMATIC_DELAY + 0.5, type: "spring" }}
+                >
+                    <h3 className={clsx(textSizeClass, "font-black uppercase leading-tight max-w-full break-words")}>
+                        {data.topLocation.name}
+                    </h3>
+                    <p className="mt-4 text-xl opacity-80">{data.topLocation.count} activities here</p>
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -773,29 +801,31 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>Peak Performance Months</h2>
 
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
-                {data.monthlyStats.map((stat, idx) => {
-                    const rank = getRank(stat.month);
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6">
+                    {data.monthlyStats.map((stat, idx) => {
+                        const rank = getRank(stat.month);
 
-                    // Determine delay based on rank (3rd first, then 2nd, then 1st)
-                    // If no rank, no delay passed (doesn't matter)
-                    let writeDelay = 0;
-                    if (rank === 3) writeDelay = BASE_WRITE_DELAY;
-                    if (rank === 2) writeDelay = BASE_WRITE_DELAY + 0.8;
-                    if (rank === 1) writeDelay = BASE_WRITE_DELAY + 1.6;
+                        // Determine delay based on rank (3rd first, then 2nd, then 1st)
+                        // If no rank, no delay passed (doesn't matter)
+                        let writeDelay = 0;
+                        if (rank === 3) writeDelay = BASE_WRITE_DELAY;
+                        if (rank === 2) writeDelay = BASE_WRITE_DELAY + 0.8;
+                        if (rank === 1) writeDelay = BASE_WRITE_DELAY + 1.6;
 
-                    return (
-                        <motion.div
-                            key={stat.month}
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: DRAMATIC_DELAY + (idx * 0.05) }}
-                            className="flex flex-col items-center"
-                        >
-                             <CalendarIcon month={stat.month} rank={rank} delay={writeDelay} />
-                        </motion.div>
-                    );
-                })}
+                        return (
+                            <motion.div
+                                key={stat.month}
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: DRAMATIC_DELAY + (idx * 0.05) }}
+                                className="flex flex-col items-center"
+                            >
+                                 <CalendarIcon month={stat.month} rank={rank} delay={writeDelay} />
+                            </motion.div>
+                        );
+                    })}
+                </div>
             </div>
         </SlideContainer>
     );
@@ -881,7 +911,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
                                 return (
                                     <div key={vibe} className="flex items-center justify-center gap-2 w-full">
                                         <span className="text-2xl shrink-0">{trait.icon}</span>
-                                        <span className="text-lg font-bold uppercase tracking-widest truncate">{vibe}</span>
+                                        <span className="text-lg font-bold uppercase tracking-widest text-wrap">{vibe}</span>
                                     </div>
                                 );
                             })}
@@ -925,25 +955,27 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Your Top Sports</h2>
-        <div className="w-full max-w-md space-y-4">
-            {data.topSports.map((sport, idx) => (
-                <motion.div
-                    key={sport.type}
-                    initial={{ x: -50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: DRAMATIC_DELAY + (idx * STAGGER_DELAY) }}
-                    className="flex items-center justify-between p-4 border-2 border-current rounded-xl bg-white/5 backdrop-blur-sm"
-                >
-                    <div className="flex items-center gap-4">
-                        <span className="text-2xl font-black opacity-50">#{idx + 1}</span>
-                        <div className="text-left">
-                            <div className="font-bold text-lg">{sport.type}</div>
-                            <div className="text-xs opacity-75">{sport.count} sessions</div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="w-full max-w-md space-y-4">
+                {data.topSports.map((sport, idx) => (
+                    <motion.div
+                        key={sport.type}
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: DRAMATIC_DELAY + (idx * STAGGER_DELAY) }}
+                        className="flex items-center justify-between p-4 border-2 border-current rounded-xl bg-white/5 backdrop-blur-sm"
+                    >
+                        <div className="flex items-center gap-4">
+                            <span className="text-2xl font-black opacity-50">#{idx + 1}</span>
+                            <div className="text-left">
+                                <div className="font-bold text-lg">{sport.type}</div>
+                                <div className="text-xs opacity-75">{sport.count} sessions</div>
+                            </div>
                         </div>
-                    </div>
-                    <div className="text-xl font-bold">{sport.displayValue}</div>
-                </motion.div>
-            ))}
+                        <div className="text-xl font-bold">{sport.displayValue}</div>
+                    </motion.div>
+                ))}
+            </div>
         </div>
     </SlideContainer>
     );
@@ -955,35 +987,37 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
-            <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY - 1 }}
-                className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
-            >
-                <div className="relative z-10">
-                    <p className="text-lg opacity-80 mb-2">You moved for</p>
-                    <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
-                    <p className="text-lg font-medium">
-                        That&apos;s like listening to <br/>
-                        <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
-                        <span className={clsx("text-4xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.funComparisons.song.count}</span> times! 💃
-                    </p>
-                </div>
-            </motion.div>
+        <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY - 1 }}
+                    className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
+                >
+                    <div className="relative z-10">
+                        <p className="text-lg opacity-80 mb-2">You moved for</p>
+                        <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
+                        <p className="text-lg font-medium">
+                            That&apos;s like listening to <br/>
+                            <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
+                            <span className={clsx("text-4xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.funComparisons.song.count}</span> times! 💃
+                        </p>
+                    </div>
+                </motion.div>
 
-            <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY }}
-                className="flex items-center justify-center gap-4"
-            >
-                <span className="text-4xl">🎬</span>
-                <p className="text-xl">
-                    Or watching <span className="font-bold">{data.funComparisons.movie.title}</span> <span className="font-bold">{data.funComparisons.movie.count}</span> times.
-                </p>
-            </motion.div>
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY }}
+                    className="flex items-center justify-center gap-4"
+                >
+                    <span className="text-4xl">🎬</span>
+                    <p className="text-xl">
+                        Or watching <span className="font-bold">{data.funComparisons.movie.title}</span> <span className="font-bold">{data.funComparisons.movie.count}</span> times.
+                    </p>
+                </motion.div>
+            </div>
         </div>
     </SlideContainer>
     );
@@ -1011,44 +1045,46 @@ export const SpotlightSlide = React.memo(function SpotlightSlide({ data, textCol
 
             <h2 className={HeaderClass}>The Crowd Went Wild</h2>
 
-            <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: DRAMATIC_DELAY }}
-                className="p-8 border-4 border-current rounded-3xl max-w-md w-full relative"
-            >
-                <div className="flex justify-between items-start mb-6">
-                    <span className="text-5xl">👍</span>
-                    <span className="text-5xl font-black">{activity.kudos_count || 0}</span>
-                </div>
-
-                <h3 className="text-2xl font-black uppercase mb-2 line-clamp-2">{activity.name}</h3>
-                <p className="opacity-75 mb-6">{new Date(activity.start_date).toLocaleDateString()}</p>
-
-                <div className="grid grid-cols-2 gap-4 text-sm font-bold opacity-80">
-                    <div className="bg-current/10 p-2 rounded-lg">
-                        {Math.round(activity.distance / 1000)} km
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: DRAMATIC_DELAY }}
+                    className="p-8 border-4 border-current rounded-3xl max-w-md w-full relative"
+                >
+                    <div className="flex justify-between items-start mb-6">
+                        <span className="text-5xl">👍</span>
+                        <span className="text-5xl font-black">{activity.kudos_count || 0}</span>
                     </div>
-                    <div className="bg-current/10 p-2 rounded-lg">
-                        {Math.round(activity.moving_time / 60)} min
-                    </div>
-                </div>
 
-                {activity.id && (
-                    <motion.a
-                        href={`https://www.strava.com/activities/${activity.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 }}
-                        className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
-                    >
-                        View on Strava
-                    </motion.a>
-                )}
-            </motion.div>
+                    <h3 className="text-2xl font-black uppercase mb-2 line-clamp-2">{activity.name}</h3>
+                    <p className="opacity-75 mb-6">{new Date(activity.start_date).toLocaleDateString()}</p>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm font-bold opacity-80">
+                        <div className="bg-current/10 p-2 rounded-lg">
+                            {Math.round(activity.distance / 1000)} km
+                        </div>
+                        <div className="bg-current/10 p-2 rounded-lg">
+                            {Math.round(activity.moving_time / 60)} min
+                        </div>
+                    </div>
+
+                    {activity.id && (
+                        <motion.a
+                            href={`https://www.strava.com/activities/${activity.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="absolute -bottom-14 left-0 right-0 mx-auto w-max px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
+                        >
+                            View on Strava
+                        </motion.a>
+                    )}
+                </motion.div>
+            </div>
         </SlideContainer>
     );
 });
@@ -1108,12 +1144,12 @@ export const VibeSlide = React.memo(function VibeSlide({ data, textColor, traits
     const titleText = count > 1 ? "Vibe Stack" : "Vibe Check";
 
     return (
-        <SlideContainer textColor={textColor} className="pt-20 md:pt-14">
+        <SlideContainer textColor={textColor} className="">
             <h2 className="mb-6 text-xl font-bold uppercase tracking-[0.2em] opacity-60">
                 {data.year} {titleText}
             </h2>
 
-            <div className="w-full flex-1 flex flex-col justify-center items-center pb-12">
+            <div className="flex-1 flex flex-col justify-center w-full items-center pb-12">
 
                 {/* 1. SINGLE VIBE */}
                 {count === 1 && (

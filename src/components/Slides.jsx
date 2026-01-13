@@ -889,7 +889,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
     };
 
     return (
-        <div className={clsx("w-full h-full flex flex-col px-6 pb-6 pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24 items-center justify-between text-center")}>
+        <div className={clsx("w-full h-full flex flex-col px-6 pt-[calc(5rem+env(safe-area-inset-top))] pb-safe md:pt-24 items-center justify-between text-center")}>
             <div className={clsx("flex-1 w-full flex flex-col items-center justify-center", textColor)}>
                 <div ref={ref} className={clsx("w-full h-full flex flex-col items-center justify-center p-6 rounded-xl relative", theme.bg, textColor)}>
                     <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter">

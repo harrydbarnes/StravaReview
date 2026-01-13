@@ -1,0 +1,55 @@
+Searching for Life in Motion
+Verified PercentSlide text color
+Searching for The Climb
+Verified ElevationSlide text color
+Searching for Clockwatcher
+Verified HeatmapSlide gold color
+Searching for The Weekly Grind
+Verified WeeklyPatternSlide non-podium black text
+Searching for Time Well Spent
+Test failed: LocatorAssertions.to_be_visible: Error: strict mode violation: locator("div").filter(has_text="That's like listening to").locator(".text-4xl") resolved to 2 elements:
+    1) <span class="text-4xl font-bold text-white">2157</span> aka get_by_text("2157")
+    2) <span class="text-4xl">🎬</span> aka get_by_text("🎬")
+
+Call log:
+  - Expect "to_be_visible" with timeout 5000ms
+  - waiting for locator("div").filter(has_text="That's like listening to").locator(".text-4xl")
+
+Traceback (most recent call last):
+  File "/app/verification/verify_orange_details.py", line 125, in <module>
+    raise e
+  File "/app/verification/verify_orange_details.py", line 121, in <module>
+    test_orange_theme_details(page)
+  File "/app/verification/verify_orange_details.py", line 108, in test_orange_theme_details
+    expect(count_span).to_be_visible(timeout=5000)
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 20424, in to_be_visible
+    self._sync(self._impl_obj.to_be_visible(visible=visible, timeout=timeout))
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 763, in to_be_visible
+    await self._expect_impl(
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 72, in _expect_impl
+    result = await self._call_expect(expression, expect_options, title)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 178, in _call_expect
+    return await self._actual_locator._expect(expression, expect_options, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_locator.py", line 726, in _expect
+    return await self._frame._expect(self._selector, expression, options, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 189, in _expect
+    result = await self._channel.send_return_as_dict(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 83, in send_return_as_dict
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: LocatorAssertions.to_be_visible: Error: strict mode violation: locator("div").filter(has_text="That's like listening to").locator(".text-4xl") resolved to 2 elements:
+    1) <span class="text-4xl font-bold text-white">2157</span> aka get_by_text("2157")
+    2) <span class="text-4xl">🎬</span> aka get_by_text("🎬")
+
+Call log:
+  - Expect "to_be_visible" with timeout 5000ms
+  - waiting for locator("div").filter(has_text="That's like listening to").locator(".text-4xl")

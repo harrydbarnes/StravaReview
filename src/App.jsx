@@ -10,6 +10,7 @@ const HowToSetup = React.lazy(() => import('./components/HowToSetup'));
 
 const STORAGE_KEY_CLIENT_ID = 'strava_client_id';
 const STORAGE_KEY_CLIENT_SECRET = 'strava_client_secret';
+const INITIAL_AUDIO_VOLUME = 0.5;
 
 function App() {
   const targetYear = new Date().getFullYear() - 1;
@@ -27,11 +28,12 @@ function App() {
 
   // Audio ref for entry sound
   const entryAudioRef = useRef(null);
+  const fadeIntervalRef = useRef(null);
 
   useEffect(() => {
     // Initialize entry audio
     entryAudioRef.current = new Audio(import.meta.env.BASE_URL + 'Entry.mp3');
-    entryAudioRef.current.volume = 0.5;
+    entryAudioRef.current.volume = INITIAL_AUDIO_VOLUME;
 
     return () => {
       if (entryAudioRef.current) {
@@ -39,12 +41,48 @@ function App() {
         entryAudioRef.current.src = '';
         entryAudioRef.current = null;
       }
+      if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+      }
     };
   }, []);
 
+  const fadeOutEntrySound = () => {
+    const audio = entryAudioRef.current;
+    if (audio) {
+        if (fadeIntervalRef.current) {
+            clearInterval(fadeIntervalRef.current);
+        }
+
+        const fadeDuration = 1000; // 1 second
+        const interval = 50; // Update every 50ms
+        const steps = fadeDuration / interval;
+        const volStep = audio.volume / steps;
+
+        fadeIntervalRef.current = setInterval(() => {
+            if (audio.volume > volStep) {
+                audio.volume -= volStep;
+            } else {
+                audio.volume = 0;
+                audio.pause();
+                clearInterval(fadeIntervalRef.current);
+                fadeIntervalRef.current = null;
+            }
+        }, interval);
+    }
+  };
+
   const playEntrySound = () => {
     if (entryAudioRef.current) {
+        // Clear any existing fade out if we are restarting
+        if (fadeIntervalRef.current) {
+            clearInterval(fadeIntervalRef.current);
+            fadeIntervalRef.current = null;
+        }
+
         try {
+            entryAudioRef.current.volume = INITIAL_AUDIO_VOLUME;
             entryAudioRef.current.currentTime = 0;
             entryAudioRef.current.play().catch(e => console.warn("Audio play failed", e));
         } catch(e) {
@@ -109,6 +147,7 @@ function App() {
                     result.athlete = athlete;
 
                     setData(result);
+                    fadeOutEntrySound();
                     setStarted(true); // Auto start if we have data from redirect
                 } else {
                     setError(`No activities found for ${targetYear}. Go record some activities!`);
@@ -174,6 +213,7 @@ function App() {
             };
 
             setData(result);
+            fadeOutEntrySound();
             setStarted(true);
         } else {
             setError("Failed to generate demo data.");

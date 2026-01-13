@@ -1,0 +1,11 @@
+Searching for Life in Motion
+Verified PercentSlide subtitle text color
+Verified PercentSlide number text color
+Searching for The Climb
+Verified ElevationSlide text color
+Searching for Clockwatcher
+Verified HeatmapSlide gold color
+Searching for The Weekly Grind
+Verified WeeklyPatternSlide non-podium black text
+Searching for Time Well Spent
+Verified FunStatsSlide white text

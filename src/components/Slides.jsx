@@ -67,7 +67,7 @@ const CountUp = ({ value, label, delay = 0 }) => {
 };
 
 export const SlideContainer = ({ children, textColor, className }) => (
-  <div className={clsx("w-full h-full flex flex-col px-6 pb-6 pt-[calc(5rem+env(safe-area-inset-top))] pb-safe items-center justify-start text-center md:pt-24", className)}>
+  <div className={clsx("w-full h-full flex flex-col px-6 pt-[calc(5rem+env(safe-area-inset-top))] pb-safe items-center justify-start text-center md:pt-24", className)}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
         {children}
     </div>

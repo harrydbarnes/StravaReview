@@ -502,7 +502,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
                 className="mt-6"
             >
                 <p className="text-2xl font-bold">
-                    You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-[#FFD700]" : "")}>{peakHour}:00</span>
+                    You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-brand-gold" : "")}>{peakHour}:00</span>
                 </p>
             </motion.div>
 

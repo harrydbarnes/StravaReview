@@ -14,8 +14,8 @@ const T_REX_SPEED_MPH = 18;
 const CountUp = ({ value, label, delay = 0 }) => {
     const ref = React.useRef(null);
     const numericValue = typeof value === 'string'
-        ? parseFloat(value.replace(/,/g, ''))
-        : value;
+        ? parseFloat((value || "0").replace(/,/g, ''))
+        : (value || 0);
     const isInt = Number.isInteger(numericValue);
 
     React.useEffect(() => {
@@ -67,7 +67,7 @@ const CountUp = ({ value, label, delay = 0 }) => {
 };
 
 export const SlideContainer = ({ children, textColor, className }) => (
-  <div className={clsx("w-full h-full flex flex-col p-6 items-center justify-start text-center pt-8 md:pt-12", className)}>
+  <div className={clsx("w-full h-full flex flex-col p-6 pt-safe pb-safe items-center justify-start text-center md:pt-12", className)}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
         {children}
     </div>

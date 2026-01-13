@@ -59,8 +59,8 @@ def verify_changes():
                 break
             # Click next (right side of screen)
             # Mobile viewport: width 375. Next is > 2/3 width => > 250
-            page.get_by_test_id("click-next").click()
-            time.sleep(1.5) # wait for animation
+            page.get_by_test_id("click-next").click(force=True)
+            page.wait_for_timeout(500) # wait for animation
 
         if found:
             print("Found ShortestSlide")
@@ -79,8 +79,8 @@ def verify_changes():
             if page.get_by_role("button", name="Save & Share").is_visible():
                 found_summary = True
                 break
-            page.get_by_test_id("click-next").click()
-            time.sleep(1.0)
+            page.get_by_test_id("click-next").click(force=True)
+            page.wait_for_timeout(500)
 
         if found_summary:
             print("Found SummarySlide")

@@ -25,10 +25,8 @@ def run():
 
         # Helper to click next
         def click_next():
-            # The click area is the right 75% of the screen.
-            # Since overlays are pointer-events-none, we click by coordinate or target the container.
-            # Mobile viewport 375x812. Click right side.
-            page.mouse.click(300, 400)
+            # Use a robust selector instead of coordinates to avoid brittle tests.
+            page.get_by_test_id("click-next").click()
             time.sleep(1) # Wait for transition
 
         # Iterate and capture

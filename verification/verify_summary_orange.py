@@ -51,7 +51,7 @@ def test_summary_slide_changes(page):
     # 3. Assert:
     # Check text color of "WRAPPED".
     wrapped_text = page.get_by_text("WRAPPED")
-    expect(wrapped_text).to_have_css("color", "rgb(77, 144, 120)")
+    expect(wrapped_text).to_have_css("color", "rgb(122, 3, 252)")
 
     # Take screenshot
     page.screenshot(path="verification/summary_slide_orange.png")

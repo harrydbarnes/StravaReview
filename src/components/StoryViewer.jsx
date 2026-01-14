@@ -424,7 +424,7 @@ const StoryViewer = ({ slides, onClose }) => {
                         transition: { duration: 1.2, delay: 0.6, ease: "easeInOut" }
                     }
                 }}
-                className="absolute inset-0 z-50 bg-black flex items-center justify-center flex-col text-center overflow-hidden"
+                className="absolute inset-0 z-50 bg-black flex items-center justify-center pb-32 flex-col text-center overflow-hidden"
             >
                 {/* Red Curtain Background */}
                 <div

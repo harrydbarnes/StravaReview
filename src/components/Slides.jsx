@@ -12,7 +12,9 @@ const INTRO_DELAY = 0.8;
 const T_REX_SPEED_MPH = 18;
 
 // Animation Constants for Summary Slide
-const COUNTUP_ANIMATION_END = 4.5;
+const COUNTUP_DURATION = 2.5;
+const COUNTUP_DELAYS = [0.5, 1.0, 1.5, 2.0];
+const COUNTUP_ANIMATION_END = Math.max(...COUNTUP_DELAYS) + COUNTUP_DURATION;
 const VIBE_STAGGER_DELAY = 0.5;
 const USERNAME_STAMP_DELAY = 0.5;
 
@@ -25,7 +27,7 @@ const CountUp = ({ value, label, delay = 0 }) => {
 
     React.useEffect(() => {
         const controls = animate(0, numericValue, {
-            duration: 2.5,
+            duration: COUNTUP_DURATION,
             delay: delay,
             ease: "easeOut",
             onUpdate: (v) => {
@@ -909,10 +911,10 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
                     <h2 className="text-2xl md:text-3xl font-bold mb-6 uppercase opacity-80">{data.year} Grand Total</h2>
 
                     <div className="grid grid-cols-2 gap-6 w-full max-w-lg mb-4">
-                        <CountUp value={data.totalActivities} label="Activities" delay={0.5} />
-                        <CountUp value={data.totalHours} label="Hours" delay={1.0} />
-                        <CountUp value={data.totalDistance} label="Km" delay={1.5} />
-                        <CountUp value={data.totalCalories} label="Cals" delay={2.0} />
+                        <CountUp value={data.totalActivities} label="Activities" delay={COUNTUP_DELAYS[0]} />
+                        <CountUp value={data.totalHours} label="Hours" delay={COUNTUP_DELAYS[1]} />
+                        <CountUp value={data.totalDistance} label="Km" delay={COUNTUP_DELAYS[2]} />
+                        <CountUp value={data.totalCalories} label="Cals" delay={COUNTUP_DELAYS[3]} />
                     </div>
 
                     {vibeArray.length > 0 && traits && (

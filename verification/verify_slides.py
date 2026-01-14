@@ -27,7 +27,6 @@ def run():
         def click_next():
             # Use keyboard navigation for robustness
             page.keyboard.press("ArrowRight")
-            time.sleep(1) # Wait for transition
 
         # Iterate and capture
         slides_to_capture = {

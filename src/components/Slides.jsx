@@ -500,7 +500,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
             <h2 className={HeaderClass}>Clockwatcher</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
-                <div className="flex-1 flex flex-col w-full max-w-md">
+                <div className="flex flex-col w-full max-w-md">
                     <div className="flex items-end gap-1 h-48 mb-2 w-full justify-between">
                         {displayData.map((val, idx) => {
                             const actualHour = startIdx + idx;

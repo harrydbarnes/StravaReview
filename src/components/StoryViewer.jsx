@@ -433,7 +433,7 @@ const StoryViewer = ({ slides, onClose }) => {
                         transition: { duration: 1.2, delay: 0.6, ease: "easeInOut" }
                     }
                 }}
-                className="absolute inset-0 z-50 bg-black flex items-center justify-center pb-32 flex-col text-center overflow-hidden"
+                className="absolute inset-0 z-50 bg-black flex items-center justify-center flex-col text-center overflow-hidden"
             >
                 {/* Red Curtain Background */}
                 <div
@@ -445,7 +445,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
                 {/* Spotlight Animation */}
                 <motion.div
-                    className="absolute w-64 h-64 bg-yellow-100/30 rounded-full blur-2xl"
+                    className="absolute w-[500px] h-[500px] blur-3xl pointer-events-none"
                     animate={{
                         x: ['-50%', '50%', '-30%', '20%'],
                         y: ['-20%', '30%', '-50%', '10%'],
@@ -456,7 +456,11 @@ const StoryViewer = ({ slides, onClose }) => {
                         repeatType: "reverse",
                         ease: "easeInOut"
                     }}
-                    style={{ left: '50%', top: '50%' }}
+                    style={{
+                        left: '50%',
+                        top: '50%',
+                        background: 'radial-gradient(circle, rgba(254, 249, 195, 0.3) 0%, rgba(254, 249, 195, 0) 70%)'
+                    }}
                 />
 
                 {/* Whiteout Effect (Flash) */}
@@ -473,17 +477,17 @@ const StoryViewer = ({ slides, onClose }) => {
                     variants={{
                         exit: { opacity: 0, transition: { duration: 0.3 } }
                     }}
-                    className="relative z-50 p-8 flex flex-col items-center"
+                    className="relative z-50 p-8 flex flex-col items-center gap-10 md:gap-12"
                 >
-                    <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tight drop-shadow-2xl">
+                    <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight drop-shadow-2xl">
                         LIFT THE CURTAIN ON YOUR YEAR
                     </h2>
-                    <p className="text-white/80 mb-10 text-lg font-medium max-w-xs leading-relaxed">
+                    <p className="text-white/80 text-lg font-medium max-w-xs leading-relaxed">
                         Turn up the volume, sit back, and enjoy the show
                     </p>
                     <button
                         onClick={handleStart}
-                        className="mt-12 px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
+                        className="px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
                     >
                         Start the Show
                     </button>

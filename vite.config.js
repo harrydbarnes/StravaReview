@@ -4,14 +4,15 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/StravaReview/', // Use leading and trailing slashes
+  base: '/StravaReview/',
   build: {
+    target: 'es2020', // Recommended: Ensures compatibility with slightly older iOS versions
     rollupOptions: {
       output: {
         manualChunks: {
-          // Split React and generic vendors
-          vendor: ['react', 'react-dom', 'lucide-react', 'clsx', 'tailwind-merge'],
-          // Isolate the heavy animation library so it's only loaded when needed
+          // Keep React core separate if you want, but allow others to split naturally
+          vendor: ['react', 'react-dom'],
+          // Keep framer separated as it is heavy
           framer: ['framer-motion']
         }
       }

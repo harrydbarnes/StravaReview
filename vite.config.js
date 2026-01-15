@@ -13,7 +13,9 @@ export default defineConfig({
           // Group React core libraries into a separate chunk for better caching.
           'react-vendor': ['react', 'react-dom'],
           // Keep framer separated as it is heavy
-          framer: ['framer-motion']
+          framer: ['framer-motion'],
+          // Note: lucide-react, clsx, and tailwind-merge are explicitly excluded from manual chunks
+          // to allow Vite to tree-shake them naturally, reducing bundle size.
         }
       }
     }

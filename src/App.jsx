@@ -286,6 +286,7 @@ function App() {
                                     pattern="[0-9]*"
                                     required
                                     autoComplete="off"
+                                    autoFocus={false}
                                     value={clientId}
                                     onChange={(e) => setClientId(e.target.value)}
                                     placeholder="e.g., 12345"

@@ -1,68 +1,84 @@
-import time
+
 from playwright.sync_api import sync_playwright, expect
 
-def run():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+def run(page):
+    print("Navigating to app...")
+    page.goto("http://localhost:5173/StravaReview/")
 
-        # Test 1: Verify Loading Screen on iPhone Safari (Production Build)
-        print("Starting Test 1: iPhone Loading Screen (Prod)")
-        context_iphone = browser.new_context(
-            user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
-            viewport={"width": 375, "height": 667}
-        )
-        page_iphone = context_iphone.new_page()
+    # 1. Enter Demo Mode
+    print("Clicking Demo Mode...")
+    page.get_by_text("Try Demo Mode").click()
 
-        # Block JS to simulate slow loading, but ALLOW CSS.
-        # We abort requests ending in .js
-        page_iphone.route("**/*.js", lambda route: route.abort())
+    # 2. Verify Intro Slide (LIFT THE CURTAIN)
+    print("Waiting for Curtain...")
+    heading = page.get_by_role("heading", name="LIFT THE CURTAIN ON YOUR YEAR")
+    expect(heading).to_be_visible(timeout=10000)
 
-        try:
-            page_iphone.goto("http://localhost:8080/StravaReview/")
-            page_iphone.wait_for_timeout(1000)
+    page.screenshot(path="verification/screenshot_1_curtain_initial.png")
+    print("Screenshot 1 taken: Curtain Initial")
 
-            # Check for the text
-            expect(page_iphone.locator("text=Loading...")).to_be_visible()
+    # 3. Start Show to see Pause Button
+    print("Starting show...")
+    page.get_by_text("Start the Show").click()
 
-            # Screenshot
-            page_iphone.screenshot(path="verification/loading_screen_prod.png")
-            print("Verified loading screen on iPhone Safari UA (Prod)")
-        except Exception as e:
-            print(f"Failed Test 1: {e}")
-            page_iphone.screenshot(path="verification/loading_screen_prod_failed.png")
-        finally:
-            context_iphone.close()
+    # Wait for Curtain to exit (animation duration ~1.2s + delay)
+    # The pause button is on Slide 0.
+    # We should wait for the pause button to be visible.
+    print("Waiting for Pause Button...")
+    pause_btn = page.get_by_text("PAUSE")
+    expect(pause_btn).to_be_visible(timeout=10000)
 
-        # Test 2: Verify No AutoFocus (Production Build)
-        print("Starting Test 2: No AutoFocus (Prod)")
-        context_desktop = browser.new_context()
-        page_desktop = context_desktop.new_page()
+    print("Pause Button visible. Waiting 3 seconds for auto-hide...")
+    page.wait_for_timeout(3000)
 
-        try:
-            page_desktop.goto("http://localhost:8080/StravaReview/")
+    # It should be hidden (moved down).
+    page.screenshot(path="verification/screenshot_2_pause_hidden.png")
+    print("Screenshot 2 taken: Pause Hidden")
 
-            # We need JS here, so we don't block it.
+    # 4. Bring it back
+    print("Clicking Trigger Zone...")
+    # Trigger zone has role="button" aria-label="Show controls"
+    # It might be tricky if "click-next" overlay covers it?
+    # StoryViewer has:
+    # {hasStarted && <div className="absolute inset-0 z-10 flex pointer-events-none">...</div>}
+    # Pause Button container is z-40. Trigger Zone is z-0 relative to that container?
+    # Container: <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto relative">
+    #   Trigger Zone: z-0
+    #   Button: z-10
+    # The Container is inside: <div className="absolute inset-0 pointer-events-none z-40 ...">
+    # So Trigger Zone is effectively z-40 context.
+    # The "click-next" overlay is z-10.
+    # So Trigger Zone (z-40) should be on top of click overlays (z-10).
+    # So it should be clickable.
 
-            expect(page_desktop.locator("label", has_text="Client ID")).to_be_visible(timeout=10000)
+    page.get_by_role("button", name="Show controls").click()
 
-            page_desktop.wait_for_load_state('networkidle')
+    # Wait for animation
+    page.wait_for_timeout(1000)
+    page.screenshot(path="verification/screenshot_3_pause_reshown.png")
+    print("Screenshot 3 taken: Pause Re-shown")
 
-            active_element_id = page_desktop.evaluate("document.activeElement.id")
+    # 5. Go to PercentSlide
+    print("Navigating to PercentSlide...")
+    page.keyboard.press("ArrowRight")
 
-            if active_element_id == "client-id":
-                print("FAIL: Client ID input is focused!")
-            else:
-                print("PASS: Client ID input is NOT focused.")
+    # Wait for "Life in Motion"
+    expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible()
 
-            page_desktop.screenshot(path="verification/desktop_loaded_prod.png")
+    # Wait for content
+    page.wait_for_timeout(2000)
 
-        except Exception as e:
-            print(f"Failed Test 2: {e}")
-            page_desktop.screenshot(path="verification/desktop_failed_prod.png")
-        finally:
-            context_desktop.close()
-
-        browser.close()
+    page.screenshot(path="verification/screenshot_4_percent_slide.png")
+    print("Screenshot 4 taken: PercentSlide")
 
 if __name__ == "__main__":
-    run()
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport={"width": 393, "height": 852}) # Pixel-ish mobile viewport
+        try:
+            run(page)
+        except Exception as e:
+            print(f"Error: {e}")
+            page.screenshot(path="verification/error_screenshot.png")
+        finally:
+            browser.close()

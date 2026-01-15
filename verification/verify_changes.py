@@ -1,110 +1,68 @@
-from playwright.sync_api import sync_playwright, expect
-import os
 import time
+from playwright.sync_api import sync_playwright, expect
 
-def verify_app():
+def run():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        # Use mobile viewport to ensure all elements are visible as intended
-        context = browser.new_context(viewport={"width": 375, "height": 667})
-        page = context.new_page()
 
-        print("Navigating to app...")
-        page.goto("http://localhost:3000/StravaReview/")
+        # Test 1: Verify Loading Screen on iPhone Safari (Production Build)
+        print("Starting Test 1: iPhone Loading Screen (Prod)")
+        context_iphone = browser.new_context(
+            user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+            viewport={"width": 375, "height": 667}
+        )
+        page_iphone = context_iphone.new_page()
 
-        # Click "Try Demo Mode"
-        print("Clicking Demo Mode...")
-        page.get_by_role("button", name="Try Demo Mode").click()
+        # Block JS to simulate slow loading, but ALLOW CSS.
+        # We abort requests ending in .js
+        page_iphone.route("**/*.js", lambda route: route.abort())
 
-        # Wait for "Your Year in Activity" (IntroSlide)
-        print("Waiting for intro...")
-        expect(page.get_by_text("Your Year")).to_be_visible(timeout=10000)
+        try:
+            page_iphone.goto("http://localhost:8080/StravaReview/")
+            page_iphone.wait_for_timeout(1000)
 
-        # Wait for loading to finish completely (Intro delay)
-        time.sleep(2)
-        page.screenshot(path="verification/01_intro.png")
+            # Check for the text
+            expect(page_iphone.locator("text=Loading...")).to_be_visible()
 
-        # Function to click next slide safely
-        def next_slide():
-            # Use the force click on the overlay or button if available
-            # The overlay is typically covering the right side
-            # Finding the "Next" button in Controls might be better if visible
-            # But the UI hides controls sometimes.
-            # Using keyboard arrow right is reliable for StoryViewer
-            page.keyboard.press("ArrowRight")
-            time.sleep(1.5) # Wait for transition
+            # Screenshot
+            page_iphone.screenshot(path="verification/loading_screen_prod.png")
+            print("Verified loading screen on iPhone Safari UA (Prod)")
+        except Exception as e:
+            print(f"Failed Test 1: {e}")
+            page_iphone.screenshot(path="verification/loading_screen_prod_failed.png")
+        finally:
+            context_iphone.close()
 
-        # Iterate through slides to find target ones
-        # We need:
-        # 1. ShortestSlide: "What Was This One, BTW?"
-        # 2. SlowestSlide: "Slow and Steady"
-        # 3. HeatmapSlide: "Clockwatcher" (Earliest/Latest)
-        # 4. OlympicsSlide: "LA 2028 Calling?"
-        # 5. NewActivitySlide: "You Tried Something New"
-        # 6. SummarySlide: Username at bottom
+        # Test 2: Verify No AutoFocus (Production Build)
+        print("Starting Test 2: No AutoFocus (Prod)")
+        context_desktop = browser.new_context()
+        page_desktop = context_desktop.new_page()
 
-        targets = [
-            "What Was This One, BTW?",
-            "Slow and Steady",
-            "Clockwatcher",
-            "LA 2028 Calling?",
-            "You Tried Something New",
-            "STRAVA WRAPPED" # Summary
-        ]
+        try:
+            page_desktop.goto("http://localhost:8080/StravaReview/")
 
-        found = set()
+            # We need JS here, so we don't block it.
 
-        # Loop enough times to cover all slides (approx 20 slides max)
-        for i in range(25):
-            content = page.content()
+            expect(page_desktop.locator("label", has_text="Client ID")).to_be_visible(timeout=10000)
 
-            # Check for current slide title
-            for target in targets:
-                if target in content and target not in found:
-                    print(f"Found {target}!")
-                    found.add(target)
-                    # Wait for animations to settle
-                    time.sleep(3)
+            page_desktop.wait_for_timeout(1000)
 
-                    # Special checks
-                    if target == "Clockwatcher":
-                        # Verify earliest/latest
-                        if "Early Bird" in page.content() or "Night Owl" in page.content():
-                            print(" - Verified Clockwatcher stats present")
-                        else:
-                            print(" - WARNING: Clockwatcher stats NOT found")
+            active_element_id = page_desktop.evaluate("document.activeElement.id")
 
-                    if target == "LA 2028 Calling?":
-                        # Verify multiple stats
-                        text_content = page.locator("body").inner_text()
-                        if "Olympic Pool lengths" in text_content or "laps of Olympic track" in text_content:
-                             print(" - Verified Olympic stats present")
+            if active_element_id == "client-id":
+                print("FAIL: Client ID input is focused!")
+            else:
+                print("PASS: Client ID input is NOT focused.")
 
-                    if target == "You Tried Something New":
-                        # Check for button
-                        if page.get_by_text("View on Strava").is_visible():
-                            print(" - Verified View on Strava button")
-                        else:
-                            print(" - WARNING: View on Strava button NOT found")
+            page_desktop.screenshot(path="verification/desktop_loaded_prod.png")
 
-                    if target == "STRAVA WRAPPED": # Summary
-                         # Check username
-                         if "DEMOUSER" in page.locator("body").inner_text().upper() or "DEMO RUNNER" in page.locator("body").inner_text().upper():
-                             print(" - Verified Username present")
-                         else:
-                             print(" - WARNING: Username NOT found")
-
-                    # Take screenshot
-                    safe_name = target.replace("?", "").replace(" ", "_").replace(",", "").lower()
-                    page.screenshot(path=f"verification/slide_{safe_name}.png")
-
-            if len(found) == len(targets):
-                print("Found all targets!")
-                break
-
-            next_slide()
+        except Exception as e:
+            print(f"Failed Test 2: {e}")
+            page_desktop.screenshot(path="verification/desktop_failed_prod.png")
+        finally:
+            context_desktop.close()
 
         browser.close()
 
 if __name__ == "__main__":
-    verify_app()
+    run()

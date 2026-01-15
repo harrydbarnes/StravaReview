@@ -124,9 +124,9 @@ export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
 
 export const PercentSlide = React.memo(function PercentSlide({ data, theme, textColor }) {
     return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className={clsx(BaseContentClass, "pt-12 gap-12")}>
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center gap-8">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -309,10 +309,10 @@ export const ElevationSlide = React.memo(function ElevationSlide({ data, theme, 
 
 export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
     return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Fuel Tank</h2>
 
-        <div className={clsx(BaseContentClass, "pt-8 justify-evenly")}>
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
             <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -1016,7 +1016,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className={clsx(BaseContentClass, "pt-8")}>
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
             <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}

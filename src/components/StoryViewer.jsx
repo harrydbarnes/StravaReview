@@ -120,7 +120,9 @@ const StoryViewer = ({ slides, onClose }) => {
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
   const [isMuted, setIsMuted] = useState(false);
+  const [showPauseHint, setShowPauseHint] = useState(true);
   const containerRef = useRef(null);
+  const pauseHintTimerRef = useRef(null);
 
   // Web Audio API Refs
   const audioCtxRef = useRef(null);
@@ -366,6 +368,23 @@ const StoryViewer = ({ slides, onClose }) => {
     }
   }, [hasStarted]);
 
+  const resetPauseHintTimer = useCallback(() => {
+    if (pauseHintTimerRef.current) clearTimeout(pauseHintTimerRef.current);
+    setShowPauseHint(true);
+    pauseHintTimerRef.current = setTimeout(() => {
+        setShowPauseHint(false);
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
+    if (currentIndex === 0 && hasStarted) {
+        resetPauseHintTimer();
+    }
+    return () => {
+        if (pauseHintTimerRef.current) clearTimeout(pauseHintTimerRef.current);
+    };
+  }, [currentIndex, hasStarted, resetPauseHintTimer]);
+
   // Touch/Click handlers
   const handleTap = (e) => {
     if (!hasStarted) return;
@@ -479,10 +498,10 @@ const StoryViewer = ({ slides, onClose }) => {
                     }}
                     className="relative z-50 p-8 flex flex-col items-center gap-10 md:gap-12"
                 >
-                    <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight drop-shadow-2xl">
+                    <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight drop-shadow-2xl">
                         LIFT THE CURTAIN ON YOUR YEAR
                     </h2>
-                    <p className="text-white/80 text-lg font-medium max-w-xs leading-relaxed">
+                    <p className="text-white/80 text-lg font-medium max-w-xs leading-relaxed drop-shadow-lg">
                         Turn up the volume, sit back, and enjoy the show
                     </p>
                     <button
@@ -550,20 +569,35 @@ const StoryViewer = ({ slides, onClose }) => {
             </div>
 
             {/* Large Pause Button Hint */}
-            <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto">
-                 <button
+            <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto relative">
+                 {/* Trigger Zone to bring back the button */}
+                 <div
+                    className="absolute bottom-0 w-64 h-32 cursor-pointer z-0"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        resetPauseHintTimer();
+                    }}
+                    role="button"
+                    aria-label="Show controls"
+                 />
+
+                 <motion.button
+                    initial={{ y: 0 }}
+                    animate={{ y: showPauseHint ? 0 : 200 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     onClick={(e) => {
                         e.stopPropagation();
                         togglePause();
+                        resetPauseHintTimer();
                     }}
                     className={clsx(
-                        "mb-8 px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 backdrop-blur-md shadow-lg transition-all active:scale-95",
+                        "mb-8 px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 backdrop-blur-md shadow-lg transition-all active:scale-95 relative z-10",
                          theme === 'white' ? 'bg-black/10 text-black hover:bg-black/20' : 'bg-white/20 text-white hover:bg-white/30'
                     )}
                  >
                      {isPaused ? <Play size={24} fill="currentColor" /> : <Pause size={24} fill="currentColor" />}
                      {isPaused ? "RESUME" : "PAUSE"}
-                 </button>
+                 </motion.button>
             </div>
           </div>
         )}

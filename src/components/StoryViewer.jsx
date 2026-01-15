@@ -403,6 +403,7 @@ const StoryViewer = ({ slides, onClose }) => {
         if (isPaused) setIsPaused(false);
     } else {
         togglePause();
+        resetPauseHintTimer();
     }
   };
 
@@ -548,7 +549,11 @@ const StoryViewer = ({ slides, onClose }) => {
         {currentIndex === 0 && (
           <div className="absolute inset-0 pointer-events-none z-40 flex flex-col justify-between">
             {/* Arrows */}
-            <div className="flex-1 flex justify-between items-center px-4">
+            <motion.div
+                className="flex-1 flex justify-between items-center px-4"
+                animate={{ opacity: showPauseHint ? 1 : 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: [0, 1, 0], x: [0, -10, 0] }}
@@ -566,13 +571,13 @@ const StoryViewer = ({ slides, onClose }) => {
                 >
                 <ChevronRight size={32} />
                 </motion.div>
-            </div>
+            </motion.div>
 
             {/* Large Pause Button Hint */}
             <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto relative">
                  {/* Trigger Zone to bring back the button */}
                  <div
-                    className="absolute bottom-0 w-64 h-32 cursor-pointer z-0"
+                    className="absolute bottom-0 w-80 h-40 cursor-pointer z-10"
                     onClick={(e) => {
                         e.stopPropagation();
                         resetPauseHintTimer();
@@ -591,7 +596,7 @@ const StoryViewer = ({ slides, onClose }) => {
                         resetPauseHintTimer();
                     }}
                     className={clsx(
-                        "mb-8 px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 backdrop-blur-md shadow-lg transition-all active:scale-95 relative z-10",
+                        "mb-8 px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 backdrop-blur-md shadow-lg transition-all active:scale-95 relative z-20",
                          theme === 'white' ? 'bg-black/10 text-black hover:bg-black/20' : 'bg-white/20 text-white hover:bg-white/30'
                     )}
                  >

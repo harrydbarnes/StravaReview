@@ -707,12 +707,30 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
 
   // Pace Logic
   let avgRunPace = null;
+  let marathonPrediction = null;
+  const MO_FARAH_SECONDS = 7511; // 2:05:11
+
   if (runStats.distance > 0 && runStats.time > 0) {
       // min/km = (time_in_min) / (dist_in_km)
       const paceVal = (runStats.time / 60) / (runStats.distance / 1000);
       const pMin = Math.floor(paceVal);
       const pSec = Math.round((paceVal - pMin) * 60);
       avgRunPace = `${pMin}:${pSec.toString().padStart(2, '0')}/km`;
+
+      // Marathon Prediction
+      const secPerKm = runStats.time / (runStats.distance / 1000);
+      const predictedSeconds = secPerKm * 42.195;
+
+      const pHours = Math.floor(predictedSeconds / 3600);
+      const pMinutes = Math.floor((predictedSeconds % 3600) / 60);
+
+      // Comparison
+      const slowerPercent = ((predictedSeconds - MO_FARAH_SECONDS) / MO_FARAH_SECONDS) * 100;
+
+      marathonPrediction = {
+          time: `${pHours}hrs ${pMinutes}mins`,
+          percentSlower: Math.round(slowerPercent)
+      };
   }
 
   let avgRideSpeed = null;
@@ -764,7 +782,8 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
     },
     averagePace: {
         run: avgRunPace,
-        ride: avgRideSpeed
+        ride: avgRideSpeed,
+        marathon: marathonPrediction
     },
     shortestActivity: shortestActivity ? {
         ...shortestActivity,

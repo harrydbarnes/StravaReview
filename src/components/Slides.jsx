@@ -382,6 +382,21 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
                     </motion.div>
                 )}
 
+                {data.averagePace.marathon && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: DRAMATIC_DELAY + 0.5 }}
+                        className="mt-4 p-6 bg-white/5 rounded-xl backdrop-blur-sm"
+                    >
+                         <p className="text-sm font-bold uppercase opacity-70 mb-2">Predicted Marathon Time</p>
+                         <p className="text-3xl font-black mb-2">{data.averagePace.marathon.time}</p>
+                         <p className="opacity-80 text-sm">
+                            That&apos;s <span className="font-bold text-brand-orange">{data.averagePace.marathon.percentSlower}%</span> slower than Mo Farah.
+                         </p>
+                    </motion.div>
+                )}
+
                 {!data.averagePace.run && !data.averagePace.ride && (
                      <p className="text-xl">Just cruising at your own speed.</p>
                 )}
@@ -396,11 +411,11 @@ export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Need for Speed</h2>
 
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
             <motion.div
                 animate={{ x: [-10, 10, -10] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                className="text-8xl mb-8"
+                className="text-8xl"
             >
                 🦖
             </motion.div>
@@ -409,7 +424,7 @@ export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: DRAMATIC_DELAY - 1 }}
-                className="mb-8"
+                className=""
             >
                 <p className="text-sm uppercase font-bold opacity-70 mb-2">Top Speed Reached</p>
                 <p className="text-7xl font-black italic">{data.speed.max} <span className="text-3xl not-italic">mph</span></p>
@@ -437,12 +452,12 @@ export const SlowestSlide = React.memo(function SlowestSlide({ data, textColor }
         <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Slow and Steady Wins... a Race</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-evenly w-full items-center">
                 <motion.div
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 3, ease: "linear" }}
-                    className="text-8xl mb-8"
+                    className="text-8xl"
                 >
                     🐌
                 </motion.div>

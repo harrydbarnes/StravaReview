@@ -96,4 +96,27 @@ describe('dataProcessor', () => {
         expect(result.speed.slowestActivity).not.toBeNull();
         expect(result.speed.slowestActivity.type).toBe('Ride');
     });
+
+    test('calculates marathon prediction and comparison correctly', () => {
+        const activities = [
+            // Run: 10km in 3000s (50 mins). Pace = 5:00 min/km.
+            {
+                start_date: '2025-01-15T12:00:00Z',
+                distance: 10000,
+                moving_time: 3000,
+                type: 'Run'
+            }
+        ];
+
+        const result = analyzeData(activities, 2025);
+        const marathon = result.averagePace.marathon;
+
+        expect(marathon).toBeDefined();
+        // Marathon time for 5:00 min/km is 3:30:58 (210.975 mins -> 3h 30m)
+        expect(marathon.time).toBe('3hrs 30mins');
+
+        // Mo Farah: 2:05:11 (7511s). Predicted: 12658.5s.
+        // Diff %: (12658.5 - 7511) / 7511 = 0.6853 -> 69%
+        expect(marathon.percentSlower).toBe(69);
+    });
 });

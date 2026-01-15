@@ -23,7 +23,7 @@ def verify_landing(page, name):
         raise e
 
     # Wait a bit for animations if any
-    page.wait_for_timeout(2000)
+    page.get_by_role("button", name="Start the Show").wait_for(state="visible")
 
     page.screenshot(path=f"/home/jules/verification/landing_{name}.png")
     print(f"Screenshot saved to /home/jules/verification/landing_{name}.png")

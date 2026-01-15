@@ -45,7 +45,7 @@ def run():
 
             expect(page_desktop.locator("label", has_text="Client ID")).to_be_visible(timeout=10000)
 
-            page_desktop.wait_for_timeout(1000)
+            page_desktop.wait_for_load_state('networkidle')
 
             active_element_id = page_desktop.evaluate("document.activeElement.id")
 

@@ -77,7 +77,6 @@ export const SlideContainer = ({ children, textColor, className, smallPadding = 
   <div className={clsx(
       "w-full h-full flex flex-col px-6 pb-safe items-center text-center",
       smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32",
-      centerContent ? "justify-center" : "justify-start",
       className
   )}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center relative", centerContent ? "justify-center" : "justify-start")}>

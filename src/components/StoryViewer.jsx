@@ -19,6 +19,9 @@ const KEYBOARD_KEYS = {
     SPACEBAR: 'Spacebar',
 };
 
+const TAP_ZONE_PREV_BOUNDARY = 0.25;
+const TAP_ZONE_NEXT_BOUNDARY = 0.75;
+
 const stopSourceNode = (sourceRef, name) => {
     if (sourceRef.current) {
         try {
@@ -373,9 +376,9 @@ const StoryViewer = ({ slides, onClose }) => {
     const x = e.clientX - rect.left;
     const width = rect.width;
 
-    if (x < width * 0.25) {
+    if (x < width * TAP_ZONE_PREV_BOUNDARY) {
         handlePrev();
-    } else if (x > width * 0.75) {
+    } else if (x > width * TAP_ZONE_NEXT_BOUNDARY) {
         handleNext();
         // Resume auto-play if tapping next
         if (isPaused) setIsPaused(false);

@@ -718,7 +718,7 @@ if (!/^(GMT|UTC|UCT|Etc|Pacific|Central|Mountain|Eastern)/i.test(potentialLoc)) 
       avgRunPace = `${pMin}:${pSec.toString().padStart(2, '0')}/km`;
 
       // Marathon Prediction
-      const secPerKm = runStats.time / (runStats.distance / 1000);
+      const secPerKm = paceVal * 60;
       const predictedSeconds = secPerKm * 42.195;
 
       const pHours = Math.floor(predictedSeconds / 3600);

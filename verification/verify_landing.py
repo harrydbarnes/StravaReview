@@ -30,14 +30,16 @@ def verify_landing(page, name):
 
 if __name__ == "__main__":
     with sync_playwright() as p:
-        # Desktop
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 1280, "height": 800})
-        verify_landing(page, "desktop")
-        browser.close()
+        try:
+            # Desktop
+            page = browser.new_page(viewport={"width": 1280, "height": 800})
+            verify_landing(page, "desktop")
+            page.close()
 
-        # Mobile (iPhone 12/13/14ish dimensions)
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
-        verify_landing(page, "mobile")
-        browser.close()
+            # Mobile (iPhone 12/13/14ish dimensions)
+            page = browser.new_page(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+            verify_landing(page, "mobile")
+            page.close()
+        finally:
+            browser.close()

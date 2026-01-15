@@ -1,81 +1,57 @@
-
-import re
-import sys
 from playwright.sync_api import sync_playwright, expect
+import time
 
-def verify_frontend():
+def run():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 375, "height": 800})
-        page = context.new_page()
+        page = browser.new_page()
 
-        print("Navigating...", flush=True)
+        # Navigate to the app
+        # Note: The base URL might need to be adjusted if vite config defines a base.
+        # The grep output showed http://localhost:5173/StravaReview/
         page.goto("http://localhost:5173/StravaReview/")
 
-        print("Clicking Demo...", flush=True)
-        page.get_by_text("Try Demo Mode").click()
-
-        page.wait_for_timeout(3000)
-
-        print("Starting Story...", flush=True)
-        page.get_by_text("Start the Show").click()
-        page.wait_for_timeout(1000)
-
-        # Helper for next slide
-        def next_slide():
-            # Use the dedicated click zone for next slide
-            page.get_by_test_id("click-next").click(force=True)
-            # Wait for transition to complete (animations usually take ~0.5s)
-            page.wait_for_timeout(500)
-
-        found_colour = False
-        found_shortest = False
-
-        # Take a screenshot of the controls immediately to verify "Colour" text
-        print("Verifying Controls...", flush=True)
-        # Assuming Controls are visible on first slide or soon after
-        # On mobile layout, they are inside.
-        page.wait_for_timeout(1000)
-        page.screenshot(path="verification/controls_check.png")
-
-        # Check text content for "Colour"
-        content = page.content()
-        if "Colour" in content:
-            print("Found 'Colour' button text", flush=True)
-            found_colour = True
+        # 1. Verify body background color style
+        # The user requested: <body ... style="background-color: #000000;">
+        body = page.locator("body")
+        # Playwright might normalize style strings, so we check if it contains the color
+        style_attr = body.get_attribute("style")
+        if "background-color: #000000" in style_attr or "background-color: rgb(0, 0, 0)" in style_attr:
+             print(f"Verified body background-color style: {style_attr}")
         else:
-            print("Did NOT find 'Colour' button text", flush=True)
+             print(f"FAILURE: Body style not correct. Found: {style_attr}")
+             exit(1)
 
-        # Search for Shortest Activity slide to verify hint
-        for i in range(25):
-            print(f"Checking slide {i}...", flush=True)
+        # 2. Verify Client ID input does not have autofocus
+        # Wait for the input to appear (it might be inside Suspense or conditionally rendered)
+        client_id_input = page.locator("#client-id")
+        try:
+            expect(client_id_input).to_be_visible(timeout=10000)
+        except Exception as e:
+             print(f"FAILURE: Client ID input not found or not visible. Error: {e}")
+             # Capture screenshot for debug
+             page.screenshot(path="verification/debug_failure.png")
+             exit(1)
 
-            # Ensure page content is loaded and available for other checks
-            text_content = page.evaluate("document.body.innerText")
+        # Check if it is focused.
+        # React's autoFocus happens on mount.
+        # We wait a brief moment to be sure.
+        time.sleep(1)
 
-            if not found_shortest:
-                try:
-                    # Wait up to 2 seconds for the slide title to appear
-                    expect(page.get_by_text("What was this one, btw?")).to_be_visible(timeout=2000)
-                    print("Found 'Shortest Activity' slide", flush=True)
+        is_focused = page.evaluate("document.activeElement === document.getElementById('client-id')")
 
-                    # Wait up to 4 seconds for the hint to appear (it has a delay)
-                    expect(page.get_by_text("Click twice to open!", exact=False)).to_be_visible(timeout=4000)
-                    print("Found 'Click twice' hint!", flush=True)
-                    page.screenshot(path="verification/shortest_hint.png")
+        if is_focused:
+            print("FAILURE: Client ID input is focused!")
+            page.screenshot(path="verification/focus_failure.png")
+            exit(1)
+        else:
+            print("Verified Client ID input is NOT focused.")
 
-                    found_shortest = True
-                except TimeoutError:
-                    # Not found, continue
-                    pass
-
-            if found_colour and found_shortest:
-                print("Found all target elements!", flush=True)
-                break
-
-            next_slide()
+        # Take screenshot
+        page.screenshot(path="verification/verification.png")
+        print("Screenshot saved to verification/verification.png")
 
         browser.close()
 
 if __name__ == "__main__":
-    verify_frontend()
+    run()

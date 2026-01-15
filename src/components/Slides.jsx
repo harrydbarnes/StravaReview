@@ -73,13 +73,14 @@ const CountUp = ({ value, label, delay = 0 }) => {
     );
 };
 
-export const SlideContainer = ({ children, textColor, className, smallPadding = false }) => (
+export const SlideContainer = ({ children, textColor, className, smallPadding = false, centerContent = false }) => (
   <div className={clsx(
-      "w-full h-full flex flex-col px-6 pb-safe items-center justify-start text-center",
+      "w-full h-full flex flex-col px-6 pb-safe items-center text-center",
       smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32",
+      centerContent ? "justify-center" : "justify-start",
       className
   )}>
-    <div className={clsx(textColor, "w-full h-full flex flex-col items-center justify-start relative")}>
+    <div className={clsx(textColor, "w-full h-full flex flex-col items-center relative", centerContent ? "justify-center" : "justify-start")}>
         {children}
     </div>
   </div>
@@ -93,7 +94,7 @@ const BaseContentClass = "flex-1 flex flex-col justify-start w-full items-center
 export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   return (
     <SlideContainer textColor={textColor}>
-        <div className={clsx(BaseContentClass, "pt-12")}>
+        <div className={clsx(BaseContentClass, "pt-24")}>
             <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -126,7 +127,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className={clsx(BaseContentClass, "pt-8")}>
+        <div className={clsx(BaseContentClass, "pt-12 gap-12")}>
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -177,7 +178,7 @@ export const OlympicsSlide = React.memo(function OlympicsSlide({ data, textColor
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>LA 2028 Calling?</h2>
 
-            <div className="flex-1 flex flex-col justify-center w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-4 w-full items-center">
                 <div className="flex flex-col gap-6 w-full max-w-lg">
                     {displayStats.map((stat, idx) => (
                         <motion.div
@@ -212,7 +213,7 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
     if (!data.shortestActivity) return null;
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>What Was This One, BTW?</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
@@ -312,7 +313,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>The Fuel Tank</h2>
 
-        <div className={clsx(BaseContentClass, "pt-8")}>
+        <div className={clsx(BaseContentClass, "pt-8 justify-evenly")}>
             <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -322,7 +323,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
                 🍕
             </motion.div>
 
-            <div className="flex flex-col gap-4 text-xl font-bold">
+            <div className="flex flex-col gap-8 text-xl font-bold">
                 <motion.p
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -347,7 +348,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
 
 export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
     return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Consistent Cruiser</h2>
 
         <div className={clsx(BaseContentClass, "pt-8")}>
@@ -393,7 +394,7 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
 
 export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
     return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Need for Speed</h2>
 
         <div className="flex-1 flex flex-col justify-center w-full items-center">
@@ -434,7 +435,7 @@ export const SlowestSlide = React.memo(function SlowestSlide({ data, textColor }
     if (!data.speed.slowestActivity) return null;
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Slow and Steady Wins... a Race</h2>
 
             <div className="flex-1 flex flex-col justify-center w-full items-center">
@@ -496,7 +497,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
     const peakHour = hourly.indexOf(Math.max(...hourly));
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Clockwatcher</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
@@ -577,7 +578,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
     });
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>The Weekly Grind</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
@@ -638,7 +639,7 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
     const formattedKudosRatio = parseFloat(data.kudosRatio).toString();
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>The Social Butterfly</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
@@ -667,7 +668,7 @@ export const KudosSlide = React.memo(function KudosSlide({ data, textColor }) {
 
 export const NewActivitySlide = React.memo(function NewActivitySlide({ data, textColor }) {
   return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
           <h2 className={HeaderClass}>You Tried Something New</h2>
           <div className={clsx(BaseContentClass, "pt-8", "pb-24")}>
               <motion.div
@@ -714,7 +715,7 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
     }
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Your Favourite Playground</h2>
             <div className={clsx(BaseContentClass, "pt-8")}>
                 <motion.div
@@ -957,7 +958,7 @@ export const SummarySlide = React.memo(function SummarySlide({ data, theme, text
                 </div>
             </div>
 
-            <div className="flex flex-col items-center mt-4 z-50 pointer-events-auto">
+            <div className="flex flex-col items-center mt-4 mb-8 z-50 pointer-events-auto">
                 {shareError && (
                     <p role="alert" className="text-red-500 font-bold mb-2 text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
                         {shareError}
@@ -984,8 +985,8 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Your Top Sports</h2>
-        <div className="flex-1 flex flex-col justify-center w-full items-center">
-            <div className="w-full max-w-md space-y-4">
+        <div className="flex-1 flex flex-col justify-start pt-4 w-full items-center">
+            <div className="w-full max-w-md space-y-2">
                 {data.topSports.map((sport, idx) => (
                     <motion.div
                         key={sport.type}
@@ -1013,7 +1014,7 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
 // 2. FUN STATS (Time Comparison) SLIDE
 export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, textColor }) {
     return (
-      <SlideContainer textColor={textColor}>
+      <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
         <div className={clsx(BaseContentClass, "pt-8")}>
@@ -1060,7 +1061,7 @@ export const SpotlightSlide = React.memo(function SpotlightSlide({ data, textCol
     if (!activity) return null;
 
     return (
-        <SlideContainer textColor={textColor}>
+        <SlideContainer textColor={textColor} centerContent={true}>
             <motion.div
                 initial={{ opacity: 0, scale: 0, rotate: 0 }}
                 animate={{ opacity: 1, scale: 1, rotate: 6 }}

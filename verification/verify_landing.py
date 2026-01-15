@@ -10,7 +10,7 @@ def verify_landing(page, name):
     except Exception as e:
         print(f"Error clicking button: {e}")
         # Debug screenshot
-        page.screenshot(path=f"/home/jules/verification/debug_{name}.png")
+        page.screenshot(path=f"debug_{name}.png")
         raise e
 
     # Wait for the curtain text

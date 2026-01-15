@@ -27,8 +27,8 @@ def run():
         client_id_input = page.locator("#client-id")
         try:
             expect(client_id_input).to_be_visible(timeout=10000)
-        except:
-             print("FAILURE: Client ID input not found or not visible.")
+        except Exception as e:
+             print(f"FAILURE: Client ID input not found or not visible. Error: {e}")
              # Capture screenshot for debug
              page.screenshot(path="verification/debug_failure.png")
              exit(1)

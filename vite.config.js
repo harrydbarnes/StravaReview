@@ -10,8 +10,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Keep React core separate if you want, but allow others to split naturally
-          vendor: ['react', 'react-dom'],
+          // Group React core libraries into a separate chunk for better caching.
+          'react-vendor': ['react', 'react-dom'],
           // Keep framer separated as it is heavy
           framer: ['framer-motion']
         }

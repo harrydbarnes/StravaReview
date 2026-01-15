@@ -14,12 +14,12 @@
     <div id="root"></div>
     <script>
       (function() {
-        var ua = window.navigator.userAgent;
-        var isIphone = /iPhone/.test(ua);
-        var isSafari = /Safari/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua);
+        const ua = window.navigator.userAgent;
+        const isIphone = /iPhone/.test(ua);
+        const isSafari = /Safari/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua);
 
         if (isIphone && isSafari) {
-          var root = document.getElementById('root');
+          const root = document.getElementById('root');
           root.innerHTML = `
             <div style="
               height: 100vh;

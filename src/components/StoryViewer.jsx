@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Pause, Play } from 'lucide-react';
 import clsx from 'clsx';
 import ProgressBars from './ProgressBars';
 
@@ -18,6 +18,9 @@ const KEYBOARD_KEYS = {
     SPACE: ' ',
     SPACEBAR: 'Spacebar',
 };
+
+const TAP_ZONE_PREV_BOUNDARY = 0.25;
+const TAP_ZONE_NEXT_BOUNDARY = 0.75;
 
 const stopSourceNode = (sourceRef, name) => {
     if (sourceRef.current) {
@@ -373,9 +376,15 @@ const StoryViewer = ({ slides, onClose }) => {
     const x = e.clientX - rect.left;
     const width = rect.width;
 
-    if (x < width * 0.25) handlePrev();
-    else handleNext();
-    // Note: Pause is best handled by long-press, but simple tap is fine for now.
+    if (x < width * TAP_ZONE_PREV_BOUNDARY) {
+        handlePrev();
+    } else if (x > width * TAP_ZONE_NEXT_BOUNDARY) {
+        handleNext();
+        // Resume auto-play if tapping next
+        if (isPaused) setIsPaused(false);
+    } else {
+        togglePause();
+    }
   };
 
   const CurrentSlideData = slides[currentIndex];
@@ -474,7 +483,7 @@ const StoryViewer = ({ slides, onClose }) => {
                     </p>
                     <button
                         onClick={handleStart}
-                        className="px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
+                        className="mt-12 px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
                     >
                         Start the Show
                     </button>
@@ -512,26 +521,46 @@ const StoryViewer = ({ slides, onClose }) => {
             </div>
         )}
 
-        {/* Tap Indicators (First Slide Only) */}
+        {/* Tap Indicators & Pause Button (First Slide Only) */}
         {currentIndex === 0 && (
-          <div className="absolute inset-0 pointer-events-none z-40 flex justify-between items-center px-4">
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: [0, 0.5, 0], x: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className={clsx("p-2 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
-            >
-              <ChevronLeft size={24} />
-            </motion.div>
+          <div className="absolute inset-0 pointer-events-none z-40 flex flex-col justify-between">
+            {/* Arrows */}
+            <div className="flex-1 flex justify-between items-center px-4">
+                <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: [0, 1, 0], x: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className={clsx("p-4 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
+                >
+                <ChevronLeft size={32} />
+                </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: [0, 0.5, 0], x: [0, 5, 0] }}
-              transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-              className={clsx("p-2 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
-            >
-              <ChevronRight size={24} />
-            </motion.div>
+                <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: [0, 1, 0], x: [0, 10, 0] }}
+                transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
+                className={clsx("p-4 rounded-full backdrop-blur-sm", theme === 'white' ? 'bg-black/10 text-black' : 'bg-white/10 text-white')}
+                >
+                <ChevronRight size={32} />
+                </motion.div>
+            </div>
+
+            {/* Large Pause Button Hint */}
+            <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto">
+                 <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        togglePause();
+                    }}
+                    className={clsx(
+                        "mb-8 px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 backdrop-blur-md shadow-lg transition-all active:scale-95",
+                         theme === 'white' ? 'bg-black/10 text-black hover:bg-black/20' : 'bg-white/20 text-white hover:bg-white/30'
+                    )}
+                 >
+                     {isPaused ? <Play size={24} fill="currentColor" /> : <Pause size={24} fill="currentColor" />}
+                     {isPaused ? "RESUME" : "PAUSE"}
+                 </button>
+            </div>
           </div>
         )}
 

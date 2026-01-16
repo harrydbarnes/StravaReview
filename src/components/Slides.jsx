@@ -391,9 +391,14 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
                     >
                          <p className="text-sm font-bold uppercase opacity-70 mb-2">Predicted Marathon Time</p>
                          <p className="text-3xl font-black mb-2">{data.averagePace.marathon.time}</p>
-                         <p className="opacity-80 text-sm">
+                         <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: DRAMATIC_DELAY + 1.5 }}
+                            className="opacity-80 text-sm"
+                         >
                             That&apos;s <span className="font-bold text-brand-orange">{data.averagePace.marathon.percentSlower}%</span> slower than Mo Farah.
-                         </p>
+                         </motion.p>
                     </motion.div>
                 )}
 
@@ -549,7 +554,7 @@ export const HeatmapSlide = React.memo(function HeatmapSlide({ data, theme, text
                     className="mt-6"
                 >
                     <p className="text-2xl font-bold">
-                        You are most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>{peakHour}:00</span>
+                        You were most active at <span className={clsx("text-4xl block my-2", theme.bg === 'bg-brand-orange' ? "text-white" : "")}>{peakHour}:00</span>
                     </p>
                 </motion.div>
 
@@ -590,6 +595,18 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
     indexedDaily.slice(0, 3).forEach((item, rank) => {
         if (item.val > 0) rankMap[item.i] = rank;
     });
+
+    const topDayIndex = indexedDaily[0].i;
+    const comments = {
+        0: "Mondays don't look forward to you!",
+        1: "Tuesday? You're definitely not a procrastinator.",
+        2: "Peak of the week. Literally.",
+        3: "Almost the weekend. Push through!",
+        4: "Leaving work early? We won't tell.",
+        5: "Too busy in the week, mhmm?",
+        6: "Saving the best for last, I see."
+    };
+    const comment = comments[topDayIndex];
 
     return (
         <SlideContainer textColor={textColor} centerContent={true}>
@@ -643,6 +660,19 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
                 >
                     Your week in motion.
                 </motion.p>
+
+                {comment && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: DRAMATIC_DELAY + 0.5 }}
+                        className="bg-white/10 backdrop-blur-md p-6 rounded-2xl max-w-sm mt-8"
+                    >
+                        <p className="text-lg md:text-xl font-medium leading-relaxed">
+                            &quot;{comment}&quot;
+                        </p>
+                    </motion.div>
+                )}
             </div>
         </SlideContainer>
     );
@@ -1028,32 +1058,43 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
 // 2. FUN STATS (Time Comparison) SLIDE
 export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, textColor }) {
     return (
-      <SlideContainer textColor={textColor} centerContent={true}>
+      <SlideContainer textColor={textColor} centerContent={false}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
-            <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
+        <div className="flex-1 flex flex-col w-full items-center justify-between pb-safe md:pb-12">
+
+            {/* Middle Section: Box Centered in remaining space */}
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: DRAMATIC_DELAY - 1 }}
-                    className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
+                    className="p-6 border-2 border-current rounded-2xl relative overflow-hidden w-full max-w-lg"
                 >
                     <div className="relative z-10">
                         <p className="text-lg opacity-80 mb-2">You moved for</p>
                         <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
-                        <p className="text-lg font-medium">
-                            That&apos;s like listening to <br/>
-                            <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
-                            <span className={clsx("text-4xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.funComparisons.song.count}</span> times! 💃
-                        </p>
                     </div>
+                </motion.div>
+            </div>
+
+            {/* Bottom Section: Comparisons */}
+            <div className="flex flex-col gap-6 w-full max-w-lg items-center">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY }}
+                    className="text-lg font-medium"
+                >
+                    That&apos;s like listening to <br/>
+                    <span className="font-black italic">&quot;{data.funComparisons.song.title}&quot;</span> <br/>
+                    <span className={clsx("text-4xl font-bold", theme.bg === 'bg-brand-orange' ? "text-white" : "text-brand-orange")}>{data.funComparisons.song.count}</span> times! 💃
                 </motion.div>
 
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY }}
+                    transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY + 0.5 }}
                     className="flex items-center justify-center gap-4"
                 >
                     <span className="text-4xl">🎬</span>

@@ -604,7 +604,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
         3: "Almost the weekend. Push through!",
         4: "Leaving work early? We won't tell.",
         5: "Too busy in the week, mhmm?",
-        6: "Too busy in the week, mhmm?"
+        6: "Saving the best for last, I see."
     };
     const comment = comments[topDayIndex];
 

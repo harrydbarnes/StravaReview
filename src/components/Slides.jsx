@@ -597,9 +597,16 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
     });
 
     const topDayIndex = indexedDaily[0].i;
-    let comment = null;
-    if (topDayIndex === 0) comment = "Monday's don't look forward to you!";
-    else if (topDayIndex === 5 || topDayIndex === 6) comment = "Too busy in the week, mhmm?";
+    const comments = {
+        0: "Monday's don't look forward to you!",
+        1: "Tuesday? You're definitely not a procrastinator.",
+        2: "Peak of the week. Literally.",
+        3: "Almost the weekend. Push through!",
+        4: "Leaving work early? We won't tell.",
+        5: "Too busy in the week, mhmm?",
+        6: "Too busy in the week, mhmm?"
+    };
+    const comment = comments[topDayIndex];
 
     return (
         <SlideContainer textColor={textColor} centerContent={true}>

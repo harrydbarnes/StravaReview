@@ -1051,23 +1051,28 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
 // 2. FUN STATS (Time Comparison) SLIDE
 export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, textColor }) {
     return (
-      <SlideContainer textColor={textColor} centerContent={true}>
+      <SlideContainer textColor={textColor} centerContent={false}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
-            <div className="grid grid-cols-1 gap-8 w-full max-w-lg">
+        <div className="flex-1 flex flex-col w-full items-center justify-between pb-safe md:pb-12">
+
+            {/* Middle Section: Box Centered in remaining space */}
+            <div className="flex-1 flex flex-col justify-center w-full items-center">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: DRAMATIC_DELAY - 1 }}
-                    className="p-6 border-2 border-current rounded-2xl relative overflow-hidden"
+                    className="p-6 border-2 border-current rounded-2xl relative overflow-hidden w-full max-w-lg"
                 >
                     <div className="relative z-10">
                         <p className="text-lg opacity-80 mb-2">You moved for</p>
                         <p className="text-5xl font-black mb-4">{data.totalHours} Hours</p>
                     </div>
                 </motion.div>
+            </div>
 
+            {/* Bottom Section: Comparisons */}
+            <div className="flex flex-col gap-6 w-full max-w-lg items-center">
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}

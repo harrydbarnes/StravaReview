@@ -598,7 +598,7 @@ export const WeeklyPatternSlide = React.memo(function WeeklyPatternSlide({ data,
 
     const topDayIndex = indexedDaily[0].i;
     const comments = {
-        0: "Monday's don't look forward to you!",
+        0: "Mondays don't look forward to you!",
         1: "Tuesday? You're definitely not a procrastinator.",
         2: "Peak of the week. Literally.",
         3: "Almost the weekend. Push through!",

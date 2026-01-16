@@ -545,7 +545,7 @@ const StoryViewer = ({ slides, onClose }) => {
             </div>
         )}
 
-        {/* Tap Indicators & Pause Button (First Slide Only) */}
+        {/* Tap Indicators (First Slide Only) */}
         {currentIndex === 0 && (
           <div className="absolute inset-0 pointer-events-none z-40 flex flex-col justify-between">
             {/* Arrows */}
@@ -572,8 +572,12 @@ const StoryViewer = ({ slides, onClose }) => {
                 <ChevronRight size={32} />
                 </motion.div>
             </motion.div>
+          </div>
+        )}
 
-            {/* Large Pause Button Hint */}
+        {/* Large Pause Button Hint (All slides except last) */}
+        {currentIndex < slides.length - 1 && (
+          <div className="absolute inset-0 pointer-events-none z-40 flex flex-col justify-end">
             <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto relative">
                  {/* Trigger Zone to bring back the button */}
                  <div

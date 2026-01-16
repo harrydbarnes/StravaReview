@@ -9,6 +9,7 @@ jest.mock('framer-motion', () => ({
     h1: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
     h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
     p: ({ children, ...props }) => <p {...props}>{children}</p>,
+    button: ({ children, ...props }) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }) => <>{children}</>,
   animate: jest.fn(() => ({ stop: jest.fn() })),

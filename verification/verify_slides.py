@@ -17,7 +17,7 @@ def verify_slides():
 
             # Wait for Curtain
             print("Waiting for Curtain...")
-            page.wait_for_timeout(2000)
+            page.get_by_role("button", name="Start the Show").wait_for(state="visible")
 
             # Click "Start the Show"
             print("Clicking Start the Show...")

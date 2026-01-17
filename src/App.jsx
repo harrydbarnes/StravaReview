@@ -205,9 +205,9 @@ function App() {
 
             // Mock athlete profile
             result.athlete = {
-                username: 'DemoUser',
-                firstname: 'Demo',
-                lastname: 'Runner',
+                username: 'Leroy Jenkins',
+                firstname: 'Leroy',
+                lastname: 'Jenkins',
                 city: 'San Francisco',
                 country: 'United States'
             };

@@ -867,7 +867,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className={HeaderClass} style={{ fontFamily: 'cursive, sans-serif' }}>Peak Performance Months</h2>
+            <h2 className={clsx(HeaderClass, "font-handwriting")}>Peak Performance Months</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6 mb-8">

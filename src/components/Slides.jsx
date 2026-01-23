@@ -126,7 +126,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center gap-8">
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center gap-8">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -866,7 +866,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className={clsx(HeaderClass, "font-marker")}>Peak Performance Months</h2>
+            <h2 className={HeaderClass}>Peak Performance Months</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6 mb-8">
@@ -1081,7 +1081,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col w-full items-center justify-start gap-8 pt-8 pb-safe md:pb-12">
+        <div className="flex-1 flex flex-col w-full items-center justify-evenly gap-8 pb-safe md:pb-12">
 
             {/* Middle Section: Box Centered in remaining space */}
             <div className="flex flex-col justify-center w-full items-center">
@@ -1115,9 +1115,9 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY + 0.5 }}
-                    className="flex items-center justify-center gap-4"
+                    className="flex items-start justify-center gap-4 text-left px-4"
                 >
-                    <span className="text-4xl">🎬</span>
+                    <span className="text-4xl mt-1">🎬</span>
                     <p className="text-xl">
                         Or watching <span className="font-bold">{data.funComparisons.movie.title}</span> <span className="font-bold">{data.funComparisons.movie.count}</span> times.
                     </p>

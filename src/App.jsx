@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import { generateMockActivities, analyzeData } from './utils/dataProcessor';
 import { getAuthUrl, exchangeToken, fetchActivities, fetchAthlete } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
@@ -239,7 +240,18 @@ function App() {
       {!started ? (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Background accent */}
-            <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none" />
+            <motion.div
+                animate={{
+                    top: ['-20%', '60%', '60%', '-20%', '-20%'],
+                    left: ['60%', '60%', '-20%', '-20%', '60%'],
+                }}
+                transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                }}
+                className="absolute w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none"
+            />
 
             <div className="z-10 w-full max-w-md flex flex-col items-center text-center">
             <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">

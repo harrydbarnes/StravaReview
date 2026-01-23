@@ -126,7 +126,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center gap-8">
+        <div className="flex-1 flex flex-col justify-start pt-8 w-full items-center gap-8">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -185,7 +185,7 @@ export const OlympicsSlide = React.memo(function OlympicsSlide({ data, textColor
         <SlideContainer textColor={textColor}>
             <h2 className={HeaderClass}>LA 2028 Calling?</h2>
 
-            <div className="flex-1 flex flex-col justify-evenly w-full items-center">
+            <div className="flex-1 flex flex-col justify-start pt-8 gap-8 w-full items-center">
                 <div className="flex flex-col gap-6 w-full max-w-lg">
                     {displayStats.map((stat, idx) => (
                         <motion.div
@@ -320,7 +320,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Fuel Tank</h2>
 
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 gap-8 w-full items-center">
             <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -359,7 +359,7 @@ export const PaceSlide = React.memo(function PaceSlide({ data, textColor }) {
         <h2 className={HeaderClass}>The Consistent Cruiser</h2>
 
         <div className={clsx(BaseContentClass, "pt-8")}>
-            <div className="flex-1 flex flex-col justify-evenly w-full max-w-md gap-4">
+            <div className="flex-1 flex flex-col justify-start w-full max-w-md gap-8">
                 {data.averagePace.run && (
                     <motion.div
                         initial={{ x: -50, opacity: 0 }}
@@ -424,7 +424,7 @@ export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Need for Speed</h2>
 
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center">
+        <div className="flex-1 flex flex-col justify-start pt-8 gap-8 w-full items-center">
             <motion.div
                 animate={{ x: [-10, 10, -10] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
@@ -722,7 +722,7 @@ export const NewActivitySlide = React.memo(function NewActivitySlide({ data, tex
   return (
       <SlideContainer textColor={textColor} centerContent={true}>
           <h2 className={HeaderClass}>You Tried Something New</h2>
-          <div className="flex-1 flex flex-col justify-center w-full items-center pt-8 pb-24">
+          <div className="flex-1 flex flex-col justify-start gap-8 w-full items-center pt-8 pb-24">
               <motion.div
                 initial={{ rotate: -10, scale: 0.8, opacity: 0 }}
                 animate={{ rotate: 0, scale: 1, opacity: 1 }}
@@ -769,7 +769,7 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
     return (
         <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Your Favourite Playground</h2>
-            <div className="flex-1 flex flex-col justify-evenly w-full items-center pt-8">
+            <div className="flex-1 flex flex-col justify-start gap-8 w-full items-center pt-8">
                 <motion.div
                     className="text-8xl md:text-9xl"
                     initial={{ scale: 0, rotate: -180, opacity: 0 }}
@@ -823,8 +823,7 @@ const CalendarIcon = ({ month, rank, delay = 0 }) => {
                                 initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
                                 animate={{ opacity: 1, scale: 1, rotate: -5 }}
                                 transition={{ delay: delay, duration: 0.4, type: "spring", bounce: 0.5 }}
-                                className="text-black font-black text-2xl tracking-tighter block transform -rotate-6"
-                                style={{ fontFamily: 'cursive, sans-serif' }} // Fallback to cursive for handwritten feel
+                                className="text-black font-marker text-2xl tracking-tighter block transform -rotate-6"
                             >
                                 {rankText}
                             </motion.span>
@@ -867,7 +866,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
 
     return (
         <SlideContainer textColor={textColor}>
-            <h2 className={clsx(HeaderClass, "font-handwriting")}>Peak Performance Months</h2>
+            <h2 className={clsx(HeaderClass, "font-marker")}>Peak Performance Months</h2>
 
             <div className={clsx(BaseContentClass, "pt-8")}>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-6 mb-8">
@@ -1082,7 +1081,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col w-full items-center justify-center gap-8 pb-safe md:pb-12">
+        <div className="flex-1 flex flex-col w-full items-center justify-start gap-8 pt-8 pb-safe md:pb-12">
 
             {/* Middle Section: Box Centered in remaining space */}
             <div className="flex flex-col justify-center w-full items-center">

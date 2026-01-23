@@ -402,7 +402,7 @@ const StoryViewer = ({ slides, onClose }) => {
         // Resume auto-play if tapping next
         if (isPaused) setIsPaused(false);
     } else {
-        togglePause();
+        // togglePause(); // User requested to only pause via the button
         resetPauseHintTimer();
     }
   };

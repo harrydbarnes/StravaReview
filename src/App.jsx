@@ -288,7 +288,7 @@ function App() {
                                         aria-haspopup="dialog"
                                         title="Get help with setup"
                                     >
-                                        <HelpCircle size={14} /> Help!
+                                        <HelpCircle size={14} /> Setup Help
                                     </button>
                                 </div>
                                 <input

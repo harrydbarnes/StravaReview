@@ -126,7 +126,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className="flex-1 flex flex-col justify-evenly w-full items-center gap-8">
+        <div className="flex-1 flex flex-col justify-start w-full items-center gap-8 pt-8">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -1081,7 +1081,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Time Well Spent</h2>
 
-        <div className="flex-1 flex flex-col w-full items-center justify-evenly gap-8 pb-safe md:pb-12">
+        <div className="flex-1 flex flex-col w-full items-center justify-start gap-8 pt-8 pb-safe md:pb-12">
 
             {/* Middle Section: Box Centered in remaining space */}
             <div className="flex flex-col justify-center w-full items-center">

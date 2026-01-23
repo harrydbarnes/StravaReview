@@ -27,6 +27,15 @@ function App() {
   const [clientSecret, setClientSecret] = useState(import.meta.env.VITE_STRAVA_CLIENT_SECRET || '');
   const [needsCreds] = useState(!import.meta.env.VITE_STRAVA_CLIENT_ID);
 
+  // Track screen size for animation
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Audio ref for entry sound
   const entryAudioRef = useRef(null);
   const fadeIntervalRef = useRef(null);
@@ -242,8 +251,12 @@ function App() {
             {/* Background accent */}
             <motion.div
                 animate={{
-                    top: ['-20%', '60%', '60%', '-20%', '-20%'],
-                    left: ['60%', '60%', '-20%', '-20%', '60%'],
+                    // Rounded path (chamfered corners)
+                    // Start Top-Right-ish -> Turn -> Right -> Turn -> Bottom -> Turn -> Left -> Turn -> Top
+                    top:  ['-20%', '-20%', '0%',   '40%',  '60%',  '60%',  '40%',  '0%',   '-20%', '-20%'],
+                    left: isDesktop
+                        ? ['60%',  '80%',  '85%',  '85%',  '80%',  '0%',   '-20%', '-20%', '0%',   '60%']
+                        : ['40%',  '50%',  '60%',  '60%',  '50%',  '0%',   '-20%', '-20%', '0%',   '40%'],
                 }}
                 transition={{
                     duration: 20,

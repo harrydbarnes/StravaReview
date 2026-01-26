@@ -1115,7 +1115,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY + 0.5 }}
-                    className="flex flex-col items-center text-center px-4"
+                    className="flex flex-col items-center text-center px-4 gap-4"
                 >
                     <span className="text-4xl mt-1">🎬</span>
                     <p className="text-xl">

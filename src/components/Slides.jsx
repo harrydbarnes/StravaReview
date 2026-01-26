@@ -126,7 +126,7 @@ export const PercentSlide = React.memo(function PercentSlide({ data, theme, text
     return (
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>Life in Motion</h2>
-        <div className="flex-1 flex flex-col justify-start w-full items-center gap-8 pt-8">
+        <div className="flex-1 flex flex-col justify-evenly w-full items-center gap-8 pt-8">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -242,7 +242,7 @@ export const ShortestSlide = React.memo(function ShortestSlide({ data, textColor
                         onClick={(e) => e.stopPropagation()}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: DRAMATIC_DELAY }}
+                        transition={{ delay: DRAMATIC_DELAY - 0.5 }}
                         className="mb-8 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-bold uppercase tracking-wider backdrop-blur-sm transition-colors"
                     >
                         View on Strava
@@ -330,7 +330,7 @@ export const FuelSlide = React.memo(function FuelSlide({ data, textColor }) {
                 🍕
             </motion.div>
 
-            <div className="flex flex-col gap-8 text-xl font-bold">
+            <div className="flex flex-col gap-8 text-xl font-bold mt-12">
                 <motion.p
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
@@ -424,7 +424,7 @@ export const SpeedSlide = React.memo(function SpeedSlide({ data, textColor }) {
       <SlideContainer textColor={textColor} centerContent={true}>
         <h2 className={HeaderClass}>The Need for Speed</h2>
 
-        <div className="flex-1 flex flex-col justify-start pt-8 gap-8 w-full items-center">
+        <div className="flex-1 flex flex-col justify-evenly pt-8 gap-8 w-full items-center">
             <motion.div
                 animate={{ x: [-10, 10, -10] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
@@ -769,7 +769,7 @@ export const LocationSlide = React.memo(function LocationSlide({ data, textColor
     return (
         <SlideContainer textColor={textColor} centerContent={true}>
             <h2 className={HeaderClass}>Your Favourite Playground</h2>
-            <div className="flex-1 flex flex-col justify-start gap-8 w-full items-center pt-8">
+            <div className="flex-1 flex flex-col justify-evenly gap-8 w-full items-center pt-8">
                 <motion.div
                     className="text-8xl md:text-9xl"
                     initial={{ scale: 0, rotate: -180, opacity: 0 }}
@@ -885,7 +885,7 @@ export const TopMonthsSlide = React.memo(function TopMonthsSlide({ data, textCol
                                 key={stat.month}
                                 initial={{ scale: 0, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: DRAMATIC_DELAY + (idx * 0.05) }}
+                                transition={{ delay: DRAMATIC_DELAY - 1 + (idx * 0.05) }}
                                 className="flex flex-col items-center"
                             >
                                  <CalendarIcon month={stat.month} rank={rank} delay={writeDelay} />
@@ -1049,7 +1049,7 @@ export const TopSportsSlide = React.memo(function TopSportsSlide({ data, textCol
     return (
       <SlideContainer textColor={textColor}>
         <h2 className={HeaderClass}>Your Top Sports</h2>
-        <div className="flex-1 flex flex-col justify-start pt-4 w-full items-center">
+        <div className="flex-1 flex flex-col justify-center pb-20 pt-4 w-full items-center">
             <div className="w-full max-w-md space-y-2">
                 {data.topSports.map((sport, idx) => (
                     <motion.div
@@ -1115,7 +1115,7 @@ export const FunStatsSlide = React.memo(function FunStatsSlide({ data, theme, te
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: (DRAMATIC_DELAY - 1) + STAGGER_DELAY + 0.5 }}
-                    className="flex items-start justify-center gap-4 text-left px-4"
+                    className="flex flex-col items-center text-center px-4"
                 >
                     <span className="text-4xl mt-1">🎬</span>
                     <p className="text-xl">

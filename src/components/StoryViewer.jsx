@@ -373,7 +373,7 @@ const StoryViewer = ({ slides, onClose }) => {
     setShowPauseHint(true);
     pauseHintTimerRef.current = setTimeout(() => {
         setShowPauseHint(false);
-    }, 2000);
+    }, 5000);
   }, []);
 
   useEffect(() => {
@@ -467,8 +467,9 @@ const StoryViewer = ({ slides, onClose }) => {
                 <motion.div
                     className="absolute w-[500px] h-[500px] blur-3xl pointer-events-none"
                     animate={{
-                        x: ['-50%', '50%', '-30%', '20%'],
-                        y: ['-20%', '30%', '-50%', '10%'],
+                        x: ['-10%', '110%', '-50%', '50%'],
+                        y: ['-30%', '40%', '-60%', '20%'],
+                        scale: [1, 1.5, 0.8, 1.2],
                     }}
                     transition={{
                         duration: 10,

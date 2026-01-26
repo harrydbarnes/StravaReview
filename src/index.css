@@ -13,6 +13,9 @@
 }
 
 @layer utilities {
+  .font-marker {
+    font-family: 'Permanent Marker', cursive;
+  }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }

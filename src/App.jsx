@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import { generateMockActivities, analyzeData } from './utils/dataProcessor';
 import { getAuthUrl, exchangeToken, fetchActivities, fetchAthlete } from './utils/stravaApi';
 import { getCityFromCoords } from './utils/geocoder';
@@ -25,6 +26,15 @@ function App() {
   const [clientId, setClientId] = useState(import.meta.env.VITE_STRAVA_CLIENT_ID || '');
   const [clientSecret, setClientSecret] = useState(import.meta.env.VITE_STRAVA_CLIENT_SECRET || '');
   const [needsCreds] = useState(!import.meta.env.VITE_STRAVA_CLIENT_ID);
+
+  // Track screen size for animation
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Audio ref for entry sound
   const entryAudioRef = useRef(null);
@@ -205,9 +215,9 @@ function App() {
 
             // Mock athlete profile
             result.athlete = {
-                username: 'DemoUser',
-                firstname: 'Demo',
-                lastname: 'Runner',
+                username: 'Leroy Jenkins',
+                firstname: 'Leroy',
+                lastname: 'Jenkins',
                 city: 'San Francisco',
                 country: 'United States'
             };
@@ -239,7 +249,22 @@ function App() {
       {!started ? (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Background accent */}
-            <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none" />
+            <motion.div
+                animate={{
+                    // Rounded path (chamfered corners)
+                    // Start Top-Right-ish -> Turn -> Right -> Turn -> Bottom -> Turn -> Left -> Turn -> Top
+                    top:  ['-20%', '-20%', '0%',   '40%',  '60%',  '60%',  '40%',  '0%',   '-20%', '-20%'],
+                    left: isDesktop
+                        ? ['60%',  '80%',  '85%',  '85%',  '80%',  '0%',   '-20%', '-20%', '0%',   '60%']
+                        : ['40%',  '50%',  '60%',  '60%',  '50%',  '0%',   '-20%', '-20%', '0%',   '40%'],
+                }}
+                transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                }}
+                className="absolute w-[500px] h-[500px] bg-brand-orange/20 rounded-full blur-[128px] pointer-events-none"
+            />
 
             <div className="z-10 w-full max-w-md flex flex-col items-center text-center">
             <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
@@ -276,7 +301,7 @@ function App() {
                                         aria-haspopup="dialog"
                                         title="Get help with setup"
                                     >
-                                        <HelpCircle size={14} /> Help!
+                                        <HelpCircle size={14} /> Setup Help
                                     </button>
                                 </div>
                                 <input

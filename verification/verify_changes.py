@@ -1,84 +1,99 @@
-
 from playwright.sync_api import sync_playwright, expect
+import time
+import re
 
-def run(page):
-    print("Navigating to app...")
-    page.goto("http://localhost:5173/StravaReview/")
-
-    # 1. Enter Demo Mode
-    print("Clicking Demo Mode...")
-    page.get_by_text("Try Demo Mode").click()
-
-    # 2. Verify Intro Slide (LIFT THE CURTAIN)
-    print("Waiting for Curtain...")
-    heading = page.get_by_role("heading", name="LIFT THE CURTAIN ON YOUR YEAR")
-    expect(heading).to_be_visible(timeout=10000)
-
-    page.screenshot(path="verification/screenshot_1_curtain_initial.png")
-    print("Screenshot 1 taken: Curtain Initial")
-
-    # 3. Start Show to see Pause Button
-    print("Starting show...")
-    page.get_by_text("Start the Show").click()
-
-    # Wait for Curtain to exit (animation duration ~1.2s + delay)
-    # The pause button is on Slide 0.
-    # We should wait for the pause button to be visible.
-    print("Waiting for Pause Button...")
-    pause_btn = page.get_by_text("PAUSE")
-    expect(pause_btn).to_be_visible(timeout=10000)
-
-    print("Pause Button visible. Waiting 3 seconds for auto-hide...")
-    page.wait_for_timeout(3000)
-
-    # It should be hidden (moved down).
-    page.screenshot(path="verification/screenshot_2_pause_hidden.png")
-    print("Screenshot 2 taken: Pause Hidden")
-
-    # 4. Bring it back
-    print("Clicking Trigger Zone...")
-    # Trigger zone has role="button" aria-label="Show controls"
-    # It might be tricky if "click-next" overlay covers it?
-    # StoryViewer has:
-    # {hasStarted && <div className="absolute inset-0 z-10 flex pointer-events-none">...</div>}
-    # Pause Button container is z-40. Trigger Zone is z-0 relative to that container?
-    # Container: <div className="pb-safe md:pb-12 flex justify-center pointer-events-auto relative">
-    #   Trigger Zone: z-0
-    #   Button: z-10
-    # The Container is inside: <div className="absolute inset-0 pointer-events-none z-40 ...">
-    # So Trigger Zone is effectively z-40 context.
-    # The "click-next" overlay is z-10.
-    # So Trigger Zone (z-40) should be on top of click overlays (z-10).
-    # So it should be clickable.
-
-    page.get_by_role("button", name="Show controls").click()
-
-    # Wait for animation
-    page.wait_for_timeout(1000)
-    page.screenshot(path="verification/screenshot_3_pause_reshown.png")
-    print("Screenshot 3 taken: Pause Re-shown")
-
-    # 5. Go to PercentSlide
-    print("Navigating to PercentSlide...")
-    page.keyboard.press("ArrowRight")
-
-    # Wait for "Life in Motion"
-    expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible()
-
-    # Wait for content
-    page.wait_for_timeout(2000)
-
-    page.screenshot(path="verification/screenshot_4_percent_slide.png")
-    print("Screenshot 4 taken: PercentSlide")
-
-if __name__ == "__main__":
+def run():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 393, "height": 852}) # Pixel-ish mobile viewport
-        try:
-            run(page)
-        except Exception as e:
-            print(f"Error: {e}")
-            page.screenshot(path="verification/error_screenshot.png")
-        finally:
-            browser.close()
+        # Use mobile viewport to check responsive changes and scrolling
+        context = browser.new_context(viewport={"width": 375, "height": 667})
+        page = context.new_page()
+
+        print("Loading app...")
+        page.goto("http://localhost:5173/StravaReview/")
+
+        # Verify App.jsx scrolling class
+        print("Verifying App.jsx scrolling...")
+        root_div = page.locator("#root > div").first
+        class_attr = root_div.get_attribute("class")
+        if "overflow-y-auto" in class_attr:
+            print("SUCCESS: App.jsx has overflow-y-auto")
+        else:
+            print(f"FAILURE: App.jsx class is {class_attr}")
+
+        # Start Demo
+        print("Starting Demo...")
+        page.get_by_role("button", name="Try Demo Mode").click()
+
+        # Wait for "Start the Show"
+        start_btn = page.get_by_role("button", name="Start the Show")
+        expect(start_btn).to_be_visible(timeout=10000)
+
+        start_btn.click()
+        print("Started Show. Waiting for curtain...")
+
+        # Wait for Intro Slide
+        expect(page.get_by_role("heading", name="Your Year in Activity")).to_be_visible(timeout=10000)
+
+        def click_next_and_wait():
+            page.keyboard.press("ArrowRight")
+            # Subsequent expect() calls will handle waiting for the next slide.
+
+        # Move to Slide 1 (PercentSlide)
+        click_next_and_wait()
+        print("Checking PercentSlide...")
+        expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible()
+        page.screenshot(path="verification/slide_percent.png")
+
+        # Move to Slide 2 (Elevation)
+        click_next_and_wait()
+        expect(page.get_by_role("heading", name="The Climb")).to_be_visible()
+
+        # Move to Slide 3 (Fuel)
+        click_next_and_wait()
+        print("Checking FuelSlide...")
+        expect(page.get_by_role("heading", name="The Fuel Tank")).to_be_visible()
+        page.screenshot(path="verification/slide_fuel.png")
+
+        # Move to Slide 4 (TopSports)
+        click_next_and_wait()
+        print("Checking TopSportsSlide...")
+        expect(page.get_by_role("heading", name="Your Top Sports")).to_be_visible()
+        page.screenshot(path="verification/slide_topsports.png")
+
+        # Move to Slide 5 (Pace)
+        click_next_and_wait()
+        expect(page.get_by_role("heading", name="The Consistent Cruiser")).to_be_visible()
+
+        # Move to Slide 6 (Speed)
+        click_next_and_wait()
+        print("Checking SpeedSlide...")
+        expect(page.get_by_role("heading", name="The Need for Speed")).to_be_visible()
+        page.screenshot(path="verification/slide_speed.png")
+
+        # Navigate until FunStatsSlide ("Time Well Spent")
+        print("Searching for FunStatsSlide...")
+        found = False
+        for i in range(10): # Try next 10 slides
+             # Check for header
+             if page.get_by_role("heading", name="Time Well Spent").is_visible():
+                 print("Found FunStatsSlide!")
+                 found = True
+                 break
+             click_next_and_wait()
+
+        if found:
+            print("Found it! Pausing...")
+            page.keyboard.press("Space")
+            print("Waiting for animations...")
+            # We still need a sleep here because the animation is time-based inside the component
+            # and we want to capture the final state.
+            expect(page.get_by_text("Or watching", exact=False)).to_be_visible()
+            page.screenshot(path="verification/slide_funstats_padded.png")
+        else:
+            print("FunStatsSlide not found.")
+
+        browser.close()
+
+if __name__ == "__main__":
+    run()

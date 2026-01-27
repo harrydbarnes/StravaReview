@@ -245,7 +245,7 @@ function App() {
   );
 
   return (
-    <div className="h-[100dvh] w-full bg-black overflow-hidden overscroll-none touch-none text-white relative">
+    <div className="h-[100dvh] w-full bg-black overflow-y-auto overscroll-none touch-none text-white relative">
       {!started ? (
         <div className="w-full h-full flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Background accent */}

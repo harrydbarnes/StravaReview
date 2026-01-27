@@ -37,7 +37,7 @@ def run():
 
         def click_next_and_wait():
             page.keyboard.press("ArrowRight")
-            page.wait_for_timeout(500) # Small wait for animation start
+            # Subsequent expect() calls will handle waiting for the next slide.
 
         # Move to Slide 1 (PercentSlide)
         click_next_and_wait()

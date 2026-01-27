@@ -472,7 +472,7 @@ const StoryViewer = ({ slides, onClose }) => {
 
                 {/* Layer 2: The Spotlight */}
                 <motion.div
-                    className="absolute w-[300px] h-[300px] rounded-full blur-3xl pointer-events-none z-10"
+                    className="absolute w-[300px] h-[300px] rounded-full blur-md pointer-events-none z-10"
                     variants={{
                         idle: {
                             y: ['10%', '-30%'],
@@ -483,7 +483,7 @@ const StoryViewer = ({ slides, onClose }) => {
                             y: '-50%',
                             scale: 30,
                             opacity: 1,
-                            backgroundColor: '#FFFFFF'
+                            background: 'radial-gradient(circle, #FFFFFF 0%, #FFFFFF 100%)'
                         }
                     }}
                     initial="idle"
@@ -498,7 +498,7 @@ const StoryViewer = ({ slides, onClose }) => {
                     style={{
                         left: '50%',
                         top: '50%',
-                        backgroundColor: 'rgba(254, 249, 195, 0.6)'
+                        background: 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0) 70%)'
                     }}
                 />
 

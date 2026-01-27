@@ -498,7 +498,7 @@ const StoryViewer = ({ slides, onClose }) => {
                     style={{
                         left: '50%',
                         top: '50%',
-                        background: 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0) 70%)'
+                        background: 'radial-gradient(circle, rgba(255, 241, 186, 0.4) 0%, rgba(255, 241, 186, 0.2) 55%, rgba(255, 241, 186, 0) 70%)'
                     }}
                 />
 

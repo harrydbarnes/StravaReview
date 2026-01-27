@@ -31,45 +31,44 @@ def run():
 
         start_btn.click()
         print("Started Show. Waiting for curtain...")
-        time.sleep(3) # Wait for curtain exit
 
-        # We are on Slide 0 (Intro)
+        # Wait for Intro Slide
+        expect(page.get_by_role("heading", name="Your Year in Activity")).to_be_visible(timeout=10000)
 
-        def click_next():
-            # Click on the right side of the screen (viewport width 375)
-            # x=350, y=333 (center vertical)
-            page.mouse.click(350, 333)
-            time.sleep(1) # Wait for transition/animation start
+        def click_next_and_wait():
+            page.keyboard.press("ArrowRight")
+            page.wait_for_timeout(500) # Small wait for animation start
 
         # Move to Slide 1 (PercentSlide)
-        click_next()
+        click_next_and_wait()
         print("Checking PercentSlide...")
-        time.sleep(2)
+        expect(page.get_by_role("heading", name="Life in Motion")).to_be_visible()
         page.screenshot(path="verification/slide_percent.png")
 
         # Move to Slide 2 (Elevation)
-        click_next()
-        time.sleep(1)
+        click_next_and_wait()
+        expect(page.get_by_role("heading", name="The Climb")).to_be_visible()
 
         # Move to Slide 3 (Fuel)
-        click_next()
+        click_next_and_wait()
         print("Checking FuelSlide...")
-        time.sleep(2)
+        expect(page.get_by_role("heading", name="The Fuel Tank")).to_be_visible()
         page.screenshot(path="verification/slide_fuel.png")
 
         # Move to Slide 4 (TopSports)
-        click_next()
+        click_next_and_wait()
         print("Checking TopSportsSlide...")
-        time.sleep(2)
+        expect(page.get_by_role("heading", name="Your Top Sports")).to_be_visible()
         page.screenshot(path="verification/slide_topsports.png")
 
         # Move to Slide 5 (Pace)
-        click_next()
+        click_next_and_wait()
+        expect(page.get_by_role("heading", name="The Consistent Cruiser")).to_be_visible()
 
         # Move to Slide 6 (Speed)
-        click_next()
+        click_next_and_wait()
         print("Checking SpeedSlide...")
-        time.sleep(2)
+        expect(page.get_by_role("heading", name="The Need for Speed")).to_be_visible()
         page.screenshot(path="verification/slide_speed.png")
 
         # Navigate until FunStatsSlide ("Time Well Spent")
@@ -81,13 +80,14 @@ def run():
                  print("Found FunStatsSlide!")
                  found = True
                  break
-             click_next()
-             time.sleep(1)
+             click_next_and_wait()
 
         if found:
             print("Found it! Pausing...")
             page.keyboard.press("Space")
             print("Waiting for animations...")
+            # We still need a sleep here because the animation is time-based inside the component
+            # and we want to capture the final state.
             time.sleep(6)
             page.screenshot(path="verification/slide_funstats_padded.png")
         else:

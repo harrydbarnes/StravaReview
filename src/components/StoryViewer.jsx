@@ -592,9 +592,9 @@ const StoryViewer = ({ slides, onClose }) => {
                  />
 
                  <motion.button
-                    initial={{ y: 0 }}
-                    animate={{ y: showPauseHint ? 0 : 200 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    initial={{ y: 0, opacity: 1 }}
+                    animate={{ y: showPauseHint ? 0 : 200, opacity: showPauseHint ? 1 : 0 }}
+                    transition={{ duration: 0.5 }}
                     onClick={(e) => {
                         e.stopPropagation();
                         togglePause();

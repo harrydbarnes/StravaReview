@@ -73,10 +73,10 @@ const CountUp = ({ value, label, delay = 0 }) => {
     );
 };
 
-export const SlideContainer = ({ children, textColor, className, smallPadding = false, centerContent = false }) => (
+export const SlideContainer = ({ children, textColor, className, smallPadding = false, largePadding = false, centerContent = false }) => (
   <div className={clsx(
       "w-full h-full flex flex-col px-6 pb-safe items-center text-center",
-      smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32",
+      smallPadding ? "pt-[calc(5rem+env(safe-area-inset-top))] md:pt-24" : largePadding ? "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-32" : "pt-[calc(6rem+env(safe-area-inset-top))] md:pt-20",
       className
   )}>
     <div className={clsx(textColor, "w-full h-full flex flex-col items-center relative", centerContent ? "justify-center" : "justify-start")}>
@@ -92,7 +92,7 @@ const BaseContentClass = "flex-1 flex flex-col justify-start w-full items-center
 
 export const IntroSlide = React.memo(function IntroSlide({ data, textColor }) {
   return (
-    <SlideContainer textColor={textColor}>
+    <SlideContainer textColor={textColor} largePadding={true}>
         <div className={clsx(BaseContentClass, "pt-24")}>
             <motion.h1
             initial={{ y: 20, opacity: 0 }}

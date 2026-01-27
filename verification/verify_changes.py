@@ -88,7 +88,7 @@ def run():
             print("Waiting for animations...")
             # We still need a sleep here because the animation is time-based inside the component
             # and we want to capture the final state.
-            time.sleep(6)
+            expect(page.get_by_text("Or watching", exact=False)).to_be_visible()
             page.screenshot(path="verification/slide_funstats_padded.png")
         else:
             print("FunStatsSlide not found.")

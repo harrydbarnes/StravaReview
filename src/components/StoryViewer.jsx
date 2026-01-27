@@ -117,6 +117,7 @@ const StoryViewer = ({ slides, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [theme, setTheme] = useState('black');
   const [textColor, setTextColor] = useState('text-white');
   const [isMuted, setIsMuted] = useState(false);
@@ -332,12 +333,15 @@ const StoryViewer = ({ slides, onClose }) => {
 
   const togglePause = useCallback(() => setIsPaused(prev => !prev), []);
 
-  const handleStart = () => {
+  const handleStartSequence = () => {
       // Resume AudioContext if suspended (critical for iOS Safari)
       if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
           audioCtxRef.current.resume().catch(e => console.warn("Audio Context resume failed", e));
       }
-      setHasStarted(true);
+      setIsStarting(true);
+      setTimeout(() => {
+          setHasStarted(true);
+      }, 1500);
       // Removed playEntrySound() call here as it's moved to App.jsx
   };
 
@@ -455,50 +459,54 @@ const StoryViewer = ({ slides, onClose }) => {
                 }}
                 className="absolute inset-0 z-50 bg-black flex items-center justify-center flex-col text-center overflow-hidden"
             >
-                {/* Red Curtain Background */}
+                {/* Layer 1: Realistic Curtain Background */}
                 <div
-                    className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"
+                    className="absolute inset-0 z-0"
                     style={{
-                        background: 'repeating-linear-gradient(90deg, var(--color-red-950), var(--color-red-950) 20px, var(--color-red-900) 20px, var(--color-red-900) 40px)'
+                        backgroundImage: `
+                            radial-gradient(circle at 50% 50%, rgba(0,0,0,0.2), rgba(0,0,0,0.8)),
+                            repeating-linear-gradient(90deg, #450a0a 0px, #450a0a 20px, #7f1d1d 40px, #450a0a 60px)
+                        `,
                     }}
                 />
 
-                {/* Spotlight Animation */}
+                {/* Layer 2: The Spotlight */}
                 <motion.div
-                    className="absolute w-[500px] h-[500px] blur-3xl pointer-events-none"
-                    animate={{
-                        x: ['-10%', '110%', '-50%', '50%'],
-                        y: ['-30%', '40%', '-60%', '20%'],
-                        scale: [1, 1.5, 0.8, 1.2],
+                    className="absolute w-[300px] h-[300px] rounded-full blur-md pointer-events-none z-10"
+                    variants={{
+                        idle: {
+                            y: ['10%', '-30%'],
+                            x: ['-55%', '-45%', '-55%'],
+                        },
+                        blinding: {
+                            x: '-50%',
+                            y: '-50%',
+                            scale: 30,
+                            opacity: 1,
+                            background: 'radial-gradient(circle, #FFFFFF 0%, #FFFFFF 100%)'
+                        }
                     }}
+                    initial="idle"
+                    animate={isStarting ? "blinding" : "idle"}
                     transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut"
+                        idle: {
+                            y: { duration: 8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" },
+                            x: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                        },
+                        blinding: { duration: 1.2, ease: "easeInOut" }
                     }}
                     style={{
                         left: '50%',
                         top: '50%',
-                        background: 'radial-gradient(circle, rgba(254, 249, 195, 0.3) 0%, rgba(254, 249, 195, 0) 70%)'
+                        background: 'radial-gradient(circle, rgba(255, 241, 186, 0.4) 0%, rgba(255, 241, 186, 0.2) 55%, rgba(255, 241, 186, 0) 70%)'
                     }}
                 />
 
-                {/* Whiteout Effect (Flash) */}
+                {/* Layer 3: Content Container */}
                 <motion.div
-                    key="whiteout"
-                    variants={{
-                        initial: { opacity: 0 },
-                        exit: { opacity: 1, transition: { duration: 0.6 } }
-                    }}
-                    className="absolute inset-0 bg-white z-40 pointer-events-none"
-                />
-
-                <motion.div
-                    variants={{
-                        exit: { opacity: 0, transition: { duration: 0.3 } }
-                    }}
-                    className="relative z-50 p-8 flex flex-col items-center gap-10 md:gap-12"
+                    className="relative z-20 p-8 flex flex-col items-center gap-10 md:gap-12"
+                    animate={{ opacity: isStarting ? 0 : 1 }}
+                    transition={{ duration: 0.3 }}
                 >
                     <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight drop-shadow-2xl">
                         LIFT THE CURTAIN ON YOUR YEAR
@@ -507,7 +515,7 @@ const StoryViewer = ({ slides, onClose }) => {
                         Turn up the volume, sit back, and enjoy the show
                     </p>
                     <button
-                        onClick={handleStart}
+                        onClick={handleStartSequence}
                         className="px-10 py-5 bg-white text-red-900 text-xl font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-red-900/50"
                     >
                         Start the Show

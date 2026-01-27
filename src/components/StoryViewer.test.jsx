@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import StoryViewer from './StoryViewer';
 
 // Mock Framer Motion
@@ -78,5 +78,40 @@ describe('StoryViewer', () => {
 
         // This test mainly verifies that the component renders without crashing
         // and that controls are interactive.
+    });
+
+    describe('Intro Sequence', () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it('transitions from intro to slides after delay', async () => {
+            render(<StoryViewer slides={mockSlides} onClose={mockOnClose} />);
+
+            // Check Slide 1 is NOT visible yet
+            expect(screen.queryByText('Slide 1')).not.toBeInTheDocument();
+
+            const startButton = screen.getByText(/Start the Show/i);
+
+            // Click Start
+            await act(async () => {
+                fireEvent.click(startButton);
+            });
+
+            // Immediately after click, isStarting should be true, but hasStarted false.
+            expect(screen.queryByText('Slide 1')).not.toBeInTheDocument();
+
+            // Fast forward time by 1.5s
+            act(() => {
+                jest.advanceTimersByTime(1500);
+            });
+
+            // Now hasStarted should be true, and Slide 1 should be visible
+            expect(screen.getByText('Slide 1')).toBeInTheDocument();
+        });
     });
 });

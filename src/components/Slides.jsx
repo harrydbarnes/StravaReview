@@ -1150,7 +1150,7 @@ export const SpotlightSlide = React.memo(function SpotlightSlide({ data, textCol
                         initial={{ opacity: 0, scale: 0, rotate: 0 }}
                         animate={{ opacity: 1, scale: 1, rotate: 6 }}
                         transition={{ delay: 1.0 }}
-                        className="absolute -top-12 right-4"
+                        className="absolute -top-14 right-4"
                     >
                         <div className="bg-white text-black font-bold px-4 py-2 rounded-full shadow-lg">
                             🏆 Fan Favourite
